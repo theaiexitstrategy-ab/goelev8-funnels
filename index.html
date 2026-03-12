@@ -751,6 +751,123 @@ footer {
 .lead-success p { color: #9aabb8; font-size: 0.92rem; line-height: 1.65; margin-bottom: 28px; }
 .lead-success-actions { display: flex; flex-direction: column; gap: 10px; }
 
+/* ── TRY A LIVE DEMO BUTTON ── */
+.btn-demo-live {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  background: transparent; color: var(--green);
+  border: 2px solid var(--green);
+  padding: 16px 40px; border-radius: 8px;
+  font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem;
+  letter-spacing: 0.08em; cursor: pointer;
+  transition: transform 0.25s, box-shadow 0.25s, background 0.25s, color 0.25s;
+  position: relative; overflow: hidden;
+}
+.btn-demo-live:hover {
+  background: var(--green); color: var(--ink);
+  transform: translateY(-3px); box-shadow: 0 16px 48px rgba(0,232,154,0.25);
+}
+
+/* ── DEMO LEAD CAPTURE MODAL ── */
+.demo-lead-overlay {
+  position: fixed; inset: 0; z-index: 700;
+  background: rgba(8,10,15,0.94);
+  backdrop-filter: blur(14px);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.35s ease;
+  padding: 20px;
+}
+.demo-lead-overlay.open { opacity: 1; pointer-events: all; }
+.demo-lead-modal {
+  background: #131820;
+  border: 1px solid rgba(0,232,154,0.25);
+  border-radius: 24px;
+  padding: 48px 44px;
+  max-width: 520px; width: 100%;
+  position: relative;
+  transform: translateY(28px) scale(0.97);
+  transition: transform 0.4s cubic-bezier(0.16,1,0.3,1);
+  box-shadow: 0 0 100px rgba(0,232,154,0.08), 0 40px 80px rgba(0,0,0,0.5);
+  max-height: 90vh; overflow-y: auto;
+}
+.demo-lead-overlay.open .demo-lead-modal { transform: translateY(0) scale(1); }
+.demo-lead-modal::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, #00e89a 40%, #00d4ff 60%, transparent);
+  border-radius: 24px 24px 0 0;
+}
+.demo-lead-close {
+  position: absolute; top: 18px; right: 22px;
+  background: none; border: none; color: #6b7a92;
+  font-size: 1.3rem; cursor: pointer; transition: color 0.2s;
+  line-height: 1; padding: 4px; z-index: 1;
+}
+.demo-lead-close:hover { color: #f4f6fa; }
+.demo-lead-kicker {
+  font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em;
+  text-transform: uppercase; color: #00e89a; margin-bottom: 10px;
+}
+.demo-lead-modal h3 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2.2rem; line-height: 1; letter-spacing: 0.02em;
+  color: #f4f6fa; margin-bottom: 8px;
+}
+.demo-lead-modal h3 em { font-style: normal; color: #00e89a; }
+.demo-lead-modal .demo-lead-sub {
+  color: #9aabb8; font-size: 0.9rem; line-height: 1.6; margin-bottom: 28px;
+}
+.demo-lead-fields { display: flex; flex-direction: column; gap: 14px; margin-bottom: 24px; }
+.demo-lead-field { display: flex; flex-direction: column; gap: 6px; }
+.demo-lead-field label {
+  font-size: 0.78rem; font-weight: 600; color: #9aabb8;
+  letter-spacing: 0.04em; text-transform: uppercase;
+}
+.demo-lead-field input, .demo-lead-field select {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px; padding: 14px 16px;
+  color: #f4f6fa; font-family: 'Outfit', sans-serif;
+  font-size: 0.95rem; outline: none;
+  transition: border-color 0.2s, background 0.2s;
+  width: 100%;
+}
+.demo-lead-field input:focus, .demo-lead-field select:focus {
+  border-color: rgba(0,232,154,0.5);
+  background: rgba(0,232,154,0.04);
+}
+.demo-lead-field input::placeholder { color: #3d4f66; }
+.demo-lead-field select { appearance: none; cursor: pointer; }
+.demo-lead-field select option { background: #131820; color: #f4f6fa; }
+.demo-lead-btn {
+  display: block; width: 100%; padding: 16px;
+  background: #00e89a; color: #080a0f;
+  border: none; border-radius: 10px;
+  font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem;
+  letter-spacing: 0.08em; cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.demo-lead-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 36px rgba(0,232,154,0.3); }
+.demo-lead-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+.demo-lead-privacy {
+  text-align: center; font-size: 0.73rem;
+  color: #3d4f66; margin-top: 14px; line-height: 1.5;
+}
+.demo-lead-privacy span { color: #00e89a; }
+.demo-lead-success {
+  text-align: center; padding: 20px 0;
+}
+.demo-lead-success-icon { font-size: 3.5rem; margin-bottom: 20px; }
+.demo-lead-success h3 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2.2rem; color: #f4f6fa; margin-bottom: 12px; letter-spacing: 0.02em;
+}
+.demo-lead-success p { color: #9aabb8; font-size: 0.92rem; line-height: 1.65; margin-bottom: 28px; }
+
+@media (max-width: 640px) {
+  .demo-lead-modal { padding: 36px 24px; }
+  .btn-demo-live { width: 100%; padding: 14px 24px; font-size: 1rem; }
+}
+
 </style>
 </head>
 <body>
@@ -765,7 +882,7 @@ footer {
     <a href="#problem" class="nav-link">The Problem</a>
     <a href="#how" class="nav-link">How It Works</a>
     <a href="#pricing" class="nav-link">Pricing</a>
-    <a href="#" class="btn-nav" onclick="openDemo();return false;" style="font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:0.1em;">🎧 Try A Quick Demo</a>
+    <a href="https://portal.goelev8.ai" target="_blank" class="btn-nav" style="font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:0.1em;">Client Login</a>
   </div>
 </nav>
 
@@ -788,6 +905,9 @@ footer {
       Every missed call, slow follow-up, and unanswered website chat is <strong>real revenue walking out the door.</strong> GoElev8.AI plugs the leak with a 24/7 AI system that captures, qualifies, books, and closes — automatically.
     </p>
     <div class="hero-cta-group">
+      <button class="btn-demo-live" onclick="openDemoLead();return false;">
+        Try a Live Demo
+      </button>
       <a href="#" class="btn-hero" onclick="openLead();return false;">
         🚀 Stop the Leak — Activate My AI System
       </a>
@@ -1517,6 +1637,119 @@ function submitLead() {
 
   </div>
 </div>
+
+<!-- DEMO LEAD CAPTURE MODAL -->
+<div class="demo-lead-overlay" id="demoLeadOverlay" onclick="if(event.target===this)closeDemoLead()">
+  <div class="demo-lead-modal">
+    <button class="demo-lead-close" onclick="closeDemoLead()">&#x2715;</button>
+    <div class="demo-lead-kicker">&#9889; Live Demo</div>
+    <h3>Try a Live Demo<br><em>of Your AI System</em></h3>
+    <p class="demo-lead-sub">Fill in your details and we'll spin up a personalized demo for your business. You'll receive a text with access within minutes.</p>
+
+    <!-- FORM -->
+    <div id="demoLeadForm">
+      <div class="demo-lead-fields">
+        <div class="demo-lead-field">
+          <label>Full Name</label>
+          <input type="text" id="demoLeadName" placeholder="Your full name" autocomplete="name">
+        </div>
+        <div class="demo-lead-field">
+          <label>Email Address</label>
+          <input type="email" id="demoLeadEmail" placeholder="you@yourbusiness.com" autocomplete="email">
+        </div>
+        <div class="demo-lead-field">
+          <label>Phone Number</label>
+          <input type="tel" id="demoLeadPhone" placeholder="+1 (555) 000-0000" autocomplete="tel">
+        </div>
+        <div class="demo-lead-field">
+          <label>Business Name</label>
+          <input type="text" id="demoLeadBiz" placeholder="Your business name">
+        </div>
+        <div class="demo-lead-field">
+          <label>Industry</label>
+          <select id="demoLeadIndustry">
+            <option value="" disabled selected>Select your industry</option>
+            <option value="Home Services">Home Services</option>
+            <option value="Real Estate">Real Estate</option>
+            <option value="Healthcare">Healthcare</option>
+            <option value="Legal">Legal</option>
+            <option value="Financial Services">Financial Services</option>
+            <option value="Automotive">Automotive</option>
+            <option value="Fitness & Wellness">Fitness & Wellness</option>
+            <option value="Restaurant & Hospitality">Restaurant & Hospitality</option>
+            <option value="E-Commerce">E-Commerce</option>
+            <option value="Marketing & Agency">Marketing & Agency</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+      </div>
+      <button class="demo-lead-btn" onclick="submitDemoLead()">Get My Demo &#8594;</button>
+      <div class="demo-lead-privacy"><span>&#10003; No spam, ever.</span> Your info is used only to create your demo.</div>
+    </div>
+
+    <!-- SUCCESS -->
+    <div id="demoLeadSuccess" style="display:none;">
+      <div class="demo-lead-success">
+        <div class="demo-lead-success-icon">&#127881;</div>
+        <h3>Your demo is being created!</h3>
+        <p>We'll text you within minutes.</p>
+        <button onclick="closeDemoLead()" style="background:none;border:1px solid rgba(255,255,255,0.1);color:#9aabb8;cursor:pointer;font-family:'Outfit',sans-serif;font-size:0.85rem;padding:10px 28px;border-radius:8px;transition:color 0.2s;">Close</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ── DEMO LEAD CAPTURE MODAL ──
+function openDemoLead() {
+  document.getElementById('demoLeadOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  // Reset form state
+  document.getElementById('demoLeadForm').style.display = 'block';
+  document.getElementById('demoLeadSuccess').style.display = 'none';
+}
+function closeDemoLead() {
+  document.getElementById('demoLeadOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', function(e) { if(e.key==='Escape') closeDemoLead(); });
+
+function submitDemoLead() {
+  var name = document.getElementById('demoLeadName').value.trim();
+  var email = document.getElementById('demoLeadEmail').value.trim();
+  var phone = document.getElementById('demoLeadPhone').value.trim();
+  var biz = document.getElementById('demoLeadBiz').value.trim();
+  var industry = document.getElementById('demoLeadIndustry').value;
+
+  if (!name || !email || !phone || !biz || !industry) {
+    alert('Please fill in all fields to continue.');
+    return;
+  }
+  var emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  if (!emailOk) { alert('Please enter a valid email address.'); return; }
+
+  var payload = {
+    name: name,
+    email: email,
+    phone: phone,
+    business: biz,
+    industry: industry,
+    timestamp: new Date().toISOString(),
+    source: 'goelev8-live-demo-cta'
+  };
+
+  // POST to the same webhook endpoint used by the existing lead form
+  // TODO: Replace with your webhook/form endpoint e.g. Formspree, Make.com, or GoHighLevel
+  // fetch('https://your-webhook-url.com', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+  console.log('Demo lead captured:', payload);
+
+  // Show success
+  document.getElementById('demoLeadForm').style.display = 'none';
+  document.getElementById('demoLeadSuccess').style.display = 'block';
+}
+</script>
+
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 
 <style>
