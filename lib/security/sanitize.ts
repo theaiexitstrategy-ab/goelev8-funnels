@@ -20,6 +20,8 @@ export function sanitize(str: string): string {
     .replace(/'/g, '&#x27;');
 }
 
+export const phoneSchema = z.string().regex(/^\+?[\d\s\-().]{7,15}$/);
+
 export const funnelSubmitSchema = z.object({
   funnel_slug: z.string().min(1).max(100),
   full_name: z.string().min(1).max(100),
