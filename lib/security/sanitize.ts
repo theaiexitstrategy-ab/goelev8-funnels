@@ -11,6 +11,15 @@ export const signupSchema = z.object({
   prompt: z.string().max(2000).optional(),
 });
 
+export function sanitize(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;');
+}
+
 export const funnelSubmitSchema = z.object({
   funnel_slug: z.string().min(1).max(100),
   full_name: z.string().min(1).max(100),

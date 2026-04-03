@@ -1,12 +1,14 @@
 // lib/tiers.ts
 // (c) 2026 GoElev8.ai | Aaron Bryant. All rights reserved.
 
+export type Tier = 'trial' | 'launch' | 'grow' | 'scale' | 'cancelled';
+
 export const TIER_LIMITS = {
-  trial:     { leads_per_month: 25,   sms_enabled: true,  ai_calls: false, products: 0,  funnels: 1 },
-  launch:    { leads_per_month: 100,  sms_enabled: true,  ai_calls: false, products: 0,  funnels: 1 },
-  grow:      { leads_per_month: 500,  sms_enabled: true,  ai_calls: true,  products: 10, funnels: 3 },
-  scale:     { leads_per_month: 2000, sms_enabled: true,  ai_calls: true,  products: 50, funnels: 10 },
-  cancelled: { leads_per_month: 0,    sms_enabled: false, ai_calls: false, products: 0,  funnels: 0 },
+  trial:     { leads_per_month: 25,   sms_enabled: true,  ai_calls: false, ai_agent: false, products: 0,  funnels: 1 },
+  launch:    { leads_per_month: 100,  sms_enabled: true,  ai_calls: false, ai_agent: false, products: 0,  funnels: 1 },
+  grow:      { leads_per_month: 500,  sms_enabled: true,  ai_calls: true,  ai_agent: true,  products: 10, funnels: 3 },
+  scale:     { leads_per_month: 2000, sms_enabled: true,  ai_calls: true,  ai_agent: true,  products: 50, funnels: 10 },
+  cancelled: { leads_per_month: 0,    sms_enabled: false, ai_calls: false, ai_agent: false, products: 0,  funnels: 0 },
 } as const;
 
 export function getPlanFromPriceId(priceId: string): string {

@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{BUSINESS_NAME}} — {{HEADLINE}}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 400;
+      color: #1a1a2a;
+      background: #f8fffe;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 24px;
+      background: #fff;
+      border-bottom: 1px solid #e8e8e8;
+    }
+    nav .brand {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.4rem;
+      letter-spacing: 1px;
+      color: #1a1a2a;
+    }
+    nav .phone-link {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 500;
+      font-size: 0.95rem;
+      color: #1a1a2a;
+      text-decoration: none;
+      border: 1px solid #ddd;
+      border-radius: 2px;
+      padding: 6px 14px;
+      transition: background 0.2s, color 0.2s;
+    }
+    nav .phone-link:hover {
+      background: #36D986;
+      color: #000;
+      border-color: #36D986;
+    }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 100px 24px 60px;
+      background: #f8fffe;
+    }
+    .hero h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 5rem;
+      line-height: 1.05;
+      letter-spacing: 2px;
+      color: #1a1a2a;
+      max-width: 800px;
+      margin-bottom: 16px;
+    }
+    .hero .subheadline {
+      font-size: 1.15rem;
+      font-weight: 300;
+      color: #444;
+      max-width: 540px;
+      margin-bottom: 40px;
+      line-height: 1.6;
+    }
+
+    /* FORM */
+    .lead-form {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      width: 100%;
+      max-width: 400px;
+      margin-bottom: 24px;
+    }
+    .lead-form input {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem;
+      font-weight: 400;
+      padding: 14px 16px;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 2px;
+      color: #1a1a2a;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .lead-form input::placeholder { color: #999; }
+    .lead-form input:focus { border-color: #36D986; }
+    .lead-form button {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.35rem;
+      letter-spacing: 1.5px;
+      padding: 16px;
+      background: #36D986;
+      color: #000;
+      border: none;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+    .lead-form button:hover { opacity: 0.9; }
+    .lead-form button:active { transform: scale(0.98); }
+    .lead-form button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .form-error {
+      color: #e53e3e;
+      font-size: 0.85rem;
+      font-weight: 500;
+      display: none;
+    }
+    .form-success {
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: #1a1a2a;
+      padding: 24px;
+      background: #e6faf0;
+      border: 1px solid #36D986;
+      border-radius: 2px;
+      display: none;
+      max-width: 400px;
+      width: 100%;
+    }
+
+    /* OFFER BADGE */
+    .offer-badge {
+      display: inline-block;
+      padding: 10px 20px;
+      background: #e6faf0;
+      border: 1px solid #36D986;
+      border-radius: 2px;
+      font-weight: 500;
+      font-size: 0.95rem;
+      color: #1a1a2a;
+      margin-bottom: 14px;
+    }
+
+    /* BOOKING LINK */
+    .booking-link {
+      font-size: 0.9rem;
+      font-weight: 300;
+      color: #666;
+    }
+    .booking-link a {
+      color: #36D986;
+      text-decoration: none;
+      font-weight: 500;
+      transition: opacity 0.2s;
+    }
+    .booking-link a:hover { opacity: 0.8; }
+
+    /* TRUST */
+    .trust {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      padding: 48px 24px;
+      background: #f1f1f1;
+      flex-wrap: wrap;
+    }
+    .trust-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.95rem;
+      font-weight: 400;
+      color: #1a1a2a;
+    }
+    .trust-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      background: #36D986;
+      color: #000;
+      border-radius: 2px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    /* FOOTER */
+    footer {
+      text-align: center;
+      padding: 32px 24px;
+      font-size: 0.8rem;
+      font-weight: 300;
+      color: #888;
+      background: #f8fffe;
+      border-top: 1px solid #e8e8e8;
+    }
+    footer .copyright {
+      margin-top: 8px;
+      font-size: 0.72rem;
+      color: #aaa;
+    }
+
+    /* BADGE ANIMATION */
+    @keyframes ge8blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* MOBILE */
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 3rem; }
+      .hero .subheadline { font-size: 1rem; }
+      nav .brand { font-size: 1.15rem; }
+      nav .phone-link { font-size: 0.8rem; padding: 5px 10px; }
+      .trust { gap: 24px; }
+      .trust-item { font-size: 0.85rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="brand">{{BUSINESS_NAME}}</div>
+    <a href="tel:{{PHONE}}" class="phone-link">{{PHONE}}</a>
+  </nav>
+
+  <section class="hero">
+    <h1>{{HEADLINE}}</h1>
+    <p class="subheadline">{{SUBHEADLINE}}</p>
+
+    <form class="lead-form" id="leadForm" novalidate>
+      <input name="name" id="formName" placeholder="Your Name" required>
+      <input name="phone" id="formPhone" type="tel" placeholder="Your Phone" required>
+      <div class="form-error" id="formError"></div>
+      <button type="submit" id="formSubmit">{{CTA_TEXT}}</button>
+    </form>
+    <div class="form-success" id="formSuccess">We'll be in touch shortly! Check your phone.</div>
+
+    <div class="offer-badge">&#127873; {{OFFER}}</div>
+    <div class="booking-link">Or <a href="{{BOOKING_URL}}">book directly &rarr;</a></div>
+  </section>
+
+  <section class="trust">
+    <div class="trust-item"><span class="trust-icon">&#10003;</span> {{TRUST_BULLET_1}}</div>
+    <div class="trust-item"><span class="trust-icon">&#10003;</span> {{TRUST_BULLET_2}}</div>
+    <div class="trust-item"><span class="trust-icon">&#10003;</span> {{TRUST_BULLET_3}}</div>
+  </section>
+
+  <footer>
+    {{BUSINESS_NAME}} &middot; {{LOCATION}} &middot; {{PHONE}} &middot; &copy;2026
+    <div class="copyright">&copy; 2026 GoElev8.ai | Aaron Bryant. All rights reserved.</div>
+  </footer>
+
+  <div style="position:fixed;bottom:12px;right:12px;z-index:999">
+    <a href="https://goelev8.ai/powered-by" target="_blank" rel="noopener"
+       style="display:inline-flex;align-items:center;gap:6px;background:rgba(0,0,0,.8);
+              border:1px solid rgba(0,207,255,.3);border-radius:2px;padding:5px 10px;
+              text-decoration:none;font-family:monospace;font-size:10px;color:#00CFFF">
+      <span style="width:5px;height:5px;background:#00CFFF;border-radius:50%;
+                   animation:ge8blink 2s infinite;flex-shrink:0"></span>
+      Powered by GoElev8.ai
+    </a>
+  </div>
+
+  <script>
+    (function() {
+      var form = document.getElementById('leadForm');
+      var nameInput = document.getElementById('formName');
+      var phoneInput = document.getElementById('formPhone');
+      var submitBtn = document.getElementById('formSubmit');
+      var errorEl = document.getElementById('formError');
+      var successEl = document.getElementById('formSuccess');
+      var phoneRegex = /^\+?[\d\s\-().]{7,15}$/;
+
+      function sanitize(str) {
+        return str.replace(/</g, '').replace(/>/g, '');
+      }
+
+      function showError(msg) {
+        errorEl.textContent = msg;
+        errorEl.style.display = 'block';
+      }
+
+      function hideError() {
+        errorEl.style.display = 'none';
+      }
+
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        hideError();
+
+        var name = nameInput.value.trim();
+        var phone = phoneInput.value.trim();
+
+        if (name.length < 2) {
+          showError('Please enter your full name (at least 2 characters).');
+          return;
+        }
+        if (!phoneRegex.test(phone)) {
+          showError('Please enter a valid phone number.');
+          return;
+        }
+
+        name = sanitize(name);
+        phone = sanitize(phone);
+
+        submitBtn.disabled = true;
+
+        fetch('/api/funnel/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            funnel_slug: '{{SLUG}}',
+            full_name: name,
+            phone: phone,
+            source: 'funnel'
+          })
+        })
+        .then(function(res) {
+          if (!res.ok) throw new Error('Request failed');
+          form.style.display = 'none';
+          successEl.style.display = 'block';
+        })
+        .catch(function() {
+          showError('Something went wrong. Please try again.');
+          submitBtn.disabled = false;
+        });
+      });
+    })();
+  </script>
+
+</body>
+</html>
