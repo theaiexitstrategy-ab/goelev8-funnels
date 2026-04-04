@@ -243,8 +243,33 @@ export default function HomePage() {
   const submitLead = useCallback(async () => {
     if (!leadFirst.trim()) return;
     if (!leadEmail.trim() || !leadEmail.includes('@')) return;
+
+    // Save to localStorage + cookie immediately
     const data = { first: leadFirst, last: leadLast, email: leadEmail, phone: leadPhone, ts: String(Date.now()) };
     saveLeadToStorage(data);
+
+    try {
+      // POST to real API route — fire and forget for UX
+      await fetch('/api/leads/capture', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          full_name: `${leadFirst} ${leadLast}`.trim(),
+          email: leadEmail || undefined,
+          phone: leadPhone,
+          source: 'homepage',
+          page_url: window.location.href,
+          utm_source: new URLSearchParams(window.location.search).get('utm_source') ?? undefined,
+          utm_medium: new URLSearchParams(window.location.search).get('utm_medium') ?? undefined,
+          utm_campaign: new URLSearchParams(window.location.search).get('utm_campaign') ?? undefined,
+        }),
+      });
+    } catch (err) {
+      // Silent fail — localStorage/cookie already saved
+      console.error('[submitLead] API call failed:', err);
+    }
+
+    // Show success state
     setLeadSuccess(true);
     const slug = (leadFirst + (leadLast ? '-' + leadLast : '')).toLowerCase().replace(/[^a-z0-9]+/g, '-');
     setTimeout(() => {
@@ -1068,7 +1093,7 @@ export default function HomePage() {
                   <input type="tel" className={s['lead-input']} id="lead_phone" value={leadPhone} onChange={e => setLeadPhone(e.target.value)} placeholder="+1 (314) 555-0100" autoComplete="tel" />
                 </div>
                 <button className={s['lead-cta']} onClick={submitLead}>START BUILDING FREE →</button>
-                <p className={s['lead-fine']}>7 days free &nbsp;·&nbsp; Card on file &nbsp;·&nbsp; Not charged until Day 8<br/>No contracts &nbsp;·&nbsp; Cancel anytime &nbsp;·&nbsp; Your data is never sold</p>
+                <p className={s['lead-fine']}>7 days free &nbsp;·&nbsp; Card on file &nbsp;·&nbsp; Not charged until Day 8<br/>No contracts &nbsp;·&nbsp; Cancel anytime &nbsp;·&nbsp; Your data is never sold<br/><span style={{color:'var(--wh4)'}}>By submitting you agree to receive SMS from GoElev8.ai. Reply STOP to opt out. Msg &amp; data rates may apply.</span></p>
               </div>
             ) : (
               <div className={`${s['lead-success']} ${s.show}`}>
