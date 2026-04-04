@@ -18,12 +18,23 @@ const BUILD_STEPS = [
   'Creating AI agent...',
 ];
 
+type PreviewResult = {
+  business_name: string;
+  slug: string;
+  tagline: string;
+  sms_preview: string;
+  accent_color: string;
+  cta_text: string;
+};
+
 export default function HomePage() {
   const [prompt, setPrompt] = useState('');
   const [placeholderIdx, setPlaceholderIdx] = useState(0);
   const [building, setBuilding] = useState(false);
   const [buildStep, setBuildStep] = useState(-1);
   const [buildDone, setBuildDone] = useState(false);
+  const [preview, setPreview] = useState<PreviewResult | null>(null);
+  const [buildError, setBuildError] = useState('');
   const [annualPricing, setAnnualPricing] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -34,17 +45,50 @@ export default function HomePage() {
     return () => clearInterval(interval);
   }, []);
 
-  const handleBuild = () => {
+  const handleBuild = async () => {
     if (!prompt.trim()) return;
     setBuilding(true);
     setBuildStep(0);
-    BUILD_STEPS.forEach((_, i) => {
-      setTimeout(() => setBuildStep(i), (i + 1) * 1200);
-    });
-    setTimeout(() => {
-      setBuildDone(true);
+    setBuildError('');
+    setPreview(null);
+
+    // Start animation steps while Claude processes
+    const stepTimers = BUILD_STEPS.map((_, i) =>
+      setTimeout(() => setBuildStep(i), (i + 1) * 1000)
+    );
+
+    try {
+      const res = await fetch('/api/generate-preview', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: prompt.trim() }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setBuildError(data.error || 'Something went wrong. Try again.');
+        setBuilding(false);
+        stepTimers.forEach(clearTimeout);
+        return;
+      }
+
+      setPreview(data);
+
+      // Make sure all steps show as complete before showing result
+      stepTimers.forEach(clearTimeout);
+      BUILD_STEPS.forEach((_, i) => setBuildStep(i));
+
+      // Small delay for final step animation
+      setTimeout(() => {
+        setBuildDone(true);
+        setBuilding(false);
+      }, 600);
+    } catch {
+      setBuildError('Connection error. Please try again.');
       setBuilding(false);
-    }, BUILD_STEPS.length * 1200 + 800);
+      stepTimers.forEach(clearTimeout);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -52,6 +96,15 @@ export default function HomePage() {
       e.preventDefault();
       handleBuild();
     }
+  };
+
+  const handleReset = () => {
+    setBuilding(false);
+    setBuildDone(false);
+    setBuildStep(-1);
+    setPreview(null);
+    setBuildError('');
+    setPrompt('');
   };
 
   return (
@@ -132,6 +185,11 @@ export default function HomePage() {
                   resize: 'none', caretColor: '#00CFFF',
                 }}
               />
+              {buildError && (
+                <p style={{ color: '#FF5F57', fontSize: 13, fontFamily: '"JetBrains Mono", monospace', margin: '8px 0 0' }}>
+                  {buildError}
+                </p>
+              )}
               <button
                 onClick={handleBuild}
                 style={{
@@ -145,6 +203,9 @@ export default function HomePage() {
             </>
           ) : building ? (
             <div style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: 14 }}>
+              <div style={{ color: '#888', fontSize: 12, marginBottom: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                &gt; {prompt.slice(0, 60)}{prompt.length > 60 ? '...' : ''}
+              </div>
               {BUILD_STEPS.map((step, i) => (
                 <div key={i} style={{
                   color: i <= buildStep ? '#00CFFF' : '#333',
@@ -155,26 +216,63 @@ export default function HomePage() {
                 </div>
               ))}
             </div>
-          ) : (
+          ) : preview ? (
             <div style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: 14 }}>
               {BUILD_STEPS.map((step, i) => (
-                <div key={i} style={{ color: '#00CFFF', marginBottom: 8 }}>
+                <div key={i} style={{ color: '#00CFFF', marginBottom: 6 }}>
                   [{i + 1}] {step} ✓
                 </div>
               ))}
-              <div style={{ color: '#28C840', marginTop: 12, fontWeight: 600 }}>
-                [5] ✓ Your page is live at goelev8.ai/f/your-slug
+              <div style={{ color: '#28C840', marginTop: 12, fontWeight: 600, marginBottom: 16 }}>
+                [5] ✓ Ready at goelev8.ai/f/{preview.slug}
               </div>
-              <a href="/auth/signup" style={{
-                display: 'block', marginTop: 16, background: '#00CFFF', color: '#000',
+
+              {/* AI-generated preview card */}
+              <div style={{
+                background: '#111', border: `1px solid ${preview.accent_color}40`, borderRadius: 10,
+                padding: 16, marginBottom: 16,
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
+                  <div>
+                    <div style={{ color: '#fff', fontSize: 16, fontWeight: 600, fontFamily: '"DM Sans", sans-serif' }}>
+                      {preview.business_name}
+                    </div>
+                    <div style={{ color: preview.accent_color, fontSize: 12, marginTop: 2 }}>
+                      {preview.tagline}
+                    </div>
+                  </div>
+                  <div style={{
+                    background: preview.accent_color, color: '#000', padding: '4px 10px',
+                    borderRadius: 6, fontSize: 11, fontWeight: 600, fontFamily: '"DM Sans", sans-serif',
+                    whiteSpace: 'nowrap',
+                  }}>
+                    {preview.cta_text}
+                  </div>
+                </div>
+                <div style={{ borderTop: '1px solid #222', paddingTop: 10, marginTop: 8 }}>
+                  <div style={{ color: '#555', fontSize: 10, marginBottom: 4 }}>SMS PREVIEW:</div>
+                  <div style={{ color: '#888', fontSize: 12, lineHeight: 1.4, fontFamily: '"DM Sans", sans-serif' }}>
+                    &ldquo;{preview.sms_preview}&rdquo;
+                  </div>
+                </div>
+              </div>
+
+              <a href={`/auth/signup?prompt=${encodeURIComponent(prompt)}`} style={{
+                display: 'block', background: '#00CFFF', color: '#000',
                 border: 'none', padding: '12px 32px', borderRadius: 8,
                 fontFamily: '"Bebas Neue", sans-serif', fontSize: 18, letterSpacing: 1,
                 textAlign: 'center', textDecoration: 'none',
               }}>
                 Claim Your Page &rarr;
               </a>
+              <button onClick={handleReset} style={{
+                display: 'block', width: '100%', marginTop: 8, background: 'none', border: 'none',
+                color: '#555', fontSize: 12, cursor: 'pointer', fontFamily: '"JetBrains Mono", monospace',
+              }}>
+                Try a different prompt
+              </button>
             </div>
-          )}
+          ) : null}
 
           <p style={{ fontSize: 12, color: '#555', textAlign: 'center', marginTop: 12, marginBottom: 0 }}>
             7 days free. Card on file. Not charged until Day 8.
