@@ -32,7 +32,7 @@
 /* NAV */
 .nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;align-items:center;justify-content:space-between;padding:14px 52px;background:rgba(0,0,0,.93);backdrop-filter:blur(24px) saturate(1.5);border-bottom:1px solid rgba(0,207,255,.1)}
 .nav-logo{display:flex;align-items:center;text-decoration:none}
-.nav-logo img{height:30px;width:auto;display:block}
+.nav-logo img{height:40px;width:auto;display:block}
 .nav-links{display:flex;gap:24px;list-style:none;align-items:center}
 .nav-links a{color:var(--mu);text-decoration:none;font-size:11px;letter-spacing:.8px;text-transform:uppercase;transition:color .2s;font-family:var(--fm)}
 .nav-links a:hover{color:var(--cyan)}
@@ -40,7 +40,7 @@
 .nav-cta:hover{background:var(--cyan);color:var(--blk)}
 
 /* HERO */
-.hero{min-height:100vh;display:grid;grid-template-columns:1fr 360px;gap:0;align-items:center;padding:130px 52px 80px;position:relative;overflow:hidden}
+.hero{min-height:100vh;display:grid;grid-template-columns:1fr;gap:0;align-items:center;padding:130px 52px 80px;position:relative;overflow:hidden}
 .hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 70% 80% at 100% 40%,rgba(0,207,255,.05) 0%,transparent 55%),radial-gradient(ellipse 50% 60% at 0% 90%,rgba(255,59,59,.03) 0%,transparent 55%);pointer-events:none}
 .hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(0,207,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,207,255,.025) 1px,transparent 1px);background-size:48px 48px;pointer-events:none}
 .hero-scan{position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,207,255,.45),transparent);animation:scanH 6s linear infinite;pointer-events:none;z-index:1}
@@ -126,17 +126,31 @@
 .aio-act-p{background:var(--cyan);color:var(--blk);border-color:var(--cyan)}
 .aio-act-p:hover{background:var(--wh);border-color:var(--wh);color:var(--blk)}
 
-/* LEV */
-.hero-lev{position:relative;z-index:1;display:flex;align-items:flex-end;justify-content:center;padding-left:20px}
-.lev-container{position:relative;animation:float 4s ease-in-out infinite}
-.lev-img{width:100%;max-width:340px;height:auto;display:block;animation:levGlow 4s ease-in-out infinite}
-.lev-halo{position:absolute;bottom:-30px;left:50%;transform:translateX(-50%);width:200px;height:60px;background:radial-gradient(ellipse,rgba(0,207,255,.18),transparent 70%)}
-.lev-badge{position:absolute;top:10px;right:-16px;background:rgba(0,0,0,.9);border:1px solid var(--cyan);border-radius:1px;padding:7px 11px;font-family:var(--fm);font-size:8px;color:var(--cyan);letter-spacing:1px;text-transform:uppercase;white-space:nowrap;animation:borderPulse 3s ease infinite;z-index:10}
-.lev-badge-dot{width:5px;height:5px;background:var(--grn);border-radius:50%;display:inline-block;margin-right:5px;animation:pulse 1.5s infinite;vertical-align:middle}
-.lev-stats{position:absolute;left:-100px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:6px}
-.lev-stat{background:rgba(0,0,0,.85);border:1px solid var(--b2);border-left:2px solid var(--cyan);padding:7px 10px;border-radius:0 1px 1px 0}
-.lev-stat-n{font-family:var(--fd);font-size:18px;color:var(--cyan);line-height:1}
-.lev-stat-l{font-family:var(--fm);font-size:7px;color:var(--mu);letter-spacing:.8px;text-transform:uppercase}
+/* LEV GHOST MASCOT */
+.lev-ghost{
+  position:absolute;bottom:0;right:2rem;z-index:10;
+  pointer-events:auto;cursor:default;
+}
+.lev-ghost-img{
+  width:280px;height:auto;display:block;
+  opacity:.15;transition:opacity .4s ease;
+  filter:drop-shadow(0 0 30px rgba(0,207,255,.1));
+}
+.lev-ghost:hover .lev-ghost-img{opacity:.35}
+.lev-speech{
+  position:absolute;bottom:100%;right:20px;margin-bottom:12px;
+  background:#080a0f;border:1px solid #00d4ff;border-radius:6px;
+  padding:12px 16px;font-family:'Outfit',var(--fb),sans-serif;font-size:13px;
+  color:var(--wh);line-height:1.5;max-width:260px;white-space:normal;
+  opacity:0;transform:translateY(8px);transition:opacity .3s ease,transform .3s ease;
+  pointer-events:none;z-index:11;
+  box-shadow:0 0 20px rgba(0,212,255,.12);
+}
+.lev-speech::after{
+  content:'';position:absolute;top:100%;right:40px;
+  border:8px solid transparent;border-top-color:#00d4ff;
+}
+.lev-ghost:hover .lev-speech{opacity:1;transform:translateY(0)}
 
 /* SHARED */
 .section{padding:88px 52px}
@@ -433,7 +447,7 @@ select.mi option{background:#0e0e0e}
 .succ-n{width:15px;height:15px;border:1px solid var(--cyan);color:var(--cyan);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:7px;flex-shrink:0}
 
 @media(max-width:1024px){
-  .hero{grid-template-columns:1fr}.hero-lev{display:none}.lev-stats{display:none}
+  .hero{grid-template-columns:1fr}.lev-ghost{display:none}
   .nav{padding:12px 20px}.nav-links{display:none}
   .section,.cta-section{padding:60px 20px}
   .hero{padding:110px 20px 56px}
@@ -529,6 +543,34 @@ select.mi option{background:#0e0e0e}
 .chat-send.ready{opacity:1}
 .chat-send:hover.ready{background:var(--wh);transform:scale(1.05)}
 .chat-send svg{width:17px;height:17px;fill:var(--blk)}
+
+/* Icon buttons (voice / attach) */
+.chat-icon-btn{
+  background:transparent;border:none;color:var(--mu);
+  width:32px;height:32px;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;border-radius:2px;transition:color .2s,background .2s;
+  flex-shrink:0;position:relative;
+}
+.chat-icon-btn:hover{color:var(--cyan);background:rgba(0,207,255,.07)}
+.rec-dot{
+  position:absolute;top:4px;right:4px;width:7px;height:7px;
+  background:var(--red);border-radius:50%;
+  animation:pulse 1s ease infinite;
+}
+
+/* Attached file chip */
+.attach-chip{
+  display:flex;align-items:center;gap:8px;
+  padding:6px 14px;border-top:1px solid var(--b1);
+  background:var(--blk2);font-family:var(--fm);font-size:10px;color:var(--wh2);
+}
+.attach-thumb{width:24px;height:24px;object-fit:cover;border-radius:2px;border:1px solid var(--b2)}
+.attach-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.attach-remove{
+  background:transparent;border:none;color:var(--mu);font-size:12px;
+  cursor:pointer;padding:2px 6px;transition:color .2s;
+}
+.attach-remove:hover{color:var(--red)}
 
 /* Footer hint */
 .chat-footer{

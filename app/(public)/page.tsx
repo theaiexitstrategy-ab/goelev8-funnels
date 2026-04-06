@@ -145,6 +145,13 @@ export default function HomePage() {
   const [phText, setPhText] = useState('');
   const [phTyping, setPhTyping] = useState(true);
 
+  /* ── Voice & Attach ── */
+  const [isRecording, setIsRecording] = useState(false);
+  const [attachedFile, setAttachedFile] = useState<File | null>(null);
+  const [attachPreview, setAttachPreview] = useState<string | null>(null);
+  const recognitionRef = useRef<any>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   /* ── Refs ── */
   const chatTARef = useRef<HTMLTextAreaElement>(null);
   const chatMsgsRef = useRef<HTMLDivElement>(null);
@@ -245,6 +252,55 @@ export default function HomePage() {
     setChatInput(text);
     sendChatMessage(text);
   }, [sendChatMessage]);
+
+  /* ── Voice recording ── */
+  const toggleVoice = useCallback(() => {
+    if (isRecording) {
+      recognitionRef.current?.stop();
+      setIsRecording(false);
+      return;
+    }
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) { alert('Speech recognition is not supported in this browser.'); return; }
+    const recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = 'en-US';
+    let finalTranscript = '';
+    recognition.onresult = (event: any) => {
+      let interim = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        if (event.results[i].isFinal) finalTranscript += event.results[i][0].transcript;
+        else interim += event.results[i][0].transcript;
+      }
+      setChatInput(finalTranscript + interim);
+    };
+    recognition.onerror = () => setIsRecording(false);
+    recognition.onend = () => setIsRecording(false);
+    recognitionRef.current = recognition;
+    recognition.start();
+    setIsRecording(true);
+  }, [isRecording]);
+
+  /* ── File attach ── */
+  const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setAttachedFile(file);
+    if (file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = (ev) => setAttachPreview(ev.target?.result as string);
+      reader.readAsDataURL(file);
+    } else {
+      setAttachPreview(null);
+    }
+  }, []);
+
+  const removeAttachedFile = useCallback(() => {
+    setAttachedFile(null);
+    setAttachPreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  }, []);
 
   /* ── Lead capture ── */
   const openLead = useCallback(() => {
@@ -391,7 +447,7 @@ export default function HomePage() {
       {/* ── NAV ── */}
       <nav className={s.nav} role="navigation" aria-label="Main navigation">
         <Link href="/" className={s['nav-logo']} aria-label="GoElev8.ai Home">
-          <Image src="/images/lockup.png" alt="GoElev8.ai" width={120} height={30} style={{height:30,width:'auto'}} />
+          <Image src="/images/logo-dark.png" alt="GoElev8.ai" width={160} height={40} style={{height:40,width:'auto'}} />
         </Link>
         <ul className={s['nav-links']} role="list">
           <li><a href="#how">How It Works</a></li>
@@ -462,6 +518,14 @@ export default function HomePage() {
                 ))}
               </div>
               <div className={s['chat-input-row']}>
+                <input ref={fileInputRef} type="file" accept="image/*,.pdf,.png,.jpg,.svg" onChange={handleFileSelect} style={{display:'none'}} />
+                <button className={s['chat-icon-btn']} onClick={toggleVoice} aria-label={isRecording ? 'Stop recording' : 'Start voice input'} title="Voice input">
+                  {isRecording && <span className={s['rec-dot']} />}
+                  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="20" height="20"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.93V21h2v-3.07A7 7 0 0 0 19 11h-2z" fill="currentColor"/></svg>
+                </button>
+                <button className={s['chat-icon-btn']} onClick={() => fileInputRef.current?.click()} aria-label="Attach file" title="Attach file or image">
+                  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="20" height="20"><path d="M16.5 6v11.5a4 4 0 0 1-8 0V5a2.5 2.5 0 0 1 5 0v10.5a1 1 0 0 1-2 0V6H10v9.5a2.5 2.5 0 0 0 5 0V5a4 4 0 0 0-8 0v12.5a5.5 5.5 0 0 0 11 0V6h-1.5z" fill="currentColor"/></svg>
+                </button>
                 <textarea
                   ref={chatTARef}
                   className={s['chat-ta']}
@@ -481,6 +545,13 @@ export default function HomePage() {
                   <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M2 21l21-9L2 3v7l15 2-15 2z"/></svg>
                 </button>
               </div>
+              {attachedFile && (
+                <div className={s['attach-chip']}>
+                  {attachPreview && <img src={attachPreview} alt="" className={s['attach-thumb']} />}
+                  <span className={s['attach-name']}>{attachedFile.name}</span>
+                  <button className={s['attach-remove']} onClick={removeAttachedFile} aria-label="Remove file">✕</button>
+                </div>
+              )}
               <div className={s['chat-footer']}>
                 <span className={s['chat-hint']}>↵ Send &nbsp;·&nbsp; <span>Shift+Enter</span> for new line</span>
                 <button className={s['start-now-btn']} onClick={openWizard}>⚡ START NOW — GUIDED SETUP</button>
@@ -514,20 +585,10 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* LEV CHARACTER */}
-        <div className={s['hero-lev']}>
-          <div className={s['lev-container']}>
-            <Image src="/images/lev.png" alt="Lev AI" width={340} height={500} className={s['lev-img']} priority />
-            <div className={s['lev-halo']} />
-            <div className={s['lev-badge']}>
-              <span className={s['lev-badge-dot']} />AI SYSTEM · ONLINE
-            </div>
-            <div className={s['lev-stats']}>
-              <div className={s['lev-stat']}><div className={s['lev-stat-n']}>24/7</div><div className={s['lev-stat-l']}>Uptime</div></div>
-              <div className={s['lev-stat']}><div className={s['lev-stat-n']}>&lt;5m</div><div className={s['lev-stat-l']}>Call Time</div></div>
-              <div className={s['lev-stat']}><div className={s['lev-stat-n']}>14d</div><div className={s['lev-stat-l']}>Follow-Up</div></div>
-            </div>
-          </div>
+        {/* LEV MASCOT — ghost presence */}
+        <div className={s['lev-ghost']}>
+          <div className={s['lev-speech']}>Describe your business and I&apos;ll build the whole system.</div>
+          <Image src="/images/lev-mascot.png" alt="Lev AI" width={280} height={420} className={s['lev-ghost-img']} priority />
         </div>
       </section>
 
@@ -920,7 +981,7 @@ export default function HomePage() {
       {/* ── CTA ── */}
       <div className={`${s['cta-section']} ${s.rev}`} role="complementary">
         <div className={s['cta-grid-bg']} aria-hidden="true" />
-        <Image src="/images/lev.png" alt="" className={s['cta-lev']} width={200} height={300} aria-hidden="true" />
+        <Image src="/images/lev-mascot.png" alt="" className={s['cta-lev']} width={200} height={300} aria-hidden="true" />
         <h2 className={s['cta-h']}>STOP LEAKING<br/><span className={s.c}>HIGH-TICKET</span><br/>REVENUE.</h2>
         <p className={s['cta-p']}>The GoElev8.AI Lead Acquisition System never sleeps, never misses a call, and never forgets to follow up. Your system is 7 minutes away — free for 7 days.</p>
         <div className={s['cta-btns']}>
