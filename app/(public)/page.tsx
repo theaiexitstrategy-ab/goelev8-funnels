@@ -133,6 +133,18 @@ export default function HomePage() {
   /* ── Counter ── */
   const [counterLeads, setCounterLeads] = useState(0);
 
+  /* ── Typewriter placeholder ── */
+  const PROMPTS = [
+    'I run a hair salon in Atlanta specializing in natural hair transformations, free consultation for new clients...',
+    'Personal trainer in Chicago, free 1-on-1 assessment for anyone trying to lose weight or build muscle...',
+    'Recording studio in St. Louis — mixing, mastering, and production. Free 1-hour intro session for new artists...',
+    'Mobile detailing business in Houston, first wash 50% off for new customers...',
+    'Law firm handling personal injury cases — free 30-minute consultation, no win no fee...',
+  ];
+  const [phIdx, setPhIdx] = useState(0);
+  const [phText, setPhText] = useState('');
+  const [phTyping, setPhTyping] = useState(true);
+
   /* ── Refs ── */
   const chatTARef = useRef<HTMLTextAreaElement>(null);
   const chatMsgsRef = useRef<HTMLDivElement>(null);
@@ -150,6 +162,29 @@ export default function HomePage() {
     };
     requestAnimationFrame(tick);
   }, []);
+
+  /* ── Typewriter effect ── */
+  useEffect(() => {
+    if (chatInput) return; // stop when user types
+    const full = PROMPTS[phIdx];
+    if (phTyping) {
+      if (phText.length < full.length) {
+        const t = setTimeout(() => setPhText(full.slice(0, phText.length + 1)), 35);
+        return () => clearTimeout(t);
+      } else {
+        const t = setTimeout(() => setPhTyping(false), 2200);
+        return () => clearTimeout(t);
+      }
+    } else {
+      if (phText.length > 0) {
+        const t = setTimeout(() => setPhText(phText.slice(0, -1)), 18);
+        return () => clearTimeout(t);
+      } else {
+        setPhIdx((phIdx + 1) % PROMPTS.length);
+        setPhTyping(true);
+      }
+    }
+  }, [phText, phTyping, phIdx, chatInput]);
 
   /* ── Scroll reveal ── */
   useEffect(() => {
@@ -434,7 +469,7 @@ export default function HomePage() {
                   value={chatInput}
                   onChange={e => { setChatInput(e.target.value); e.target.style.height = 'auto'; e.target.style.height = Math.min(e.target.scrollHeight, 160) + 'px'; }}
                   onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChatMessage(); } }}
-                  placeholder="Describe your business — I'll build your complete AI system..."
+                  placeholder={phText || "Describe your business — I'll build your complete AI system..."}
                   aria-label="Describe your business"
                 />
                 <button
