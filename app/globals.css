@@ -1,0 +1,18 @@
+/* (c) 2026 GoElev8.ai | Aaron Bryant. All rights reserved. */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+:root {
+  --bg: #000000;
+  --card: #0e0e0e;
+  --border: #222222;
+  --cyan: #00CFFF;
+  --green: #00E87A;
+  --red: #FF3B3B;
+  --white: #F5F5F5;
+  --muted: #555555;
+  --font-display: 'Bebas Neue', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}

@@ -1,512 +1,839 @@
 // (c) 2026 GoElev8.ai | Aaron Bryant. All rights reserved.
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import Link from 'next/link';
+import s from '../styles/homepage.module.css';
+import {
+  NAV_LOGO,
+  LEV_MASCOT,
+  FLEX_FACILITY,
+  ISLAY_STUDIOS,
+  DANIELS_LEGACY,
+  FOOTER_LOGO,
+} from '../lib/homepage-images';
 
-const PLACEHOLDERS = [
-  'I run a hair salon in Atlanta specializing in natural hair...',
-  'Personal trainer in Chicago, free assessment for new clients...',
-  'Recording studio in St. Louis, free 1-hour intro session...',
-  'Mobile detailing business in Houston, first wash 50% off...',
-  'Med spa in Miami offering free consultations...',
+const TYPEWRITER_MESSAGES = [
+  "Describe your business and we'll build your first AI site for you...",
+  "I run a hair salon in Atlanta called Luxe Hair Studio. I specialize in braids, natural hair, and loc maintenance. Free consultation for new clients.",
+  "I'm a personal trainer in Chicago helping adults over 40 lose weight and build real strength. I design programs so clients see results without getting hurt. Free 1-on-1 fitness assessment.",
+  "We run a recording studio in St. Louis called iSlay Studios \u2014 full recording, mixing, and mastering. We work with artists at every level. Free 1-hour intro session.",
+  "I'm a family law attorney in Dallas handling divorce, custody, and estate planning. I help clients protect what matters most. Free 30-minute consultation.",
+  "We're an HVAC company serving Dallas-Fort Worth for residential and commercial customers. Same-day availability. Free system inspection and estimate.",
+  "Our dental practice in Phoenix offers general and cosmetic dentistry. We specialize in smile makeovers, implants, and preventive care. Free exam and X-rays for new patients.",
 ];
 
-const BUILD_STEPS = [
-  'Analyzing your business...',
-  'Building funnel page...',
-  'Generating SMS sequence...',
-  'Creating AI agent...',
-];
-
-type PreviewResult = {
-  business_name: string;
-  slug: string;
-  tagline: string;
-  sms_preview: string;
-  accent_color: string;
-  cta_text: string;
-};
+function isLight(hex: string): boolean {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return (r * 299 + g * 587 + b * 114) / 1000 > 128;
+}
 
 export default function HomePage() {
-  const [prompt, setPrompt] = useState('');
-  const [placeholderIdx, setPlaceholderIdx] = useState(0);
-  const [building, setBuilding] = useState(false);
-  const [buildStep, setBuildStep] = useState(-1);
-  const [buildDone, setBuildDone] = useState(false);
-  const [preview, setPreview] = useState<PreviewResult | null>(null);
-  const [buildError, setBuildError] = useState('');
-  const [annualPricing, setAnnualPricing] = useState(false);
-  const inputRef = useRef<HTMLTextAreaElement>(null);
+  // --- State ---
+  const [leadOpen, setLeadOpen] = useState(false);
+  const [leadSubmitted, setLeadSubmitted] = useState(false);
+  const [activeTab, setActiveTab] = useState<'build' | 'embed'>('build');
+  const [uploadOpen, setUploadOpen] = useState(false);
+  const [listening, setListening] = useState(false);
+  const [activeColor, setActiveColor] = useState('#00CFFF');
+  const [customColorOutline, setCustomColorOutline] = useState('');
 
+  // --- Refs ---
+  const promptTARef = useRef<HTMLTextAreaElement>(null);
+  const mFirstRef = useRef<HTMLInputElement>(null);
+  const mLastRef = useRef<HTMLInputElement>(null);
+  const mEmailRef = useRef<HTMLInputElement>(null);
+  const mPhoneRef = useRef<HTMLInputElement>(null);
+  const customColorPickerRef = useRef<HTMLInputElement>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const recognitionRef = useRef<any>(null);
+  const modalFormRef = useRef<HTMLDivElement>(null);
+  const modalSuccessRef = useRef<HTMLDivElement>(null);
+  const colorPreviewLabelRef = useRef<HTMLSpanElement>(null);
+  const colorPreviewDotRef = useRef<HTMLDivElement>(null);
+  const colorPreviewTextRef = useRef<HTMLDivElement>(null);
+  const colorPreviewBarRef = useRef<HTMLDivElement>(null);
+  const colorPreviewBtnRef = useRef<HTMLButtonElement>(null);
+
+  // --- Typewriter effect (isolated useEffect) ---
   useEffect(() => {
-    const interval = setInterval(() => {
-      setPlaceholderIdx((i) => (i + 1) % PLACEHOLDERS.length);
-    }, 3500);
-    return () => clearInterval(interval);
+    const taEl = promptTARef.current;
+    if (!taEl) return;
+    const ta = taEl as HTMLTextAreaElement;
+
+    let msgIndex = 0;
+    let charIndex = 0;
+    let typeInterval: ReturnType<typeof setInterval> | null = null;
+    let eraseInterval: ReturnType<typeof setInterval> | null = null;
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
+    let cancelled = false;
+
+    function startTyping() {
+      if (cancelled) return;
+      if (ta === document.activeElement) return;
+      typeInterval = setInterval(() => {
+        if (cancelled) { if (typeInterval) clearInterval(typeInterval); return; }
+        if (ta === document.activeElement) { if (typeInterval) clearInterval(typeInterval); return; }
+        const current = TYPEWRITER_MESSAGES[msgIndex];
+        if (charIndex <= current.length) {
+          ta.setAttribute('placeholder', current.slice(0, charIndex));
+          charIndex++;
+        } else {
+          if (typeInterval) clearInterval(typeInterval);
+          timeoutId = setTimeout(startErasing, 3000);
+        }
+      }, 28);
+    }
+
+    function startErasing() {
+      if (cancelled) return;
+      if (ta === document.activeElement) { scheduleNext(); return; }
+      const current = TYPEWRITER_MESSAGES[msgIndex];
+      charIndex = current.length;
+      eraseInterval = setInterval(() => {
+        if (cancelled) { if (eraseInterval) clearInterval(eraseInterval); return; }
+        if (ta === document.activeElement) { if (eraseInterval) clearInterval(eraseInterval); return; }
+        if (charIndex >= 0) {
+          ta.setAttribute('placeholder', current.slice(0, charIndex));
+          charIndex--;
+        } else {
+          if (eraseInterval) clearInterval(eraseInterval);
+          scheduleNext();
+        }
+      }, 10);
+    }
+
+    function scheduleNext() {
+      if (cancelled) return;
+      msgIndex = (msgIndex + 1) % TYPEWRITER_MESSAGES.length;
+      charIndex = 0;
+      timeoutId = setTimeout(startTyping, 400);
+    }
+
+    timeoutId = setTimeout(startTyping, 800);
+
+    return () => {
+      cancelled = true;
+      if (typeInterval) clearInterval(typeInterval);
+      if (eraseInterval) clearInterval(eraseInterval);
+      if (timeoutId) clearTimeout(timeoutId);
+    };
   }, []);
 
-  const handleBuild = async () => {
-    if (!prompt.trim()) return;
-    setBuilding(true);
-    setBuildStep(0);
-    setBuildError('');
-    setPreview(null);
+  // --- Close upload dropdown on outside click ---
+  useEffect(() => {
+    function handleClick() {
+      setUploadOpen(false);
+    }
+    document.addEventListener('click', handleClick);
+    return () => document.removeEventListener('click', handleClick);
+  }, []);
 
-    // Start animation steps while Claude processes
-    const stepTimers = BUILD_STEPS.map((_, i) =>
-      setTimeout(() => setBuildStep(i), (i + 1) * 1000)
-    );
+  // --- Escape key closes modal ---
+  useEffect(() => {
+    function handleKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') closeLead();
+    }
+    document.addEventListener('keydown', handleKey);
+    return () => document.removeEventListener('keydown', handleKey);
+  }, []);
 
-    try {
-      const res = await fetch('/api/generate-preview', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: prompt.trim() }),
-      });
+  // --- Functions ---
+  function openLead() {
+    const cookie = document.cookie.split(';').find((c) => c.trim().startsWith('ge8_lead='));
+    if (cookie) {
+      window.location.href = '/auth/signup';
+      return;
+    }
+    setLeadOpen(true);
+    setLeadSubmitted(false);
+    document.body.style.overflow = 'hidden';
+  }
 
-      const data = await res.json();
+  function closeLead() {
+    setLeadOpen(false);
+    document.body.style.overflow = '';
+  }
 
-      if (!res.ok) {
-        setBuildError(data.error || 'Something went wrong. Try again.');
-        setBuilding(false);
-        stepTimers.forEach(clearTimeout);
-        return;
+  function submitLead() {
+    const first = mFirstRef.current?.value.trim() || '';
+    const last = mLastRef.current?.value.trim() || '';
+    const email = mEmailRef.current?.value.trim() || '';
+    const phone = mPhoneRef.current?.value.trim() || '';
+
+    if (!first || !email || !phone) {
+      alert('Please fill in your name, email, and phone number.');
+      return;
+    }
+
+    localStorage.setItem('ge8_lead', JSON.stringify({ first, last, email, phone }));
+
+    const d = new Date();
+    d.setTime(d.getTime() + 30 * 24 * 60 * 60 * 1000);
+    document.cookie = 'ge8_lead=1; expires=' + d.toUTCString() + '; path=/';
+
+    setLeadSubmitted(true);
+
+    setTimeout(() => {
+      const params = new URLSearchParams({ email, name: first + ' ' + last, phone });
+      window.location.href = '/auth/signup?' + params.toString();
+    }, 3200);
+  }
+
+  function toggleMic() {
+    if (typeof window === 'undefined') return;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const win = window as any;
+    const SpeechRecognitionAPI = win.SpeechRecognition || win.webkitSpeechRecognition;
+    if (!SpeechRecognitionAPI) {
+      alert('Speech recognition is not supported in this browser.');
+      return;
+    }
+
+    if (listening && recognitionRef.current) {
+      recognitionRef.current.stop();
+      setListening(false);
+      return;
+    }
+
+    const recognition = new SpeechRecognitionAPI();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = 'en-US';
+
+    recognition.onresult = (event: any) => {
+      const transcript = event.results[0][0].transcript;
+      if (promptTARef.current) {
+        promptTARef.current.value += transcript;
       }
+      setListening(false);
+    };
 
-      setPreview(data);
+    recognition.onerror = () => {
+      setListening(false);
+    };
 
-      // Make sure all steps show as complete before showing result
-      stepTimers.forEach(clearTimeout);
-      BUILD_STEPS.forEach((_, i) => setBuildStep(i));
+    recognition.onend = () => {
+      setListening(false);
+    };
 
-      // Small delay for final step animation
-      setTimeout(() => {
-        setBuildDone(true);
-        setBuilding(false);
-      }, 600);
-    } catch {
-      setBuildError('Connection error. Please try again.');
-      setBuilding(false);
-      stepTimers.forEach(clearTimeout);
+    recognitionRef.current = recognition;
+    recognition.start();
+    setListening(true);
+  }
+
+  function switchTab(tab: 'build' | 'embed') {
+    setActiveTab(tab);
+    if (tab === 'embed') {
+      openLead();
     }
-  };
+  }
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleBuild();
+  function toggleUpload(e: React.MouseEvent) {
+    e.stopPropagation();
+    setUploadOpen((prev) => !prev);
+  }
+
+  function handleUpload(type: 'logo' | 'images') {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = type === 'logo' ? '.png,.svg' : 'image/*';
+    input.multiple = type === 'images';
+    input.click();
+    setUploadOpen(false);
+  }
+
+  function applyColorPreview(hex: string) {
+    if (colorPreviewLabelRef.current) colorPreviewLabelRef.current.textContent = hex.toUpperCase();
+    if (colorPreviewDotRef.current) colorPreviewDotRef.current.style.background = hex;
+    if (colorPreviewTextRef.current) colorPreviewTextRef.current.style.color = hex;
+    if (colorPreviewBarRef.current) colorPreviewBarRef.current.style.borderColor = hex;
+    if (colorPreviewBtnRef.current) {
+      colorPreviewBtnRef.current.style.background = hex;
+      colorPreviewBtnRef.current.style.color = isLight(hex) ? '#000' : '#fff';
     }
-  };
+  }
 
-  const handleReset = () => {
-    setBuilding(false);
-    setBuildDone(false);
-    setBuildStep(-1);
-    setPreview(null);
-    setBuildError('');
-    setPrompt('');
-  };
+  function selectColor(hex: string) {
+    setActiveColor(hex);
+    setCustomColorOutline('');
+    applyColorPreview(hex);
+  }
 
+  function applyCustomColor(hex: string) {
+    setActiveColor('custom');
+    setCustomColorOutline('2px solid ' + hex);
+    applyColorPreview(hex);
+  }
+
+  // --- Render ---
   return (
-    <div style={{
-      background: '#000', color: '#E0E0E0', minHeight: '100vh',
-      fontFamily: '"DM Sans", -apple-system, sans-serif', fontWeight: 300,
-      cursor: 'crosshair', position: 'relative', overflow: 'hidden',
-    }}>
-      {/* Scanline overlay */}
-      <div style={{
-        position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 1,
-        background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,207,255,0.009) 2px, rgba(0,207,255,0.009) 4px)',
-      }} />
-
+    <div className={s.page}>
       {/* NAV */}
-      <nav style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: '16px 24px', maxWidth: 1200, margin: '0 auto', position: 'relative', zIndex: 10,
-      }}>
-        <span style={{ fontFamily: '"Bebas Neue", sans-serif', fontSize: 28, color: '#00CFFF', letterSpacing: 2 }}>
-          GoElev8.ai
-        </span>
-        <div style={{ display: 'flex', gap: 28, alignItems: 'center', fontSize: 14 }}>
-          <a href="/pricing" style={{ color: '#999', textDecoration: 'none' }}>Pricing</a>
-          <a href="/demo" style={{ color: '#999', textDecoration: 'none' }}>Demo</a>
-          <a href="/templates" style={{ color: '#999', textDecoration: 'none' }}>Templates</a>
-          <a href="/auth/signup" style={{
-            background: '#00CFFF', color: '#000', padding: '8px 20px', borderRadius: 6,
-            textDecoration: 'none', fontFamily: '"Bebas Neue", sans-serif', fontSize: 16, letterSpacing: 1,
-          }}>
-            Start Free Trial
-          </a>
+      <nav className={s.nav}>
+        <Link href="/" className={s.navBrand}>
+          <img src={NAV_LOGO} alt="GoElev8.AI" className={s.navLogo} style={{ mixBlendMode: 'screen', filter: 'brightness(1.2)' }} />
+          <span className={s.navName}>GOELEV8.AI</span>
+        </Link>
+        <div className={s.navLinks}>
+          <Link href="/pricing">Pricing</Link>
+          <Link href="/portal">Portal</Link>
+          <Link href="/privacy">Privacy</Link>
+          <Link href="/terms">Terms</Link>
+        </div>
+        <div className={s.navRight}>
+          <Link href="/auth/signin" className={s.navSignin}>Sign In</Link>
+          <button className={s.btnNav} onClick={openLead}>START BUILDING FREE &rarr;</button>
         </div>
       </nav>
 
       {/* HERO */}
-      <section style={{
-        maxWidth: 1000, margin: '60px auto 0', padding: '0 24px', textAlign: 'center',
-        position: 'relative', zIndex: 10,
-      }}>
-        <h1 style={{
-          fontFamily: '"Bebas Neue", sans-serif', fontSize: 'clamp(36px, 6vw, 72px)',
-          color: '#fff', letterSpacing: 3, lineHeight: 1.1, marginBottom: 16,
-          animation: 'glitch 3s infinite',
-        }}>
-          BUILD YOUR AI BUSINESS PAGE BY PROMPT.
+      <section className={s.hero}>
+        <div className={s.statusPill}>
+          <span className={s.statusDot}></span>
+          SYSTEM ONLINE &middot; 7-DAY FREE TRIAL &middot; ZERO HUMANS REQUIRED
+        </div>
+
+        <h1 className={s.heroH1}>
+          <span className={s.h1Solid}>JUST TELL US WHAT YOU DO.</span>
+          <span className={s.h1Ghost}>WE BUILD EVERYTHING.</span>
         </h1>
-        <p style={{ fontSize: 18, color: '#888', marginBottom: 48 }}>
-          The only page that calls your leads back. Free for 7 days.
+
+        <p className={s.heroSub}>
+          Your lead capture page, SMS follow-up, and AI phone agent &mdash; live in 20 seconds. No code. No agency. No tech skills needed.
         </p>
 
         {/* PROMPT BOX */}
-        <div style={{
-          background: '#0A0A0A', border: '1px solid #1A1A1A', borderRadius: 12,
-          padding: 24, maxWidth: 680, margin: '0 auto', textAlign: 'left',
-        }}>
-          <div style={{ display: 'flex', gap: 6, marginBottom: 16 }}>
-            <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#FF5F57' }} />
-            <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#FEBC2E' }} />
-            <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#28C840' }} />
-            <span style={{ marginLeft: 12, fontSize: 11, color: '#444', fontFamily: '"JetBrains Mono", monospace' }}>
-              goelev8.ai/build
-            </span>
+        <div className={s.promptWrapper}>
+          <div className={s.promptTabs}>
+            <button
+              className={`${s.ptab} ${activeTab === 'build' ? s.ptabActive : ''}`}
+              onClick={() => switchTab('build')}
+            >
+              &#9889; BUILD AI BUSINESS PAGE
+            </button>
+            <button
+              className={`${s.ptab} ${activeTab === 'embed' ? s.ptabActive : ''}`}
+              onClick={() => switchTab('embed')}
+            >
+              &#128279; ADD TO MY EXISTING SITE
+            </button>
           </div>
-
-          {!building && !buildDone ? (
-            <>
+          <div className={s.promptBox}>
+            <div className={s.promptRow1}>
               <textarea
-                ref={inputRef}
-                value={prompt}
-                onChange={(e) => setPrompt(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder={PLACEHOLDERS[placeholderIdx]}
-                rows={3}
-                style={{
-                  width: '100%', background: 'transparent', border: 'none', outline: 'none',
-                  color: '#00CFFF', fontSize: 16, fontFamily: '"JetBrains Mono", monospace',
-                  resize: 'none', caretColor: '#00CFFF',
-                }}
+                ref={promptTARef}
+                className={s.promptTextarea}
+                rows={2}
+                placeholder=""
               />
-              {buildError && (
-                <p style={{ color: '#FF5F57', fontSize: 13, fontFamily: '"JetBrains Mono", monospace', margin: '8px 0 0' }}>
-                  {buildError}
-                </p>
-              )}
               <button
-                onClick={handleBuild}
-                style={{
-                  marginTop: 16, background: '#00CFFF', color: '#000', border: 'none',
-                  padding: '12px 32px', borderRadius: 8, fontFamily: '"Bebas Neue", sans-serif',
-                  fontSize: 18, letterSpacing: 1, cursor: 'pointer', width: '100%',
-                }}
+                className={`${s.btnMic} ${listening ? s.btnMicListening : ''}`}
+                onClick={toggleMic}
+                title="Speak your prompt"
               >
-                Start Free Trial &rarr;
+                <span className={s.micTooltip}>{listening ? 'Listening...' : 'Click to speak'}</span>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                  <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                  <line x1="12" y1="19" x2="12" y2="23"></line>
+                  <line x1="8" y1="23" x2="16" y2="23"></line>
+                </svg>
               </button>
-            </>
-          ) : building ? (
-            <div style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: 14 }}>
-              <div style={{ color: '#888', fontSize: 12, marginBottom: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                &gt; {prompt.slice(0, 60)}{prompt.length > 60 ? '...' : ''}
-              </div>
-              {BUILD_STEPS.map((step, i) => (
-                <div key={i} style={{
-                  color: i <= buildStep ? '#00CFFF' : '#333',
-                  marginBottom: 8,
-                  transition: 'color 0.3s',
-                }}>
-                  [{i + 1}] {step} {i < buildStep ? '✓' : i === buildStep ? '...' : ''}
-                </div>
-              ))}
+              <button className={s.btnSend} onClick={openLead} title="Build my system">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="22" y1="2" x2="11" y2="13"></line>
+                  <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+              </button>
             </div>
-          ) : preview ? (
-            <div style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: 14 }}>
-              {BUILD_STEPS.map((step, i) => (
-                <div key={i} style={{ color: '#00CFFF', marginBottom: 6 }}>
-                  [{i + 1}] {step} ✓
-                </div>
-              ))}
-              <div style={{ color: '#28C840', marginTop: 12, fontWeight: 600, marginBottom: 16 }}>
-                [5] ✓ Ready at goelev8.ai/f/{preview.slug}
+            <div className={s.promptRow2}>
+              <button className={s.btnPlus} onClick={toggleUpload}>+</button>
+              <span className={s.plusLabel}>Add image or logo</span>
+              <div className={`${s.uploadDropdown} ${uploadOpen ? s.uploadDropdownOpen : ''}`}>
+                <div className={s.uploadOpt} onClick={() => handleUpload('logo')}>&#127991;&#65039; Upload Logo &mdash; PNG/SVG</div>
+                <div className={s.uploadOpt} onClick={() => handleUpload('images')}>&#128444;&#65039; Upload Images &mdash; photos, team, products</div>
               </div>
+            </div>
+          </div>
+        </div>
 
-              {/* AI-generated preview card */}
-              <div style={{
-                background: '#111', border: `1px solid ${preview.accent_color}40`, borderRadius: 10,
-                padding: 16, marginBottom: 16,
-              }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
-                  <div>
-                    <div style={{ color: '#fff', fontSize: 16, fontWeight: 600, fontFamily: '"DM Sans", sans-serif' }}>
-                      {preview.business_name}
-                    </div>
-                    <div style={{ color: preview.accent_color, fontSize: 12, marginTop: 2 }}>
-                      {preview.tagline}
-                    </div>
-                  </div>
-                  <div style={{
-                    background: preview.accent_color, color: '#000', padding: '4px 10px',
-                    borderRadius: 6, fontSize: 11, fontWeight: 600, fontFamily: '"DM Sans", sans-serif',
-                    whiteSpace: 'nowrap',
-                  }}>
-                    {preview.cta_text}
-                  </div>
-                </div>
-                <div style={{ borderTop: '1px solid #222', paddingTop: 10, marginTop: 8 }}>
-                  <div style={{ color: '#555', fontSize: 10, marginBottom: 4 }}>SMS PREVIEW:</div>
-                  <div style={{ color: '#888', fontSize: 12, lineHeight: 1.4, fontFamily: '"DM Sans", sans-serif' }}>
-                    &ldquo;{preview.sms_preview}&rdquo;
-                  </div>
-                </div>
+        {/* LEV MASCOT */}
+        <div className={s.levWrap}>
+          <div className={s.levMascot}>
+            <img src={LEV_MASCOT} alt="Lev — GoElev8.AI Mascot" style={{ width: '100%', height: '100%', objectFit: 'contain', padding: 0 }} />
+          </div>
+        </div>
+
+        {/* TRUSTED BY */}
+        <div className={s.trusted}>
+          <p className={s.trustedLabel}>Trusted by real businesses</p>
+          <div className={s.trustedCards}>
+            <div className={s.trustedCard}>
+              <div className={s.liveRow}>
+                <span className={s.liveDot}></span>
+                <span className={s.liveText}>Live</span>
               </div>
-
-              <a href={`/auth/signup?prompt=${encodeURIComponent(prompt)}`} style={{
-                display: 'block', background: '#00CFFF', color: '#000',
-                border: 'none', padding: '12px 32px', borderRadius: 8,
-                fontFamily: '"Bebas Neue", sans-serif', fontSize: 18, letterSpacing: 1,
-                textAlign: 'center', textDecoration: 'none',
-              }}>
-                Claim Your Page &rarr;
+              <a href="https://www.theflexfacility.com" target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: 110 }}>
+                <img src={FLEX_FACILITY} alt="The Flex Facility" style={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'contain', filter: 'invert(1) brightness(0.88)' }} />
               </a>
-              <button onClick={handleReset} style={{
-                display: 'block', width: '100%', marginTop: 8, background: 'none', border: 'none',
-                color: '#555', fontSize: 12, cursor: 'pointer', fontFamily: '"JetBrains Mono", monospace',
-              }}>
-                Try a different prompt
-              </button>
+              <p className={s.cardIndustry}>FITNESS &middot; EARTH CITY, MO</p>
             </div>
-          ) : null}
-
-          <p style={{ fontSize: 12, color: '#555', textAlign: 'center', marginTop: 12, marginBottom: 0 }}>
-            7 days free. Card on file. Not charged until Day 8.
-          </p>
+            <div className={s.trustedCard}>
+              <div className={s.liveRow}>
+                <span className={s.liveDot}></span>
+                <span className={s.liveText}>Live</span>
+              </div>
+              <a href="https://www.islaystudiosllc.com" target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: 110 }}>
+                <img src={ISLAY_STUDIOS} alt="iSlay Studios" style={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'contain', background: 'transparent' }} />
+              </a>
+              <p className={s.cardIndustry}>HAIR STUDIO &middot; ST. LOUIS, MO</p>
+            </div>
+            <div className={s.trustedCard}>
+              <div className={s.liveRow}>
+                <span className={s.liveDot}></span>
+                <span className={s.liveText}>Live</span>
+              </div>
+              <a href="https://www.danielslegacyplanning.com" target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: 110 }}>
+                <img src={DANIELS_LEGACY} alt="Daniels Legacy Planning" style={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'contain', background: 'transparent' }} />
+              </a>
+              <p className={s.cardIndustry}>LEGACY PLANNING &middot; ST. LOUIS, MO</p>
+            </div>
+          </div>
+          <div className={s.industryPills}>
+            <span className={s.pill}>&#127947;&#65039; Fitness</span>
+            <span className={s.pill}>&#128135; Salons</span>
+            <span className={s.pill}>&#127897;&#65039; Studios</span>
+            <span className={s.pill}>&#9878;&#65039; Law &amp; Finance</span>
+            <span className={s.pill}>&#127973; Health &amp; Dental</span>
+            <span className={s.pill}>&#128295; Home Services</span>
+          </div>
         </div>
       </section>
 
-      {/* SOCIAL PROOF BAR */}
-      <section style={{
-        maxWidth: 800, margin: '80px auto 0', padding: '0 24px', textAlign: 'center',
-        position: 'relative', zIndex: 10,
-      }}>
-        <p style={{ fontSize: 13, color: '#555', marginBottom: 16, letterSpacing: 2, textTransform: 'uppercase' }}>
-          Live examples built on GoElev8.ai
-        </p>
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 32, flexWrap: 'wrap' }}>
-          <a href="/f/the-flex-facility" style={{ color: '#00CFFF', fontSize: 14, textDecoration: 'none', fontFamily: '"JetBrains Mono", monospace' }}>
-            /f/the-flex-facility
-          </a>
-          <a href="/f/islay-studios" style={{ color: '#00CFFF', fontSize: 14, textDecoration: 'none', fontFamily: '"JetBrains Mono", monospace' }}>
-            /f/islay-studios
-          </a>
+      {/* PAIN */}
+      <section className={s.painSection}>
+        <div className={s.painGrid}>
+          <div className={`${s.painCol} ${s.redSide}`}>
+            <span className={s.sectionLabel} style={{ color: 'var(--red)' }}>The problem</span>
+            <h2 className={s.painAccent}>You Call Back Tomorrow.</h2>
+            <p className={s.painBody}>
+              62% of your leads go to whoever responds first.<br />
+              The average business takes 47 hours to follow up.
+            </p>
+            <p className={s.painStat}>Source: Harvard Business Review &amp; InsideSales.com</p>
+          </div>
+          <div className={`${s.painCol} ${s.cyanSide}`}>
+            <span className={s.sectionLabel}>The system</span>
+            <h2 className={s.painAccent}>The System Calls in 5 Min.</h2>
+            <p className={s.painBody}>
+              Lead opts in. AI calls within 5 minutes.<br />
+              14-day SMS sequence runs automatically.<br />
+              No one on your payroll. Nothing to manage.
+            </p>
+            <button className={s.btnNav} style={{ marginTop: 8, width: 'fit-content' }} onClick={openLead}>START FREE TRIAL &rarr;</button>
+          </div>
         </div>
       </section>
 
       {/* HOW IT WORKS */}
-      <section style={{
-        maxWidth: 900, margin: '100px auto 0', padding: '0 24px',
-        position: 'relative', zIndex: 10,
-      }}>
-        <h2 style={{ fontFamily: '"Bebas Neue", sans-serif', fontSize: 40, color: '#fff', textAlign: 'center', letterSpacing: 2, marginBottom: 48 }}>
-          HOW IT WORKS
-        </h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 32 }}>
-          {[
-            { num: '01', title: 'Describe your business', desc: 'Type one prompt. That\'s it.' },
-            { num: '02', title: 'System builds everything', desc: 'Your page, SMS sequence, and AI phone agent — generated in seconds.' },
-            { num: '03', title: 'Leads come in automatically', desc: 'Leads opt in. System calls them in 5 minutes. Books automatically.' },
-          ].map((step) => (
-            <div key={step.num} style={{ textAlign: 'center' }}>
-              <span style={{ fontFamily: '"Bebas Neue", sans-serif', fontSize: 56, color: '#00CFFF', opacity: 0.3 }}>
-                {step.num}
-              </span>
-              <h3 style={{ fontSize: 18, fontWeight: 600, color: '#fff', marginBottom: 8 }}>{step.title}</h3>
-              <p style={{ color: '#888', fontSize: 14, lineHeight: 1.6 }}>{step.desc}</p>
+      <section className={s.section} style={{ background: 'var(--bg)' }}>
+        <div className={s.container}>
+          <span className={s.sectionLabel}>How it works</span>
+          <h2 className={s.sectionH2}>FOUR STEPS.<br />TWENTY SECONDS.</h2>
+          <div className={s.stepsGrid}>
+            <div className={s.step}>
+              <div className={s.stepNum}>01</div>
+              <div className={s.stepIcon}>&#9999;&#65039;</div>
+              <div className={s.stepTitle}>DESCRIBE YOUR BUSINESS</div>
+              <p className={s.stepBody}>Type what you do &mdash; your city, service, and free offer. That&apos;s it. No forms. No onboarding calls.</p>
             </div>
-          ))}
+            <div className={s.step}>
+              <div className={s.stepNum}>02</div>
+              <div className={s.stepIcon}>&#9889;</div>
+              <div className={s.stepTitle}>SYSTEM BUILDS YOUR FUNNEL</div>
+              <p className={s.stepBody}>The GoElev8.AI Lead Acquisition System generates your page, SMS sequence, and AI phone agent instantly.</p>
+            </div>
+            <div className={s.step}>
+              <div className={s.stepNum}>03</div>
+              <div className={s.stepIcon}>&#128222;</div>
+              <div className={s.stepTitle}>LEADS COME IN. AI CALLS.</div>
+              <p className={s.stepBody}>A dedicated number goes live. When a lead opts in, your AI agent calls within 5 minutes &mdash; day or night.</p>
+            </div>
+            <div className={s.step}>
+              <div className={s.stepNum}>04</div>
+              <div className={s.stepIcon}>&#128176;</div>
+              <div className={s.stepTitle}>YOU CLOSE. WE FOLLOW UP.</div>
+              <p className={s.stepBody}>The 14-day SMS sequence nurtures every lead automatically. Your CRM tracks everything in real time.</p>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* WHAT YOU GET */}
-      <section style={{
-        maxWidth: 900, margin: '100px auto 0', padding: '0 24px',
-        position: 'relative', zIndex: 10,
-      }}>
-        <h2 style={{ fontFamily: '"Bebas Neue", sans-serif', fontSize: 40, color: '#fff', textAlign: 'center', letterSpacing: 2, marginBottom: 48 }}>
-          WHAT YOU GET
-        </h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 24 }}>
-          {[
-            { icon: '📄', title: 'AI Business Page', desc: 'Custom landing page built from your prompt' },
-            { icon: '💬', title: '5-Step SMS Nudge', desc: 'Automated follow-up that converts leads' },
-            { icon: '📞', title: 'AI Phone Agent', desc: 'Calls your leads within 5 minutes' },
-            { icon: '📅', title: 'Booking Calendar', desc: 'Google Calendar integration, auto-schedule' },
-            { icon: '🛒', title: 'Product Store', desc: 'Sell products directly from your page' },
-            { icon: '🌐', title: 'Works on Any Website', desc: 'Embed on Shopify, WordPress, Wix, more' },
-          ].map((f) => (
-            <div key={f.title} style={{
-              background: '#0A0A0A', border: '1px solid #1A1A1A', borderRadius: 10, padding: 20,
-            }}>
-              <span style={{ fontSize: 28 }}>{f.icon}</span>
-              <h3 style={{ fontSize: 16, fontWeight: 600, color: '#fff', marginTop: 12, marginBottom: 4 }}>{f.title}</h3>
-              <p style={{ color: '#888', fontSize: 13, lineHeight: 1.5, margin: 0 }}>{f.desc}</p>
+      {/* HEAR IT WORK */}
+      <section className={s.demoSection}>
+        <div className={s.container}>
+          <span className={s.sectionLabel}>Hear it work</span>
+          <h2 className={s.sectionH2}>CALL THE AI AGENT LIVE.</h2>
+          <div className={s.demoGrid}>
+            <div className={s.demoPhone}>
+              <div className={s.phoneIcon}>&#128222;</div>
+              <p className={s.phoneLabel}>Live Demo Line</p>
+              <div className={s.phoneNumber}>888-302-0649</div>
+              <p style={{ fontSize: 13, color: '#666', fontWeight: 300 }}>Call right now and hear the AI agent handle your inquiry like a trained sales rep &mdash; 24/7, zero wait time.</p>
+              <a href="tel:8883020649" className={s.btnCall}>CALL NOW &rarr;</a>
             </div>
-          ))}
-        </div>
-      </section>
-
-      {/* PRICING PREVIEW */}
-      <section style={{
-        maxWidth: 1000, margin: '100px auto 0', padding: '0 24px',
-        position: 'relative', zIndex: 10,
-      }}>
-        <h2 style={{ fontFamily: '"Bebas Neue", sans-serif', fontSize: 40, color: '#fff', textAlign: 'center', letterSpacing: 2, marginBottom: 16 }}>
-          PRICING
-        </h2>
-        <div style={{ textAlign: 'center', marginBottom: 32 }}>
-          <button
-            onClick={() => setAnnualPricing(false)}
-            style={{ background: !annualPricing ? '#00CFFF' : 'transparent', color: !annualPricing ? '#000' : '#888', border: '1px solid #333', padding: '6px 16px', borderRadius: '6px 0 0 6px', cursor: 'pointer', fontSize: 13 }}
-          >Monthly</button>
-          <button
-            onClick={() => setAnnualPricing(true)}
-            style={{ background: annualPricing ? '#00CFFF' : 'transparent', color: annualPricing ? '#000' : '#888', border: '1px solid #333', padding: '6px 16px', borderRadius: '0 6px 6px 0', cursor: 'pointer', fontSize: 13 }}
-          >Annual (Save 20%)</button>
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 20 }}>
-          {[
-            { name: 'Launch', monthly: 99, annual: 79, popular: false },
-            { name: 'Grow', monthly: 199, annual: 159, popular: true },
-            { name: 'Scale', monthly: 397, annual: 317, popular: false },
-          ].map((plan) => (
-            <div key={plan.name} style={{
-              background: '#0A0A0A', border: plan.popular ? '2px solid #00CFFF' : '1px solid #1A1A1A',
-              borderRadius: 12, padding: 24, textAlign: 'center', position: 'relative',
-            }}>
-              {plan.popular && (
-                <span style={{
-                  position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)',
-                  background: '#00CFFF', color: '#000', padding: '2px 12px', borderRadius: 12,
-                  fontSize: 11, fontWeight: 700, letterSpacing: 1,
-                }}>MOST POPULAR</span>
-              )}
-              <h3 style={{ fontFamily: '"Bebas Neue", sans-serif', fontSize: 28, color: '#fff', letterSpacing: 2 }}>{plan.name}</h3>
-              <div style={{ fontSize: 36, fontWeight: 700, color: '#00CFFF', marginBottom: 4 }}>
-                ${annualPricing ? plan.annual : plan.monthly}
-                <span style={{ fontSize: 14, color: '#888', fontWeight: 300 }}>/mo</span>
+            <div className={s.demoFlow}>
+              <div className={s.flowStep}>
+                <div className={s.flowIcon}>&#128276;</div>
+                <div>
+                  <div className={s.flowTime}>T + 0:00</div>
+                  <div className={s.flowTitle}>Lead Opts In</div>
+                  <div className={s.flowDesc}>Visitor submits name, email, and phone on your funnel page.</div>
+                </div>
               </div>
-              {annualPricing && (
-                <p style={{ fontSize: 12, color: '#555', margin: '0 0 12px' }}>
-                  billed annually (${plan.annual * 12}/yr)
-                </p>
-              )}
+              <div className={s.flowStep}>
+                <div className={s.flowIcon}>&#128222;</div>
+                <div>
+                  <div className={s.flowTime}>T + 4:47</div>
+                  <div className={s.flowTitle}>AI Agent Calls</div>
+                  <div className={s.flowDesc}>System dials the lead, introduces your business, qualifies interest, and books the appointment.</div>
+                </div>
+              </div>
+              <div className={s.flowStep}>
+                <div className={s.flowIcon}>&#128172;</div>
+                <div>
+                  <div className={s.flowTime}>T + 5:30</div>
+                  <div className={s.flowTitle}>SMS Sequence Starts</div>
+                  <div className={s.flowDesc}>14-day automated follow-up begins &mdash; reminders, value texts, re-engagement nudges.</div>
+                </div>
+              </div>
+              <div className={s.flowStep}>
+                <div className={s.flowIcon}>&#128197;</div>
+                <div>
+                  <div className={s.flowTime}>T + 6:12</div>
+                  <div className={s.flowTitle}>Booking Confirmed</div>
+                  <div className={s.flowDesc}>Appointment lands on your calendar. Confirmation SMS sent. You show up and close.</div>
+                </div>
+              </div>
             </div>
-          ))}
-        </div>
-        <div style={{ textAlign: 'center', marginTop: 24 }}>
-          <a href="/pricing" style={{ color: '#00CFFF', fontSize: 14, textDecoration: 'none' }}>
-            View full pricing &rarr;
-          </a>
+          </div>
         </div>
       </section>
 
-      {/* DEMO CALLOUT */}
-      <section style={{
-        maxWidth: 700, margin: '100px auto 0', padding: '40px 24px',
-        textAlign: 'center', position: 'relative', zIndex: 10,
-      }}>
-        <h2 style={{ fontFamily: '"Bebas Neue", sans-serif', fontSize: 36, color: '#fff', letterSpacing: 2, marginBottom: 12 }}>
-          HEAR IT LIVE
-        </h2>
-        <p style={{ color: '#888', fontSize: 16, marginBottom: 24 }}>
-          Call the AI agent right now and hear it work.
-        </p>
-        <a href="tel:888-302-0649" style={{
-          display: 'inline-block', background: '#0A0A0A', border: '1px solid #00CFFF',
-          color: '#00CFFF', padding: '14px 32px', borderRadius: 8, fontSize: 22,
-          fontFamily: '"JetBrains Mono", monospace', textDecoration: 'none', letterSpacing: 2,
-        }}>
-          888-302-0649
-        </a>
-        <p style={{ color: '#555', fontSize: 13, marginTop: 12 }}>
-          <a href="/demo" style={{ color: '#00CFFF', textDecoration: 'none' }}>Or try the browser demo &rarr;</a>
-        </p>
+      {/* PRODUCT STORE */}
+      <section className={s.section} style={{ background: 'var(--bg)' }}>
+        <div className={s.container}>
+          <div className={s.storeHeader}>
+            <span className={s.sectionLabel}>Product store</span>
+            <h2 className={s.sectionH2}>YOUR PRODUCTS.<br />YOUR SYSTEM SELLS THEM.</h2>
+            <p className={s.storeSub}>Sell eBooks, services, physical products, or custom packages directly from your funnel &mdash; no third-party store required.</p>
+          </div>
+          <div className={s.storeGrid}>
+            <div className={s.storeCard}>
+              <div className={s.storeCardTop}>
+                <span className={s.storeType}>eBook</span>
+                <span className={`${s.storeStatus} ${s.storeStatusLive}`}>&#9679; LIVE</span>
+              </div>
+              <div className={s.storeEmoji}>&#128214;</div>
+              <div className={s.storeName}>THE ROAD TO THE STAGE</div>
+              <div className={s.storePrice}>$27</div>
+              <p style={{ fontSize: 12, color: '#555', fontWeight: 300 }}>Instant digital delivery via automated SMS after purchase.</p>
+            </div>
+            <div className={s.storeCard}>
+              <div className={s.storeCardTop}>
+                <span className={s.storeType}>Service</span>
+                <span className={`${s.storeStatus} ${s.storeStatusLive}`}>&#9679; LIVE</span>
+              </div>
+              <div className={s.storeEmoji}>&#127942;</div>
+              <div className={s.storeName}>ATHLETE RECRUITING PAGE</div>
+              <div className={s.storePrice}>$197</div>
+              <p style={{ fontSize: 12, color: '#555', fontWeight: 300 }}>Custom recruiting page built within 48 hours of purchase.</p>
+            </div>
+            <div className={s.storeCard}>
+              <div className={s.storeCardTop}>
+                <span className={s.storeType}>Physical</span>
+                <span className={`${s.storeStatus} ${s.storeStatusConnecting}`}>&#9679; CONNECTING</span>
+              </div>
+              <div className={s.storeEmoji}>&#128134;</div>
+              <div className={s.storeName}>HAIR PRODUCT COLLECTION</div>
+              <div className={s.storePrice}>&mdash;</div>
+              <p style={{ fontSize: 12, color: '#555', fontWeight: 300 }}>Shopify sync in progress. Live soon.</p>
+            </div>
+          </div>
+        </div>
       </section>
 
-      {/* RESULTS / PAIN POINTS */}
-      <section style={{
-        maxWidth: 700, margin: '100px auto 0', padding: '0 24px',
-        textAlign: 'center', position: 'relative', zIndex: 10,
-      }}>
-        <div style={{ background: '#0A0A0A', border: '1px solid #1A1A1A', borderRadius: 12, padding: 32 }}>
-          <p style={{ color: '#fff', fontSize: 20, lineHeight: 1.6, marginBottom: 16 }}>
-            &ldquo;The average service business loses 62% of leads to slow follow-up.&rdquo;
-          </p>
-          <p style={{ color: '#888', fontSize: 15, lineHeight: 1.6 }}>
-            AI calling your leads in 5 minutes vs. calling back tomorrow.<br />
-            You know which one books.
-          </p>
+      {/* TEMPLATES */}
+      <section className={s.templatesSection}>
+        <div className={s.container}>
+          <span className={s.sectionLabel}>Templates &amp; Customization</span>
+          <h2 className={s.sectionH2}>20+ INDUSTRY TEMPLATES.<br />YOUR COLORS. YOUR BRAND.</h2>
+          <div className={s.templatesGrid}>
+            {[
+              { emoji: '\u{1F3CB}\uFE0F', name: 'Fitness & Gyms' },
+              { emoji: '\u{1F487}', name: 'Salons & Beauty' },
+              { emoji: '\u{1F399}\uFE0F', name: 'Recording Studios' },
+              { emoji: '\u2696\uFE0F', name: 'Law Firms' },
+              { emoji: '\u{1F3E5}', name: 'Health & Dental' },
+              { emoji: '\u{1F527}', name: 'HVAC & Home' },
+              { emoji: '\u{1F3E0}', name: 'Real Estate' },
+              { emoji: '\u{1F37D}\uFE0F', name: 'Restaurants' },
+              { emoji: '\u{1F48A}', name: 'MedSpas' },
+              { emoji: '\u{1F9B7}', name: 'Dental Practices' },
+              { emoji: '\u{1F3D7}\uFE0F', name: 'Roofing & Construction' },
+              { emoji: '\u{1F4DA}', name: 'Tutoring & Coaching' },
+            ].map((t) => (
+              <div key={t.name} className={s.tmplCard} onClick={openLead}>
+                <div className={s.tmplEmoji}>{t.emoji}</div>
+                <div className={s.tmplName}>{t.name}</div>
+              </div>
+            ))}
+          </div>
+          <div className={s.colorPickerRow}>
+            <span className={s.colorPickerLabel}>Brand color:</span>
+            {[
+              { id: 'cyan', hex: '#00CFFF' },
+              { id: 'green', hex: '#00E87A' },
+              { id: 'red', hex: '#FF3B3B' },
+              { id: 'purple', hex: '#A855F7' },
+              { id: 'gold', hex: '#F59E0B' },
+              { id: 'pink', hex: '#EC4899' },
+              { id: 'white', hex: '#F5F5F5' },
+            ].map((c) => (
+              <div
+                key={c.id}
+                className={`${s.colorSwatch} ${activeColor === c.hex ? s.colorSwatchActive : ''}`}
+                style={{ background: c.hex }}
+                title={c.id.charAt(0).toUpperCase() + c.id.slice(1)}
+                onClick={() => selectColor(c.hex)}
+              />
+            ))}
+            <div
+              className={`${s.colorSwatch} ${s.colorSwatchCustom} ${activeColor === 'custom' ? s.colorSwatchActive : ''}`}
+              title="Custom color"
+              style={customColorOutline ? { outline: customColorOutline } : undefined}
+              onClick={() => customColorPickerRef.current?.click()}
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ pointerEvents: 'none' }}>
+                <circle cx="12" cy="12" r="3" />
+                <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83" />
+              </svg>
+              <input
+                ref={customColorPickerRef}
+                type="color"
+                defaultValue="#00CFFF"
+                style={{ position: 'absolute', opacity: 0, width: 0, height: 0, pointerEvents: 'none' }}
+                onChange={(e) => applyCustomColor(e.target.value)}
+              />
+            </div>
+            <span ref={colorPreviewLabelRef} style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: '#555', marginLeft: 4, letterSpacing: '0.06em' }}>#00CFFF</span>
+          </div>
+          <div ref={colorPreviewBarRef} style={{ marginTop: 16, padding: '16px 20px', borderRadius: 4, border: '2px solid #00CFFF', display: 'flex', alignItems: 'center', gap: 12, maxWidth: 420, transition: 'border-color 0.3s' }}>
+            <div ref={colorPreviewDotRef} style={{ width: 36, height: 36, borderRadius: 4, background: '#00CFFF', flexShrink: 0, transition: 'background 0.3s' }}></div>
+            <div>
+              <div style={{ fontFamily: "var(--font-mono)", fontSize: 9, color: '#555', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 3 }}>YOUR FUNNEL WILL USE</div>
+              <div ref={colorPreviewTextRef} style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 20, transition: 'color 0.3s', color: '#00CFFF' }}>THIS COLOR &rarr;</div>
+            </div>
+            <button ref={colorPreviewBtnRef} onClick={openLead} style={{ marginLeft: 'auto', fontFamily: "'Bebas Neue',sans-serif", fontSize: 14, padding: '8px 16px', border: 'none', cursor: 'pointer', borderRadius: 2, background: '#00CFFF', color: '#000', transition: 'background 0.3s', whiteSpace: 'nowrap' }}>BUILD WITH THIS COLOR &rarr;</button>
+          </div>
         </div>
+      </section>
+
+      {/* CHAT WIDGET */}
+      <section className={s.chatSection}>
+        <div className={s.container} style={{ textAlign: 'center' }}>
+          <span className={s.sectionLabel}>AI Chat Widget</span>
+          <h2 className={s.sectionH2}>YOUR SITE NEVER SLEEPS.</h2>
+          <p style={{ fontSize: 15, color: '#666', maxWidth: 480, margin: '12px auto 0', fontWeight: 300 }}>The AI chat widget answers questions, qualifies leads, and captures contact info &mdash; even at 2am on a Sunday.</p>
+          <div className={s.chatDemo}>
+            <div className={s.chatHeader}>
+              <div className={s.chatAvatar}>&#129302;</div>
+              <div>
+                <div className={s.chatHname}>LEV &mdash; AI ASSISTANT</div>
+                <div className={s.chatHstatus}>&#9679; Online now</div>
+              </div>
+            </div>
+            <div className={s.chatMessages}>
+              <div className={`${s.chatMsg} ${s.chatMsgAgent}`}>Hey! I&apos;m Lev, your AI assistant. What brings you in today?</div>
+              <div className={`${s.chatMsg} ${s.chatMsgUser}`}>Do you have any openings this week?</div>
+              <div className={`${s.chatMsg} ${s.chatMsgAgent}`}>Absolutely! I can get you scheduled. What&apos;s the best day for you &mdash; and can I grab your name and number?</div>
+              <div className={`${s.chatMsg} ${s.chatMsgUser}`}>I&apos;m Marcus, 314-555-0182. Wednesday works.</div>
+              <div className={`${s.chatMsg} ${s.chatMsgAgent}`}>Perfect, Marcus! You&apos;re booked for Wednesday. You&apos;ll get a confirmation text in a few seconds. &#127881;</div>
+            </div>
+            <div className={s.chatInputRow}>
+              <input className={s.chatInput} type="text" placeholder="Ask anything..." disabled />
+              <button className={s.chatSend}>&rarr;</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* TRUST */}
+      <section className={s.trustSection}>
+        <div className={s.container}>
+          <span className={s.sectionLabel}>Built to perform</span>
+          <h2 className={s.sectionH2}>RELIABILITY YOU CAN<br />SEND LEADS TO.</h2>
+          <div className={s.trustGrid}>
+            <div className={s.trustItem}>
+              <div className={s.trustIcon}>&#9889;</div>
+              <div className={s.trustStat}>99.9%</div>
+              <div className={s.trustLabel}>Platform uptime SLA &mdash; your funnel never goes down when it matters most.</div>
+            </div>
+            <div className={s.trustItem}>
+              <div className={s.trustIcon}>&#9989;</div>
+              <div className={s.trustStat}>A2P</div>
+              <div className={s.trustLabel}>10DLC compliance handled automatically &mdash; your SMS lands in inbox, not spam.</div>
+            </div>
+            <div className={s.trustItem}>
+              <div className={s.trustIcon}>&#128274;</div>
+              <div className={s.trustStat}>SOC2</div>
+              <div className={s.trustLabel}>Enterprise-grade security. Encrypted data. GDPR-aligned storage. Your leads are safe.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* PRICING */}
+      <section className={s.pricingSection}>
+        <div className={s.pricingHeader}>
+          <span className={s.sectionLabel}>Pricing</span>
+          <h2 className={s.sectionH2}>LESS THAN ONE MISSED CLIENT.</h2>
+          <p className={s.pricingSub}>Start free for 7 days. Not charged until Day 8.</p>
+        </div>
+        <div className={s.pricingGrid}>
+          <div className={s.priceCard}>
+            <div className={s.priceTier}>LAUNCH</div>
+            <div className={s.priceAmount}>
+              <span className={s.priceDollar}>$99</span>
+              <span className={s.pricePeriod}>/mo</span>
+            </div>
+            <div className={s.priceFeatures}>
+              <div className={`${s.pf} ${s.pfYes}`}>1 funnel page</div>
+              <div className={`${s.pf} ${s.pfYes}`}>250 leads/mo</div>
+              <div className={`${s.pf} ${s.pfYes}`}>AI chat widget</div>
+              <div className={`${s.pf} ${s.pfYes}`}>5-step SMS sequence</div>
+              <div className={`${s.pf} ${s.pfYes}`}>Booking calendar</div>
+              <div className={`${s.pf} ${s.pfYes}`}>Product store</div>
+              <div className={`${s.pf} ${s.pfNo}`}>AI phone agent</div>
+              <div className={`${s.pf} ${s.pfNo}`}>CRM portal</div>
+            </div>
+            <button className={`${s.btnPrice} ${s.btnPriceOutline}`} onClick={openLead}>START FREE TRIAL &rarr;</button>
+          </div>
+
+          <div className={`${s.priceCard} ${s.priceCardPopular}`}>
+            <div className={s.popularBadge}>MOST POPULAR</div>
+            <div className={s.priceTier}>GROW</div>
+            <div className={s.priceAmount}>
+              <span className={s.priceDollar}>$199</span>
+              <span className={s.pricePeriod}>/mo</span>
+            </div>
+            <div className={s.priceFeatures}>
+              <div className={`${s.pf} ${s.pfYes}`}>3 funnel pages</div>
+              <div className={`${s.pf} ${s.pfYes}`}>1,000 leads/mo</div>
+              <div className={`${s.pf} ${s.pfYes}`}>AI phone agent</div>
+              <div className={`${s.pf} ${s.pfYes}`}>SMS blast campaigns</div>
+              <div className={`${s.pf} ${s.pfYes}`}>Realtime CRM portal</div>
+              <div className={`${s.pf} ${s.pfYes}`}>Custom domain add-on</div>
+              <div className={`${s.pf} ${s.pfYes}`}>Everything in Launch</div>
+            </div>
+            <button className={`${s.btnPrice} ${s.btnPricePrimary}`} onClick={openLead}>START FREE TRIAL &rarr;</button>
+          </div>
+
+          <div className={s.priceCard}>
+            <div className={s.priceTier}>SCALE</div>
+            <div className={s.priceAmount}>
+              <span className={s.priceDollar}>$397</span>
+              <span className={s.pricePeriod}>/mo</span>
+            </div>
+            <div className={s.priceFeatures}>
+              <div className={`${s.pf} ${s.pfYes}`}>Unlimited funnels</div>
+              <div className={`${s.pf} ${s.pfYes}`}>Unlimited leads</div>
+              <div className={`${s.pf} ${s.pfYes}`}>White-label option</div>
+              <div className={`${s.pf} ${s.pfYes}`}>1 domain included</div>
+              <div className={`${s.pf} ${s.pfYes}`}>Multi-client mgmt</div>
+              <div className={`${s.pf} ${s.pfYes}`}>8% store cut (vs 10%)</div>
+              <div className={`${s.pf} ${s.pfYes}`}>Everything in Grow</div>
+            </div>
+            <button className={`${s.btnPrice} ${s.btnPriceOutline}`} onClick={openLead}>START FREE TRIAL &rarr;</button>
+          </div>
+        </div>
+        <p style={{ textAlign: 'center', marginTop: 28, fontFamily: "var(--font-mono)", fontSize: 10, color: '#444', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+          <Link href="/pricing" style={{ color: 'var(--cyan)', textDecoration: 'none' }}>View full pricing &amp; feature comparison &rarr;</Link>
+        </p>
       </section>
 
       {/* FINAL CTA */}
-      <section style={{
-        maxWidth: 700, margin: '100px auto 0', padding: '0 24px',
-        textAlign: 'center', position: 'relative', zIndex: 10,
-      }}>
-        <h2 style={{ fontFamily: '"Bebas Neue", sans-serif', fontSize: 'clamp(28px, 4vw, 48px)', color: '#fff', letterSpacing: 2, marginBottom: 16 }}>
-          BUILD YOUR AI BUSINESS PAGE.<br />FREE FOR 7 DAYS.
-        </h2>
-        <a href="/auth/signup" style={{
-          display: 'block', maxWidth: 500, margin: '0 auto', background: '#00CFFF', color: '#000',
-          padding: '16px 32px', borderRadius: 8, fontFamily: '"Bebas Neue", sans-serif',
-          fontSize: 22, letterSpacing: 2, textDecoration: 'none', textAlign: 'center',
-        }}>
-          START FREE TRIAL &rarr;
-        </a>
-        <p style={{ color: '#555', fontSize: 14, marginTop: 12 }}>
-          No code. No agency. One prompt.
-        </p>
+      <section className={s.finalCta}>
+        <span className={s.sectionLabel}>Ready?</span>
+        <h2 className={s.finalH2}>STOP LEAKING<br />HIGH-TICKET REVENUE.</h2>
+        <p className={s.finalSub}>Every lead that goes unanswered for more than an hour is a lost client. The GoElev8.AI Lead Acquisition System calls before your competition even reads the notification.</p>
+        <button className={s.btnFinal} onClick={openLead}>BUILD MY SYSTEM FREE &rarr;</button>
+        <p style={{ marginTop: 20, fontFamily: "var(--font-mono)", fontSize: 10, color: '#444', letterSpacing: '0.06em' }}>7-DAY FREE TRIAL &middot; NO CARD UNTIL DAY 8 &middot; CANCEL ANYTIME</p>
       </section>
 
       {/* FOOTER */}
-      <footer style={{
-        maxWidth: 1200, margin: '100px auto 0', padding: '40px 24px 32px',
-        borderTop: '1px solid #1A1A1A', position: 'relative', zIndex: 10,
-      }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 32 }}>
-          <div>
-            <span style={{ fontFamily: '"Bebas Neue", sans-serif', fontSize: 22, color: '#00CFFF', letterSpacing: 2 }}>
-              GoElev8.ai
-            </span>
-          </div>
-          <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', fontSize: 13 }}>
-            {[
-              { label: 'Pricing', href: '/pricing' },
-              { label: 'Demo', href: '/demo' },
-              { label: 'Templates', href: '/templates' },
-              { label: 'Support', href: '/support' },
-              { label: 'Privacy', href: '/privacy' },
-              { label: 'Terms', href: '/terms' },
-              { label: 'SMS Policy', href: '/sms-policy' },
-            ].map((link) => (
-              <a key={link.href} href={link.href} style={{ color: '#555', textDecoration: 'none' }}>
-                {link.label}
-              </a>
-            ))}
-          </div>
+      <footer className={s.footer}>
+        <div className={s.footerBrand}>
+          <img src={FOOTER_LOGO} alt="GoElev8.AI" className={s.footerLogo} style={{ mixBlendMode: 'screen', filter: 'brightness(1.2)' }} />
+          <span className={s.footerName}>GOELEV8.AI</span>
         </div>
-        <div style={{ marginTop: 24, fontSize: 12, color: '#333' }}>
-          &copy; 2026 GoElev8.ai &middot; Aaron Bryant &middot; All rights reserved.
-          <br />Powered by Claude and Vapi
+        <div className={s.footerLinks}>
+          <Link href="/pricing">Pricing</Link>
+          <Link href="/privacy">Privacy</Link>
+          <Link href="/terms">Terms</Link>
+          <Link href="/sms-policy">SMS Policy</Link>
         </div>
+        <span className={s.footerCopy}>&copy; 2025 GoElev8.AI &mdash; All rights reserved</span>
       </footer>
 
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
-        @keyframes glitch {
-          0%, 90%, 100% { text-shadow: none; }
-          92% { text-shadow: -2px 0 #00CFFF, 2px 0 #FF00FF; }
-          94% { text-shadow: 2px 0 #00CFFF, -2px 0 #FF00FF; }
-          96% { text-shadow: none; }
-        }
-      `}</style>
+      {/* LEAD MODAL */}
+      <div
+        className={`${s.modalOverlay} ${leadOpen ? s.modalOverlayOpen : ''}`}
+        onClick={(e) => { if (e.target === e.currentTarget) closeLead(); }}
+      >
+        <div className={s.modal}>
+          <button className={s.modalClose} onClick={closeLead}>&#10005;</button>
+
+          {!leadSubmitted ? (
+            <div ref={modalFormRef}>
+              <div className={s.modalTag}>Start Free Trial</div>
+              <h2 className={s.modalH}>7 DAYS FREE.<br />THEN $99/MO.</h2>
+              <p className={s.modalSub}>No charge until Day 8. Cancel any time. Start building your lead system in 20 seconds.</p>
+              <div className={s.modalForm}>
+                <div className={s.formRow}>
+                  <div className={s.formField}>
+                    <label className={s.formLabel}>First Name</label>
+                    <input ref={mFirstRef} className={s.formInput} type="text" placeholder="Marcus" />
+                  </div>
+                  <div className={s.formField}>
+                    <label className={s.formLabel}>Last Name</label>
+                    <input ref={mLastRef} className={s.formInput} type="text" placeholder="Johnson" />
+                  </div>
+                </div>
+                <div className={s.formField}>
+                  <label className={s.formLabel}>Email</label>
+                  <input ref={mEmailRef} className={s.formInput} type="email" placeholder="marcus@mybusiness.com" />
+                </div>
+                <div className={s.formField}>
+                  <label className={s.formLabel}>Phone</label>
+                  <input ref={mPhoneRef} className={s.formInput} type="tel" placeholder="(314) 555-0182" />
+                </div>
+                <button className={s.btnModal} onClick={submitLead}>START BUILDING FREE &rarr;</button>
+                <p className={s.modalFine}>By submitting you agree to receive SMS from GoElev8.ai. Reply STOP to opt out. Msg &amp; data rates may apply.</p>
+              </div>
+            </div>
+          ) : (
+            <div className={s.modalSuccess} style={{ display: 'flex' }}>
+              <div className={s.successIcon}>&#10003;</div>
+              <div className={s.successH}>YOU&apos;RE IN.</div>
+              <p className={s.successSub}>Redirecting you to your dashboard now...</p>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
