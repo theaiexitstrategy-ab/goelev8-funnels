@@ -2,7 +2,7 @@
    GOELEV8.AI — CYBER-NOIR AI STARTUP
    (c) 2026 Aaron Bryant. All rights reserved.
    ==================================================== */
-:root{
+.page{
   --blk:#000;--blk2:#060606;--card:#0e0e0e;--card2:#141414;
   --b1:#191919;--b2:#222;--b3:#2e2e2e;
   --cyan:#00CFFF;--cyan-d:#009dcc;--cyan-f:rgba(0,207,255,.07);--cyan-g:rgba(0,207,255,.14);
@@ -12,8 +12,8 @@
   --fd:'Bebas Neue',sans-serif;
   --fb:'DM Sans',sans-serif;
   --fm:'JetBrains Mono',monospace;
+  background:var(--blk);color:var(--wh);font-family:var(--fb);font-weight:300;line-height:1.6;overflow-x:hidden;margin:0;padding:0
 }
-.page{background:var(--blk);color:var(--wh);font-family:var(--fb);font-weight:300;line-height:1.6;overflow-x:hidden;margin:0;padding:0}
 .page *{margin:0;padding:0;box-sizing:border-box}
 .scanlines{position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,207,255,.011) 2px,rgba(0,207,255,.011) 4px);pointer-events:none;z-index:9998}
 .noise{position:fixed;inset:0;pointer-events:none;z-index:9997;opacity:.5}
