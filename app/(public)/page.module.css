@@ -519,7 +519,7 @@ select.mi option{background:#0e0e0e}
   line-height:1.65;resize:none;min-height:28px;max-height:160px;
   caret-color:var(--cyan);overflow-y:auto;
 }
-.chat-ta::placeholder{color:var(--b4)}
+.chat-ta::placeholder{color:var(--mu)}
 .chat-send{
   width:40px;height:40px;background:var(--cyan);border:none;border-radius:2px;
   display:flex;align-items:center;justify-content:center;cursor:none;
