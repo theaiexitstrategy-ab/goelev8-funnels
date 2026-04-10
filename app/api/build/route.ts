@@ -4,7 +4,7 @@ import { createServiceClient } from '@/lib/db/supabase-service';
 import { z } from 'zod';
 import { createHash } from 'crypto';
 
-const anthropic = new Anthropic();
+const anthropic = new Anthropic({ maxRetries: 3 });
 
 const buildSchema = z.object({
   prompt: z.string().min(10, 'Describe your business in at least 10 characters').max(500),
@@ -243,6 +243,15 @@ Return exactly this JSON structure:
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);
     console.error('[api/build]', message, err);
+
+    // Friendly message for Anthropic overload errors
+    if (message.includes('overloaded') || message.includes('529')) {
+      return Response.json(
+        { error: 'AI servers are busy right now. Please try again in a few seconds.' },
+        { status: 503 }
+      );
+    }
+
     return Response.json({ error: `Build failed: ${message}` }, { status: 500 });
   }
 }
