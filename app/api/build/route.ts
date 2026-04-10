@@ -77,9 +77,9 @@ export async function POST(req: Request) {
 
     const { prompt } = parsed.data;
 
-    // 3. Generate slug via Claude Haiku
+    // 3. Generate slug via Claude
     const slugMessage = await anthropic.messages.create({
-      model: 'claude-haiku-4-5-20251001',
+      model: 'claude-sonnet-4-20250514',
       max_tokens: 50,
       messages: [{
         role: 'user',
@@ -113,9 +113,9 @@ Business: ${prompt.slice(0, 500)}`,
       slug = `${slug}-${Math.floor(Math.random() * 900 + 100)}`;
     }
 
-    // 4. Generate funnel content via Claude Haiku
+    // 4. Generate funnel content via Claude
     const buildMessage = await anthropic.messages.create({
-      model: 'claude-haiku-4-5-20251001',
+      model: 'claude-sonnet-4-20250514',
       max_tokens: 1200,
       messages: [{
         role: 'user',
@@ -240,8 +240,9 @@ Return exactly this JSON structure:
       },
     });
 
-  } catch (err) {
-    console.error('[api/build]', err);
-    return Response.json({ error: 'Internal server error' }, { status: 500 });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error('[api/build]', message, err);
+    return Response.json({ error: `Build failed: ${message}` }, { status: 500 });
   }
 }
