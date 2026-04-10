@@ -12,41 +12,46 @@ const buildSchema = z.object({
 
 // ── Rate limiting (3 builds per IP per hour) ──
 async function checkRateLimit(req: Request, supabase: ReturnType<typeof createServiceClient>): Promise<Response | null> {
-  const forwarded = req.headers.get('x-forwarded-for');
-  const ip = forwarded ? forwarded.split(',')[0].trim() : 'unknown';
-  const ipHash = createHash('sha256').update(ip).digest('hex').slice(0, 16);
+  try {
+    const forwarded = req.headers.get('x-forwarded-for');
+    const ip = forwarded ? forwarded.split(',')[0].trim() : 'unknown';
+    const ipHash = createHash('sha256').update(ip).digest('hex').slice(0, 16);
 
-  const windowStart = new Date(Date.now() - 60 * 60 * 1000); // 1 hour ago
+    const windowStart = new Date(Date.now() - 60 * 60 * 1000); // 1 hour ago
 
-  // Clean old entries
-  await supabase
-    .from('build_rate_limits')
-    .delete()
-    .lt('window_start', windowStart.toISOString());
+    // Clean old entries
+    await supabase
+      .from('build_rate_limits')
+      .delete()
+      .lt('window_start', windowStart.toISOString());
 
-  // Check current count
-  const { data: existing } = await supabase
-    .from('build_rate_limits')
-    .select('id, count')
-    .eq('ip_hash', ipHash)
-    .gte('window_start', windowStart.toISOString())
-    .single();
+    // Check current count
+    const { data: existing } = await supabase
+      .from('build_rate_limits')
+      .select('id, count')
+      .eq('ip_hash', ipHash)
+      .gte('window_start', windowStart.toISOString())
+      .single();
 
-  if (existing) {
-    if (existing.count >= 3) {
-      return Response.json(
-        { error: "You've built 3 pages this hour. Sign up to build unlimited pages." },
-        { status: 429 }
-      );
+    if (existing) {
+      if (existing.count >= 3) {
+        return Response.json(
+          { error: "You've built 3 pages this hour. Sign up to build unlimited pages." },
+          { status: 429 }
+        );
+      }
+      await supabase
+        .from('build_rate_limits')
+        .update({ count: existing.count + 1 })
+        .eq('id', existing.id);
+    } else {
+      await supabase
+        .from('build_rate_limits')
+        .insert({ ip_hash: ipHash, count: 1, window_start: new Date().toISOString() });
     }
-    await supabase
-      .from('build_rate_limits')
-      .update({ count: existing.count + 1 })
-      .eq('id', existing.id);
-  } else {
-    await supabase
-      .from('build_rate_limits')
-      .insert({ ip_hash: ipHash, count: 1, window_start: new Date().toISOString() });
+  } catch (err) {
+    // Rate limit table may not exist yet — skip gracefully
+    console.error('[api/build] Rate limit check failed (table may not exist):', err);
   }
 
   return null;
@@ -188,8 +193,8 @@ Return exactly this JSON structure:
       .single();
 
     if (insertError) {
-      console.error('[api/build] Supabase insert error:', insertError);
-      return Response.json({ error: 'Failed to create funnel page.' }, { status: 500 });
+      console.error('[api/build] Supabase insert error:', insertError.message, insertError.code, insertError.details);
+      return Response.json({ error: `Failed to create funnel page: ${insertError.message}` }, { status: 500 });
     }
 
     // 7. Insert SMS nudge sequence
