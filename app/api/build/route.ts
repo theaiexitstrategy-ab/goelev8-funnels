@@ -11,7 +11,7 @@ const buildSchema = z.object({
 });
 
 // ── Rate limiting (3 builds per IP per hour) ──
-async function checkRateLimit(req: Request, supabase: ReturnType<typeof createServiceClient>) {
+async function checkRateLimit(req: Request, supabase: ReturnType<typeof createServiceClient>): Promise<Response | null> {
   const forwarded = req.headers.get('x-forwarded-for');
   const ip = forwarded ? forwarded.split(',')[0].trim() : 'unknown';
   const ipHash = createHash('sha256').update(ip).digest('hex').slice(0, 16);
@@ -34,10 +34,10 @@ async function checkRateLimit(req: Request, supabase: ReturnType<typeof createSe
 
   if (existing) {
     if (existing.count >= 3) {
-      return { limited: true, response: Response.json(
+      return Response.json(
         { error: "You've built 3 pages this hour. Sign up to build unlimited pages." },
         { status: 429 }
-      )};
+      );
     }
     await supabase
       .from('build_rate_limits')
@@ -49,7 +49,7 @@ async function checkRateLimit(req: Request, supabase: ReturnType<typeof createSe
       .insert({ ip_hash: ipHash, count: 1, window_start: new Date().toISOString() });
   }
 
-  return { limited: false, response: null };
+  return null;
 }
 
 export async function POST(req: Request) {
@@ -57,8 +57,8 @@ export async function POST(req: Request) {
     const supabase = createServiceClient();
 
     // 1. Rate limit
-    const rateCheck = await checkRateLimit(req, supabase);
-    if (rateCheck.limited) return rateCheck.response;
+    const rateLimited = await checkRateLimit(req, supabase);
+    if (rateLimited) return rateLimited;
 
     // 2. Parse and validate prompt
     const body = await req.json();
