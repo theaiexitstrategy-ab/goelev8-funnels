@@ -86,6 +86,8 @@ export default function HomePage() {
   const [chatOf, setChatOf] = useState('—');
   const [chatS0, setChatS0] = useState('—');
   const [chatAg, setChatAg] = useState('—');
+  const [buildResult, setBuildResult] = useState<{slug:string;funnel_id:string;url:string;full_url:string;expires_at:string;preview:Record<string,string>}|null>(null);
+  const [buildError, setBuildError] = useState('');
 
   /* ── Pricing ── */
   const [annualBilling, setAnnualBilling] = useState(false);
@@ -203,27 +205,33 @@ export default function HomePage() {
 
   const buildFromChat = useCallback(async (prompt: string) => {
     setShowChatOutput(true);
-    addMessage('assistant', '<strong>Building your system now...</strong><br><span style="font-family:var(--fm);font-size:10px;color:var(--mu)">Analyzing your business · Generating SMS copy · Writing agent script...</span>');
+    setBuildError('');
+    setBuildResult(null);
+    addMessage('assistant', '<strong>Building your system now...</strong><br><span style="font-family:var(--fm);font-size:10px;color:var(--mu)">Generating slug · Building page · Writing SMS sequence...</span>');
     try {
-      const res = await fetch('/api/funnel/preview', {
+      const res = await fetch('/api/build', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: prompt.slice(0, 1000) }),
+        body: JSON.stringify({ prompt: prompt.slice(0, 500) }),
       });
       const data = await res.json();
-      setChatHl(data.headline || '—');
-      setChatOf(data.offer || '—');
-      setChatS0(data.sms_day0 || '—');
-      setChatAg(data.agent_opening || '—');
+      if (!res.ok) {
+        setBuildError(data.error || 'Something went wrong. Please try again.');
+        addMessage('assistant', `<span style="color:#FF3B3B">✗ ${data.error || 'Build failed. Please try again.'}</span>`);
+        setChatSending(false);
+        return;
+      }
+      setBuildResult(data);
+      setChatHl(data.preview?.hero_headline || '—');
+      setChatOf(data.preview?.offer_text || '—');
+      setChatS0('5-step SMS sequence generated');
+      setChatAg(`Live at goelev8.ai/f/${data.slug}`);
       setShowChatBlocks(true);
       setShowChatActs(true);
-      addMessage('assistant', `✓ <strong>Your system is ready.</strong><br>Page headline, SMS sequence, and AI agent script generated. Click <strong>Launch This Funnel →</strong> to claim your free page.`);
+      addMessage('assistant', `✓ <strong>Your page is live.</strong><br>Visit <strong>goelev8.ai/f/${data.slug}</strong> — claim it free to activate your lead system.`);
     } catch {
-      setChatHl('Your AI Business Page Is Ready');
-      setChatS0("Hey! Thanks for reaching out — what's your main goal right now? Reply and we'll get you sorted 🔥");
-      setShowChatBlocks(true);
-      setShowChatActs(true);
-      addMessage('assistant', '✓ <strong>Your system is generated.</strong> Review the output below and click Launch to claim your free page.');
+      setBuildError('Network error. Please check your connection and try again.');
+      addMessage('assistant', '<span style="color:#FF3B3B">✗ Network error. Please try again.</span>');
     }
     setChatSending(false);
   }, [addMessage]);
@@ -338,7 +346,6 @@ export default function HomePage() {
       closeWizard();
       setChatInput(prompt);
       setTimeout(() => sendChatMessage(prompt), 300);
-      setTimeout(() => openLead(), 6000);
     }
   }, [wizStep, wizData, closeWizard, sendChatMessage, openLead]);
 
@@ -491,6 +498,9 @@ export default function HomePage() {
                 <button className={s['chat-chip']} onClick={() => useChatChip('Professional recording studio — recording, mixing, mastering, free 1-hour intro session')}>🎙️ Recording studio</button>
                 <button className={s['chat-chip']} onClick={() => useChatChip('Law firm handling personal injury and family law, free 30-minute consultation')}>⚖️ Law firm</button>
               </div>
+              {buildError && (
+                <div style={{padding:'10px 14px',marginTop:8,background:'rgba(255,59,59,.08)',border:'1px solid rgba(255,59,59,.2)',borderRadius:6,fontSize:12,color:'#FF3B3B',fontFamily:'var(--fm)'}}>{buildError}</div>
+              )}
               {showChatOutput && (
                 <div className={`${s['chat-output']} ${s.show}`}>
                   <div className={s['co-label']}>// Generated for your business</div>
@@ -498,14 +508,25 @@ export default function HomePage() {
                     <div className={s['co-blocks']}>
                       <div className={s['co-blk']}><div className={s['co-blk-l']}>Page Headline</div><div className={s['co-blk-v']}>{chatHl}</div></div>
                       <div className={s['co-blk']}><div className={s['co-blk-l']}>Lead Offer</div><div className={s['co-blk-v']}>{chatOf}</div></div>
-                      <div className={s['co-blk']}><div className={s['co-blk-l']}>Day 0 SMS — fires in 60 seconds</div><div className={s['co-blk-v']}>{chatS0}</div></div>
-                      <div className={s['co-blk']}><div className={s['co-blk-l']}>AI Agent Opening Line</div><div className={s['co-blk-v']}>{chatAg}</div></div>
+                      <div className={s['co-blk']}><div className={s['co-blk-l']}>SMS Sequence</div><div className={s['co-blk-v']}>{chatS0}</div></div>
+                      {buildResult && (
+                        <div className={s['co-blk']}>
+                          <div className={s['co-blk-l']}>Live URL</div>
+                          <div className={s['co-blk-v']} style={{cursor:'pointer',textDecoration:'underline'}} onClick={() => { navigator.clipboard.writeText(buildResult.full_url); }}>{chatAg}</div>
+                        </div>
+                      )}
                     </div>
                   )}
-                  {showChatActs && (
+                  {showChatActs && buildResult && (
+                    <div className={s['co-acts']}>
+                      <button className={s['co-act']} onClick={() => { navigator.clipboard.writeText(buildResult.full_url); }}>Copy URL</button>
+                      <a href={buildResult.full_url} target="_blank" rel="noopener noreferrer" className={s['co-act']} style={{textDecoration:'none'}}>Preview Page →</a>
+                      <button className={`${s['co-act']} ${s['co-act-p']}`} onClick={() => { window.location.href = `/auth/signup?slug=${buildResult.slug}&funnel_id=${buildResult.funnel_id}`; }}>Claim This Page Free →</button>
+                    </div>
+                  )}
+                  {showChatActs && !buildResult && (
                     <div className={s['co-acts']}>
                       <button className={s['co-act']} onClick={() => chatTARef.current?.focus()}>↺ Refine</button>
-                      <button className={`${s['co-act']} ${s['co-act-p']}`} onClick={openLead}>Launch This Funnel →</button>
                     </div>
                   )}
                 </div>
