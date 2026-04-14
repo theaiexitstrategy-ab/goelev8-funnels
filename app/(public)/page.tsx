@@ -406,10 +406,14 @@ export default function HomePage() {
           <li><a href="#templates">Templates</a></li>
           <li><a href="#pricing">Pricing</a></li>
           <li><a href="#proof">Results</a></li>
+          <li><a href="https://book.goelev8.ai" target="_blank" rel="noopener noreferrer">AI Booking</a></li>
         </ul>
-        <Link href="/auth/signup" className={s['nav-cta']} onClick={(e) => { e.preventDefault(); openLead(); }}>
-          Start Free Trial →
-        </Link>
+        <div className={s['nav-actions']}>
+          <a href="https://portal.goelev8.ai" className={s['nav-signin']} target="_blank" rel="noopener noreferrer">Sign In</a>
+          <Link href="/auth/signup" className={s['nav-cta']} onClick={(e) => { e.preventDefault(); openLead(); }}>
+            Start Free Trial →
+          </Link>
+        </div>
       </nav>
 
       {/* ── HERO ── */}

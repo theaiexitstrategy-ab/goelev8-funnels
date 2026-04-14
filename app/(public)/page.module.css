@@ -36,6 +36,9 @@
 .nav-links{display:flex;gap:24px;list-style:none;align-items:center}
 .nav-links a{color:var(--mu);text-decoration:none;font-size:11px;letter-spacing:.8px;text-transform:uppercase;transition:color .2s;font-family:var(--fm)}
 .nav-links a:hover{color:var(--cyan)}
+.nav-actions{display:flex;align-items:center;gap:16px}
+.nav-signin{color:var(--mu);text-decoration:none;font-size:11px;letter-spacing:.8px;text-transform:uppercase;transition:color .2s;font-family:var(--fm);padding:8px 16px;border:1px solid rgba(255,255,255,.15);border-radius:1px}
+.nav-signin:hover{color:var(--cyan);border-color:var(--cyan)}
 .nav-cta{background:transparent;color:var(--cyan);border:1px solid var(--cyan);padding:8px 20px;border-radius:1px;font-size:11px;font-weight:500;letter-spacing:1px;cursor:pointer;font-family:var(--fm);text-decoration:none;transition:all .2s;text-transform:uppercase;animation:borderPulse 3s ease infinite}
 .nav-cta:hover{background:var(--cyan);color:var(--blk)}
 
@@ -434,7 +437,7 @@ select.mi option{background:#0e0e0e}
 
 @media(max-width:1024px){
   .hero{grid-template-columns:1fr}.hero-lev{display:none}.lev-stats{display:none}
-  .nav{padding:12px 20px}.nav-links{display:none}
+  .nav{padding:12px 20px}.nav-links{display:none}.nav-signin{display:none}
   .section,.cta-section{padding:60px 20px}
   .hero{padding:110px 20px 56px}
   .hero-h{font-size:clamp(48px,13vw,84px)}
