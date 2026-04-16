@@ -21,7 +21,7 @@ export async function POST(req: Request) {
     const { data: user } = await service.from('users').select('tier').eq('id', session.user.id).single();
 
     // Tier check — custom domains are paid plans only
-    if (!user || !['launch', 'grow', 'scale'].includes(user.tier))
+    if (!user || !['starter', 'growth', 'pro', 'launch', 'grow', 'scale'].includes(user.tier))
       return Response.json({ error: 'Upgrade required' }, { status: 402 });
 
     // Add domain to Vercel project

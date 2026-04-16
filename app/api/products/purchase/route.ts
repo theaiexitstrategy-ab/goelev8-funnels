@@ -26,8 +26,9 @@ export async function POST(req: Request) {
       return Response.json({ error: 'Seller payment not configured' }, { status: 402 });
 
     // Calculate platform cut based on seller's tier
-    const limits = TIER_LIMITS[seller.tier as Tier] || TIER_LIMITS.launch;
-    const cutPct = limits.store_cut_pct; // 10 or 8
+    // Default to growth tier for any unrecognized tier (including legacy tier names)
+    const limits = TIER_LIMITS[seller.tier as Tier] || TIER_LIMITS.growth;
+    const cutPct = 10; // flat 10% platform cut
     const platformCutCents = Math.round(product.price_cents * (cutPct / 100));
 
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);

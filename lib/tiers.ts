@@ -1,45 +1,41 @@
 // (c) 2026 GoElev8.ai | Aaron Bryant. All rights reserved.
 
-export type Tier = 'free' | 'launch' | 'grow' | 'scale';
+export type Tier = 'starter' | 'growth' | 'pro';
 
 export const TIER_LIMITS: Record<Tier, {
-  funnels: number;
-  leads_per_month: number;
   sms_per_month: number;
-  custom_domain: boolean;
-  store_cut_pct: number;
-  products: number;
+  vapi_minutes_per_month: number;
+  sms_overage: number;
+  vapi_overage: number;
+  setup_fee: number;
+  monthly_price: number;
+  has_vapi: boolean;
 }> = {
-  free: {
-    funnels: 1,
-    leads_per_month: 50,
-    sms_per_month: 0,
-    custom_domain: false,
-    store_cut_pct: 15,
-    products: 3,
+  starter: {
+    sms_per_month: 300,
+    vapi_minutes_per_month: 0,
+    sms_overage: 0.05,
+    vapi_overage: 0,
+    setup_fee: 300,
+    monthly_price: 127,
+    has_vapi: false,
   },
-  launch: {
-    funnels: 3,
-    leads_per_month: 500,
-    sms_per_month: 500,
-    custom_domain: true,
-    store_cut_pct: 10,
-    products: 25,
+  growth: {
+    sms_per_month: 600,
+    vapi_minutes_per_month: 60,
+    sms_overage: 0.05,
+    vapi_overage: 0.15,
+    setup_fee: 400,
+    monthly_price: 197,
+    has_vapi: true,
   },
-  grow: {
-    funnels: 10,
-    leads_per_month: 2000,
-    sms_per_month: 2000,
-    custom_domain: true,
-    store_cut_pct: 10,
-    products: 100,
-  },
-  scale: {
-    funnels: 50,
-    leads_per_month: 10000,
-    sms_per_month: 10000,
-    custom_domain: true,
-    store_cut_pct: 8,
-    products: 500,
+  pro: {
+    sms_per_month: 1200,
+    vapi_minutes_per_month: 120,
+    sms_overage: 0.05,
+    vapi_overage: 0.15,
+    setup_fee: 600,
+    monthly_price: 297,
+    has_vapi: true,
   },
 };
