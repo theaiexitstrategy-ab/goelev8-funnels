@@ -58,7 +58,7 @@
 .hero-eyebrow::before{content:'';width:24px;height:1px;background:var(--gold)}
 
 .hero-h{position:relative;font-family:var(--fd);font-size:clamp(44px,6.2vw,86px);line-height:.95;letter-spacing:1.5px;margin-bottom:22px;animation:fadeUp .5s .05s ease both;font-weight:400;color:var(--wh)}
-.hero-h .gold{color:var(--gold)}
+.hero-h .gold{color:var(--cyan)}
 .hero-h .c{color:var(--gold)}
 .hero-h .s{-webkit-text-stroke:1.5px rgba(255,255,255,.22);color:transparent}
 
