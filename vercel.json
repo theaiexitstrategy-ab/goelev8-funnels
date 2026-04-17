@@ -1,5 +1,19 @@
 {
   "framework": "nextjs",
   "buildCommand": "npm run build",
-  "outputDirectory": ".next"
+  "outputDirectory": ".next",
+  "rewrites": [
+    {
+      "source": "/rome",
+      "destination": "/rome-hub.html"
+    },
+    {
+      "source": "/rome/comedy",
+      "destination": "/rome-comedy.html"
+    },
+    {
+      "source": "/rome/barber",
+      "destination": "/rome-barber.html"
+    }
+  ]
 }
