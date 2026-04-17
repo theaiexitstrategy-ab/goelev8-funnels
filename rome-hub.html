@@ -1,0 +1,304 @@
+<!-- © 2026 GoElev8.ai | Aaron Bryant. All rights reserved. Unauthorized use prohibited. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Rome – Comedian. Barber. Brand.</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,700;1,300&family=Permanent+Marker&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --black: #080808;
+    --white: #F4F0E8;
+    --gold: #FFD700;
+    --red: #E8000A;
+    --blue: #0057FF;
+    --gray: #141414;
+    --mid: #1E1E1E;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  /* NOISE */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 9999; opacity: 0.5;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.1rem 2rem;
+    background: rgba(8,8,8,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .nav-brand {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 0.18em;
+    color: rgba(255,255,255,0.35);
+    text-decoration: none;
+  }
+  .nav-brand span { color: var(--gold); }
+  .nav-links { display: flex; gap: 1.5rem; }
+  .nav-links a {
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--gold); }
+
+  /* HERO — SPLIT */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 8rem 1.5rem 4rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* diagonal bg split */
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(
+      135deg,
+      rgba(232,0,10,0.07) 0%,
+      transparent 45%,
+      rgba(0,87,255,0.07) 100%
+    );
+    pointer-events: none;
+  }
+
+  .eyebrow {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.35);
+    margin-bottom: 1.2rem;
+    animation: up 0.6s ease both;
+  }
+
+  .hero-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(6rem, 22vw, 14rem);
+    line-height: 0.88;
+    letter-spacing: 0.01em;
+    animation: up 0.65s 0.1s ease both;
+  }
+  .hero-name .outline {
+    -webkit-text-stroke: 2px var(--white);
+    color: transparent;
+  }
+
+  .hero-tagline {
+    font-family: 'Permanent Marker', cursive;
+    font-size: clamp(0.95rem, 2.5vw, 1.3rem);
+    color: rgba(255,255,255,0.4);
+    margin-top: 1rem;
+    margin-bottom: 3.5rem;
+    animation: up 0.65s 0.2s ease both;
+  }
+
+  /* TWO DOORS */
+  .doors {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    max-width: 680px;
+    width: 100%;
+    animation: up 0.7s 0.3s ease both;
+  }
+
+  @media (max-width: 520px) { .doors { grid-template-columns: 1fr; max-width: 340px; } }
+
+  .door {
+    position: relative;
+    border-radius: 6px;
+    overflow: hidden;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-end;
+    padding: 2rem 1.8rem;
+    min-height: 240px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .door:hover { transform: translateY(-5px); }
+
+  .door-comedy {
+    background: linear-gradient(160deg, #1a0002 0%, #3d0003 100%);
+    box-shadow: 0 4px 30px rgba(232,0,10,0.15);
+  }
+  .door-comedy:hover { box-shadow: 0 16px 50px rgba(232,0,10,0.3); }
+
+  .door-barber {
+    background: linear-gradient(160deg, #00081a 0%, #00153d 100%);
+    box-shadow: 0 4px 30px rgba(0,87,255,0.12);
+  }
+  .door-barber:hover { box-shadow: 0 16px 50px rgba(0,87,255,0.25); }
+
+  .door-icon {
+    position: absolute;
+    top: 1.5rem; right: 1.5rem;
+    font-size: 3rem;
+    opacity: 0.15;
+  }
+
+  .door-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+  .door-comedy .door-label { color: var(--red); }
+  .door-barber .door-label { color: #5585FF; }
+
+  .door-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.4rem;
+    line-height: 1;
+    letter-spacing: 0.03em;
+    color: var(--white);
+    margin-bottom: 0.75rem;
+  }
+
+  .door-desc {
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.45);
+    line-height: 1.6;
+    margin-bottom: 1.2rem;
+  }
+
+  .door-arrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+  }
+  .door-comedy .door-arrow { color: var(--red); }
+  .door-barber .door-arrow { color: #5585FF; }
+
+  /* DIVIDER LINE */
+  .divider {
+    width: 1px;
+    height: 60px;
+    background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.15), transparent);
+    margin: 2.5rem auto 0;
+    animation: up 0.7s 0.4s ease both;
+  }
+
+  /* SOCIAL ROW */
+  .socials {
+    display: flex;
+    justify-content: center;
+    gap: 1.2rem;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+    animation: up 0.7s 0.45s ease both;
+  }
+  .socials a {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.3);
+    text-decoration: none;
+    border: 1px solid rgba(255,255,255,0.08);
+    padding: 0.45rem 1rem;
+    border-radius: 100px;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .socials a:hover { color: var(--gold); border-color: var(--gold); }
+
+  /* FOOTER */
+  footer {
+    padding: 2rem;
+    text-align: center;
+    border-top: 1px solid rgba(255,255,255,0.05);
+  }
+  footer p { font-size: 0.7rem; color: rgba(255,255,255,0.18); }
+  footer a { color: var(--gold); text-decoration: none; font-weight: 700; }
+
+  @keyframes up {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="https://goelev8.ai" class="nav-brand">GO<span>ELEV8</span>.AI</a>
+  <div class="nav-links">
+    <a href="comedy.html">Comedy</a>
+    <a href="barber.html">Barber</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <p class="eyebrow">GoElev8.ai / Rome</p>
+  <h1 class="hero-name">
+    <span class="outline">ROME</span>
+  </h1>
+  <p class="hero-tagline">Comedian. Barber. STL Original.</p>
+
+  <div class="doors">
+    <a href="comedy.html" class="door door-comedy">
+      <span class="door-icon">🎤</span>
+      <span class="door-label">Stand-Up Comedy</span>
+      <h2 class="door-title">Rome The Comedian</h2>
+      <p class="door-desc">Live shows, tickets, and clips from STL's funniest.</p>
+      <span class="door-arrow">Get Tickets →</span>
+    </a>
+
+    <a href="barber.html" class="door door-barber">
+      <span class="door-icon">✂️</span>
+      <span class="door-label">Barbershop</span>
+      <h2 class="door-title">Rome The Barber</h2>
+      <p class="door-desc">Book your cut, see the work, join the client list.</p>
+      <span class="door-arrow">Book a Cut →</span>
+    </a>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="socials">
+    <a href="https://www.instagram.com/romethecomedian" target="_blank">📸 Instagram</a>
+    <a href="https://youtube.com/@romethecomedian1468" target="_blank">▶️ YouTube</a>
+    <a href="#" target="_blank">🎵 TikTok</a>
+    <a href="#" target="_blank">👤 Facebook</a>
+  </div>
+</section>
+
+<footer>
+  <p>© 2026 Rome. All rights reserved. &nbsp;|&nbsp; Powered by <a href="https://goelev8.ai" target="_blank">GoElev8.ai</a></p>
+</footer>
+
+</body>
+</html>
