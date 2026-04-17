@@ -38,9 +38,9 @@
 .nav-links a{color:var(--mu);text-decoration:none;font-size:11px;letter-spacing:.8px;text-transform:uppercase;transition:color .2s;font-family:var(--fm);cursor:pointer}
 .nav-links a:hover{color:var(--gold)}
 .nav-actions{display:flex;align-items:center;gap:10px}
-.nav-demo{background:transparent;color:var(--gold);border:1px solid var(--gold);padding:8px 20px;border-radius:1px;font-size:11px;font-weight:500;letter-spacing:1px;cursor:pointer;font-family:var(--fm);text-decoration:none;transition:all .2s;text-transform:uppercase}
-.nav-demo:hover{background:rgba(201,168,76,.1)}
-.nav-login{background:var(--gold);color:var(--blk);padding:8px 20px;border-radius:1px;font-size:11px;font-weight:600;letter-spacing:1px;cursor:pointer;font-family:var(--fm);text-decoration:none;transition:all .2s;text-transform:uppercase;border:1px solid var(--gold)}
+.nav-demo{background:transparent;color:var(--cyan);border:1px solid var(--cyan);padding:8px 20px;border-radius:1px;font-size:11px;font-weight:500;letter-spacing:1px;cursor:pointer;font-family:var(--fm);text-decoration:none;transition:all .2s;text-transform:uppercase}
+.nav-demo:hover{background:rgba(0,207,255,.1)}
+.nav-login{background:var(--cyan);color:var(--blk);padding:8px 20px;border-radius:1px;font-size:11px;font-weight:600;letter-spacing:1px;cursor:pointer;font-family:var(--fm);text-decoration:none;transition:all .2s;text-transform:uppercase;border:1px solid var(--cyan)}
 .nav-login:hover{background:var(--wh);border-color:var(--wh)}
 
 
@@ -86,7 +86,7 @@
 .demo-phone::placeholder{color:var(--b4)}
 .demo-phone:disabled{opacity:.5}
 
-.demo-submit{background:var(--gold);color:var(--blk);border:none;padding:13px 24px;font-family:var(--fd);font-size:16px;letter-spacing:1.5px;cursor:pointer;border-radius:2px;transition:all .2s;white-space:nowrap;font-weight:600;position:relative;overflow:hidden}
+.demo-submit{background:var(--cyan);color:var(--blk);border:none;padding:13px 24px;font-family:var(--fd);font-size:16px;letter-spacing:1.5px;cursor:pointer;border-radius:2px;transition:all .2s;white-space:nowrap;font-weight:600;position:relative;overflow:hidden}
 .demo-submit:hover:not(:disabled){background:var(--wh);transform:translateY(-1px)}
 .demo-submit:disabled{opacity:.6;cursor:wait}
 
@@ -165,10 +165,10 @@
 .rev.vis{opacity:1;transform:translateY(0)}
 
 /* BUTTONS */
-.btn-primary{background:var(--gold);color:var(--blk);padding:13px 34px;font-size:14px;font-weight:600;border:none;border-radius:2px;cursor:pointer;transition:all .2s;font-family:var(--fb);text-decoration:none;display:inline-block;letter-spacing:.3px}
+.btn-primary{background:var(--cyan);color:var(--blk);padding:13px 34px;font-size:14px;font-weight:600;border:none;border-radius:2px;cursor:pointer;transition:all .2s;font-family:var(--fb);text-decoration:none;display:inline-block;letter-spacing:.3px}
 .btn-primary:hover{background:var(--wh);transform:translateY(-1px)}
 .btn-outline{background:transparent;color:var(--wh);padding:13px 34px;font-size:14px;border:1px solid var(--b3);border-radius:2px;cursor:pointer;transition:all .2s;font-family:var(--fb);text-decoration:none;display:inline-block}
-.btn-outline:hover{border-color:var(--gold);color:var(--gold)}
+.btn-outline:hover{border-color:var(--cyan);color:var(--cyan)}
 
 /* HOW IT WORKS */
 .hiw{background:var(--blk2);border-top:1px solid var(--b1);border-bottom:1px solid var(--b1)}
@@ -236,8 +236,8 @@
 .tfl li.off::before{content:'–';color:var(--mu)}
 .tcta{display:block;width:100%;text-align:center;padding:11px;font-family:var(--fd);font-size:15px;letter-spacing:2px;border-radius:2px;text-decoration:none;cursor:pointer;transition:all .2s;border:none}
 .pc:not(.feat) .tcta{background:transparent;border:1px solid var(--b2);color:var(--wh)}
-.pc:not(.feat) .tcta:hover{border-color:var(--gold);color:var(--gold)}
-.pc.feat .tcta{background:var(--gold);color:var(--blk);font-weight:600}
+.pc:not(.feat) .tcta:hover{border-color:var(--cyan);color:var(--cyan)}
+.pc.feat .tcta{background:var(--cyan);color:var(--blk);font-weight:600}
 .pc.feat .tcta:hover{background:var(--wh)}
 
 .pricing-note{margin-top:20px;padding:14px 18px;background:var(--gold-f);border:1px solid var(--gold-g);border-radius:2px;font-size:12px;color:var(--mu);line-height:1.7;font-family:var(--fm);text-align:center}
