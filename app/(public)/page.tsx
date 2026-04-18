@@ -228,7 +228,7 @@ export default function HomePage() {
       {/* NAV */}
       <nav className={s.nav} role="navigation" aria-label="Main navigation">
         <Link href="/" className={s['nav-logo']} aria-label="GoElev8.ai Home">
-          <Image src="/images/goelev8.ai_logo.png" alt="GoElev8.ai" width={36} height={36} style={{height:36,width:36}} />
+          <Image src="/images/inverse-transparent-logo.png" alt="GoElev8.ai" width={36} height={36} style={{height:36,width:36}} />
         </Link>
         <ul className={s['nav-links']} role="list">
           <li><a href="#how" onClick={(e) => { e.preventDefault(); scrollTo('how'); }}>How It Works</a></li>

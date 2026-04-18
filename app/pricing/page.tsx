@@ -65,7 +65,7 @@ export default function PricingPage() {
 
       {/* Nav */}
       <nav style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 24px', maxWidth: 1200, margin: '0 auto', position: 'relative', zIndex: 10 }}>
-        <a href="/" style={{ display: 'inline-flex', lineHeight: 0 }}><img src="/images/goelev8.ai_logo.png" alt="GoElev8.ai" width={36} height={36} style={{ display: 'block' }} /></a>
+        <a href="/" style={{ display: 'inline-flex', lineHeight: 0 }}><img src="/images/inverse-transparent-logo.png" alt="GoElev8.ai" width={36} height={36} style={{ display: 'block' }} /></a>
         <a href="/auth/signup" style={{ background: '#00CFFF', color: '#000', padding: '8px 20px', borderRadius: 6, textDecoration: 'none', fontFamily: '"Bebas Neue", sans-serif', fontSize: 16, letterSpacing: 1 }}>Start Free Trial</a>
       </nav>
 

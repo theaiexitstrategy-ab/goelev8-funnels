@@ -18,7 +18,7 @@ export default function TemplatesPage() {
       <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 1, background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,207,255,0.009) 2px, rgba(0,207,255,0.009) 4px)' }} />
 
       <nav style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 24px', maxWidth: 1200, margin: '0 auto', position: 'relative', zIndex: 10 }}>
-        <a href="/" style={{ display: 'inline-flex', lineHeight: 0 }}><img src="/images/goelev8.ai_logo.png" alt="GoElev8.ai" width={36} height={36} style={{ display: 'block' }} /></a>
+        <a href="/" style={{ display: 'inline-flex', lineHeight: 0 }}><img src="/images/inverse-transparent-logo.png" alt="GoElev8.ai" width={36} height={36} style={{ display: 'block' }} /></a>
         <a href="/auth/signup" style={{ background: '#00CFFF', color: '#000', padding: '8px 20px', borderRadius: 6, textDecoration: 'none', fontFamily: 'Bebas Neue, sans-serif', fontSize: 16, letterSpacing: 1 }}>Start Free Trial</a>
       </nav>
 
