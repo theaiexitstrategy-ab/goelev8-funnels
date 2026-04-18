@@ -7,7 +7,7 @@ export default function SmsPolicyPage() {
   return (
     <div style={{ background: '#000', color: '#E0E0E0', minHeight: '100vh', fontFamily: '"DM Sans", sans-serif', fontWeight: 300 }}>
       <nav style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 24px', maxWidth: 1200, margin: '0 auto' }}>
-        <a href="/" style={{ display: 'inline-flex', lineHeight: 0 }}><img src="/images/inverse-transparent-logo.png" alt="GoElev8.ai" width={36} height={36} style={{ display: 'block' }} /></a>
+        <a href="/" style={{ display: 'inline-flex', lineHeight: 0 }}><img src="/images/goelev8-full-logo.png" alt="GoElev8.ai — Infinite Possibilities" width={60} height={60} style={{ display: 'block' }} /></a>
       </nav>
 
       <main style={{ maxWidth: 760, margin: '0 auto', padding: '40px 24px 80px', lineHeight: 1.8, fontSize: 14, color: '#AAA' }}>

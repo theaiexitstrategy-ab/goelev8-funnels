@@ -22,7 +22,7 @@ export default function RiyanBRecruitingPage() {
       <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 1, background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,207,255,0.009) 2px, rgba(0,207,255,0.009) 4px)' }} />
 
       <nav style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 24px', maxWidth: 1200, margin: '0 auto', position: 'relative', zIndex: 10 }}>
-        <a href="/" style={{ display: 'inline-flex', lineHeight: 0 }}><img src="/images/inverse-transparent-logo.png" alt="GoElev8.ai" width={36} height={36} style={{ display: 'block' }} /></a>
+        <a href="/" style={{ display: 'inline-flex', lineHeight: 0 }}><img src="/images/goelev8-full-logo.png" alt="GoElev8.ai — Infinite Possibilities" width={60} height={60} style={{ display: 'block' }} /></a>
         <span style={{ fontSize: 12, color: '#555', fontFamily: '"JetBrains Mono", monospace' }}>/ Recruiting</span>
       </nav>
 
