@@ -1,24 +1,30 @@
 // (c) 2026 GoElev8.ai | Aaron Bryant. All rights reserved.
 //
-// GoElev8.ai toll-free inbound call routing (1-888-302-0649).
+// GoElev8.ai demo-line inbound call routing (1-888-302-0649).
 //
 // Flow:
 //   STEP 1 — Call arrives. Log ringing row. SMS Aaron.
-//   STEP 2 — Ring Aaron 15s with a whisper menu (press 1 for Vapi, press 2 for text-back).
-//            If Aaron answers + doesn't press anything → normal bridge.
-//   STEP 3 — If Aaron doesn't answer → hand off to Vapi (outbound callback).
-//   STEP 4 — If Vapi unavailable → SMS text-back to caller.
-//   STEP 5 — Every terminal state updated in Supabase `calls` table.
+//   STEP 2 — Ring Aaron 15s with a whisper menu:
+//              1 → connect caller through to Aaron
+//              2 → SMS text-back + hang up
+//              3 → hand off to Vapi assistant (outbound callback)
+//            Any other / silent → bridge to Aaron normally.
+//   STEP 3 — If Aaron doesn't answer within 15s → SMS text-back (Vapi is press-3 only).
+//   STEP 4 — Every terminal state updated in Supabase `calls` table.
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
 const twilioAccountSid = process.env.TWILIO_ACCOUNT_SID!;
 const twilioAuthToken = process.env.TWILIO_AUTH_TOKEN!;
-const twilioNumber = process.env.TWILIO_TOLL_FREE || process.env.TWILIO_MASTER_NUMBER || '';
-const aaronCell = process.env.AARON_CELL || process.env.AARON_PERSONAL_CELL || '';
+const twilioNumber = process.env.TWILIO_DEMO_NUMBER || process.env.TWILIO_TOLL_FREE || process.env.TWILIO_MASTER_NUMBER || '';
+const aaronCell = process.env.AARON_PHONE || process.env.AARON_CELL || process.env.AARON_PERSONAL_CELL || '';
 const vapiPhoneNumberId = process.env.VAPI_PHONE_NUMBER_ID;
-const vapiAssistantId = process.env.VAPI_ASSISTANT_ID || process.env.VAPI_LEV_ASSISTANT_ID;
+const vapiAssistantId =
+  process.env.VAPI_DEMO_ASSISTANT_ID ||
+  process.env.VAPI_ASSISTANT_ID ||
+  process.env.VAPI_LEV_ASSISTANT_ID ||
+  'cd0460b5-e1d0-4693-b842-93d68ddf628e';
 const vapiApiKey = process.env.VAPI_API_KEY;
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -156,11 +162,11 @@ async function handleWhisper(req: NextRequest) {
   const caller = url.searchParams.get('caller') || '';
   const actionUrl = `${APP_URL}/api/calls/inbound?step=whisper-action&callSid=${encodeURIComponent(callSid)}&caller=${encodeURIComponent(caller)}`;
 
-  // numDigits=1: first keypress triggers the action URL. timeout=6: if Aaron says nothing in 6s, fall through to bridge.
+  // numDigits=1: first keypress triggers the action URL. timeout=5: if Aaron says nothing, fall through to bridge.
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Gather numDigits="1" timeout="6" action="${actionUrl}" method="POST">
-    <Say voice="Polly.Joanna">GoElev8 call from ${caller.replace(/\D/g, '').split('').join(' ')}. Press 1 to hand off to Vapi. Press 2 for auto text back. Stay silent to take the call.</Say>
+  <Gather numDigits="1" timeout="5" action="${actionUrl}" method="POST">
+    <Say voice="Polly.Joanna">GoElev8 demo call from ${caller.replace(/\D/g, '').split('').join(' ')}. Press 1 to connect. Press 2 to send an auto SMS and hang up. Press 3 for the AI assistant. Stay silent to connect normally.</Say>
   </Gather>
 </Response>`;
   return twiml(xml);
@@ -174,16 +180,13 @@ async function handleWhisperAction(req: NextRequest) {
   const formData = await req.formData();
   const digit = (formData.get('Digits') as string) || '';
 
+  // 1 → connect Aaron through normally. Empty TwiML = Gather finishes, Dial bridges.
   if (digit === '1') {
-    // Hand off to Vapi via outbound callback. Aaron's leg hangs up; dial-result sees routed-to-vapi.
-    await updateCall(callSid, { status: 'routed-to-vapi', vapi_used: true });
-    startVapiCallback(caller).catch(() => {});
-    if (aaronCell) sendSms(aaronCell, `✅ Handed off to Vapi — ${caller}`).catch(() => {});
-    return twiml(`<?xml version="1.0" encoding="UTF-8"?><Response><Say voice="Polly.Joanna">Handing off to Vapi.</Say><Hangup/></Response>`);
+    return twiml(`<?xml version="1.0" encoding="UTF-8"?><Response></Response>`);
   }
 
+  // 2 → auto SMS text-back, hang up Aaron; dial-result sees sms-sent and hangs up the caller.
   if (digit === '2') {
-    // Auto text-back. Aaron's leg hangs up; dial-result sees sms-sent and hangs up the caller.
     await updateCall(callSid, { status: 'sms-sent', text_back_sent: true });
     sendSms(
       caller,
@@ -193,7 +196,15 @@ async function handleWhisperAction(req: NextRequest) {
     return twiml(`<?xml version="1.0" encoding="UTF-8"?><Response><Say voice="Polly.Joanna">Text back sent.</Say><Hangup/></Response>`);
   }
 
-  // Any other digit: just bridge normally (empty TwiML = continue to bridge)
+  // 3 → hand off to Vapi via outbound callback. Aaron's leg hangs up; dial-result sees routed-to-vapi.
+  if (digit === '3') {
+    await updateCall(callSid, { status: 'routed-to-vapi', vapi_used: true });
+    startVapiCallback(caller).catch(() => {});
+    if (aaronCell) sendSms(aaronCell, `✅ Handed off to Vapi — ${caller}`).catch(() => {});
+    return twiml(`<?xml version="1.0" encoding="UTF-8"?><Response><Say voice="Polly.Joanna">Handing off to the AI assistant.</Say><Hangup/></Response>`);
+  }
+
+  // Any other digit or timeout with no input: bridge normally.
   return twiml(`<?xml version="1.0" encoding="UTF-8"?><Response></Response>`);
 }
 
@@ -219,14 +230,8 @@ async function handleDialResult(req: NextRequest) {
     return twiml(`<?xml version="1.0" encoding="UTF-8"?><Response><Hangup/></Response>`);
   }
 
-  // Aaron didn't answer (no-answer, busy, failed, canceled, or completed with <3s) → fall back to Vapi
-  const vapiOk = await startVapiCallback(caller);
-  if (vapiOk) {
-    await updateCall(callSid, { status: 'routed-to-vapi', vapi_used: true });
-    return twiml(`<?xml version="1.0" encoding="UTF-8"?><Response><Say voice="Polly.Joanna">Thanks for calling GoElev8.ai. Our assistant Lev will call you right back.</Say><Hangup/></Response>`);
-  }
-
-  // Vapi unavailable → SMS fallback
+  // Aaron didn't answer (no-answer, busy, failed, canceled, or completed <3s) → SMS text-back.
+  // Vapi is press-3 only per spec; no auto-handoff on no-answer.
   await sendSms(
     caller,
     "Hey! Sorry we missed your call at GoElev8.ai. How can we help? Reply to this text and we'll get right back to you. - GoElev8.ai Team"
