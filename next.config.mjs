@@ -7,16 +7,8 @@ const nextConfig = {
       // beforeFiles runs before the public/ filesystem check, so rewrite
       // destinations resolve to static .html files in public/.
       beforeFiles: [
-        // book.goelev8.ai/willpower → static booking page.
-        // Placed first so the /:slug catch-all in afterFiles can't intercept it.
-        {
-          source: '/willpower',
-          destination: '/willpower-booking.html',
-          has: [
-            { type: 'host', value: '(?<bookhost>book\\..+)' },
-          ],
-        },
         // goelev8.ai/willpower → static index page.
+        // (book.goelev8.ai/willpower lives in the separate goelev8-book project.)
         {
           source: '/willpower',
           destination: '/willpower-index.html',
