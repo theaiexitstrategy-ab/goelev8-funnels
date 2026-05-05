@@ -28,7 +28,7 @@ const INDUSTRY_LABELS: Record<string, string> = {
   other: 'local service business',
 };
 
-const SIGNATURE = '\n\n— Powered by GoElev8.ai\nbook.goelev8.ai';
+const SIGNATURE = '\n\n— Powered by GoElev8.ai\nbook.goelev8.ai/go';
 
 function normalizePhone(phone: string): string | null {
   const digits = phone.replace(/\D/g, '');

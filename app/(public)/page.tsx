@@ -238,7 +238,7 @@ export default function HomePage() {
         </ul>
         <div className={s['nav-actions']}>
           <button className={s['nav-demo']} onClick={() => scrollTo('vapi-strip')}>See Demo</button>
-          <a href="https://book.goelev8.ai" target="_blank" rel="noopener noreferrer" className={s['nav-login']}>Book a Call</a>
+          <a href="https://book.goelev8.ai/go" target="_blank" rel="noopener noreferrer" className={s['nav-login']}>Book a Call</a>
         </div>
       </nav>
 
@@ -315,7 +315,7 @@ export default function HomePage() {
               </div>
               <p className={s['demo-success-sub']}>That&apos;s exactly what your missed callers receive — automatically.</p>
               <div className={s['demo-success-links']}>
-                <a href="https://book.goelev8.ai" target="_blank" rel="noopener noreferrer" className={s['demo-success-link']}>Book a setup call →</a>
+                <a href="https://book.goelev8.ai/go" target="_blank" rel="noopener noreferrer" className={s['demo-success-link']}>Book a setup call →</a>
                 <button className={s['demo-success-link']} onClick={() => scrollTo('pricing')}>See pricing →</button>
               </div>
             </div>
@@ -386,7 +386,7 @@ export default function HomePage() {
                 </div>
                 {vapiError && (
                   <div className={s['vapi-error']}>
-                    {vapiError} <a href="https://book.goelev8.ai" target="_blank" rel="noopener noreferrer" className={s['vapi-error-link']}>Book a setup call →</a>
+                    {vapiError} <a href="https://book.goelev8.ai/go" target="_blank" rel="noopener noreferrer" className={s['vapi-error-link']}>Book a setup call →</a>
                   </div>
                 )}
               </>
@@ -563,7 +563,7 @@ export default function HomePage() {
                 {plan.features.map((f, i) => <li key={i}>{f}</li>)}
                 {plan.off.map((f, i) => <li key={`off-${i}`} className={s.off}>{f}</li>)}
               </ul>
-              <a href="https://book.goelev8.ai" target="_blank" rel="noopener noreferrer" className={s.tcta}>BOOK A SETUP CALL →</a>
+              <a href="https://book.goelev8.ai/go" target="_blank" rel="noopener noreferrer" className={s.tcta}>BOOK A SETUP CALL →</a>
             </div>
           ))}
         </div>
@@ -594,7 +594,7 @@ export default function HomePage() {
         </div>
         <div className={`${s['results-footer']} ${s.rev}`}>
           <p className={s['results-serving']}>Serving businesses in St. Louis, MO and Tulsa, OK — and growing.</p>
-          <a href="https://book.goelev8.ai" target="_blank" rel="noopener noreferrer" className={s['btn-primary']}>Apply for Early Access →</a>
+          <a href="https://book.goelev8.ai/go" target="_blank" rel="noopener noreferrer" className={s['btn-primary']}>Apply for Early Access →</a>
         </div>
       </section>
 
@@ -605,7 +605,7 @@ export default function HomePage() {
         <h2 className={s['cta-h']}>STOP LOSING LEADS<br/><span className={s.c}>WHILE YOU SLEEP.</span></h2>
         <p className={s['cta-p']}>Every missed call is a missed appointment. GoElev8.ai texts them back in 60 seconds — automatically. Setup takes 48 hours.</p>
         <div className={s['cta-btns']}>
-          <a href="https://book.goelev8.ai" target="_blank" rel="noopener noreferrer" className={s['btn-primary']}>Book a Setup Call →</a>
+          <a href="https://book.goelev8.ai/go" target="_blank" rel="noopener noreferrer" className={s['btn-primary']}>Book a Setup Call →</a>
           <button className={s['btn-outline']} onClick={() => scrollTo('vapi-strip')}>See It Work Live →</button>
         </div>
       </div>
@@ -619,7 +619,7 @@ export default function HomePage() {
         <div className={s.fc}>// (c) 2026 GoElev8.ai | Aaron Bryant. All rights reserved.</div>
         <nav className={s.flinks} aria-label="Footer navigation">
           <a href="#pricing" onClick={(e) => { e.preventDefault(); scrollTo('pricing'); }}>Pricing</a>
-          <a href="https://book.goelev8.ai" target="_blank" rel="noopener noreferrer">Book a Call</a>
+          <a href="https://book.goelev8.ai/go" target="_blank" rel="noopener noreferrer">Book a Call</a>
           <a href="/support">Support</a>
           <a href="/privacy">Privacy</a>
           <a href="/terms">Terms</a>
