@@ -3,38 +3,44 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   async rewrites() {
-    return [
-      {
-        source: '/.well-known/apple-developer-merchantid-domain-association',
-        destination: '/api/apple-pay-verification',
-      },
-      // Willpower booking page on book.* — static HTML override.
-      // Must precede the /:slug catch-all below so book.goelev8.ai/willpower
-      // serves the static page instead of the dynamic Supabase booking flow.
-      {
-        source: '/willpower',
-        destination: '/willpower-booking.html',
-        has: [
-          { type: 'host', value: '(?<bookhost>book\\..+)' },
-        ],
-      },
-      // Willpower index on apex / www.
-      {
-        source: '/willpower',
-        destination: '/willpower-index.html',
-      },
-      // Matches book.goelev8.ai (canonical) and any Scale-tier CNAME alias
-      // that follows the `book.<clientdomain>` convention — e.g.
-      // book.danielslegacyplanning.com. A single regex keeps primary site
-      // traffic (goelev8.ai, www.goelev8.ai, *.vercel.app, localhost) unaffected.
-      {
-        source: '/:slug',
-        destination: '/book/:slug',
-        has: [
-          { type: 'host', value: '(?<bookhost>book\\..+)' },
-        ],
-      },
-    ];
+    return {
+      // beforeFiles runs before the public/ filesystem check, so rewrite
+      // destinations resolve to static .html files in public/.
+      beforeFiles: [
+        // book.goelev8.ai/willpower → static booking page.
+        // Placed first so the /:slug catch-all in afterFiles can't intercept it.
+        {
+          source: '/willpower',
+          destination: '/willpower-booking.html',
+          has: [
+            { type: 'host', value: '(?<bookhost>book\\..+)' },
+          ],
+        },
+        // goelev8.ai/willpower → static index page.
+        {
+          source: '/willpower',
+          destination: '/willpower-index.html',
+        },
+      ],
+      afterFiles: [
+        {
+          source: '/.well-known/apple-developer-merchantid-domain-association',
+          destination: '/api/apple-pay-verification',
+        },
+        // Matches book.goelev8.ai (canonical) and any Scale-tier CNAME alias
+        // that follows the `book.<clientdomain>` convention — e.g.
+        // book.danielslegacyplanning.com. A single regex keeps primary site
+        // traffic (goelev8.ai, www.goelev8.ai, *.vercel.app, localhost) unaffected.
+        {
+          source: '/:slug',
+          destination: '/book/:slug',
+          has: [
+            { type: 'host', value: '(?<bookhost>book\\..+)' },
+          ],
+        },
+      ],
+      fallback: [],
+    };
   },
 };
 
