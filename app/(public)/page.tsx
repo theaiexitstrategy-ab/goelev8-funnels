@@ -92,6 +92,25 @@ export default function HomePage() {
   const [vapiStatus, setVapiStatus] = useState<'idle'|'calling'|'sent'|'error'>('idle');
   const [vapiError, setVapiError] = useState('');
 
+  /* Founding Client checkout */
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const goToCheckout = useCallback(async () => {
+    setCheckoutLoading(true);
+    try {
+      const res = await fetch('/api/create-checkout', { method: 'POST' });
+      const data = await res.json();
+      if (data?.url) {
+        window.location.href = data.url;
+        return;
+      }
+      setCheckoutLoading(false);
+      alert(data?.error || 'Could not start checkout. Try again or book a setup call.');
+    } catch {
+      setCheckoutLoading(false);
+      alert('Network error. Try again or book a setup call.');
+    }
+  }, []);
+
   /* Animation state */
   const [exIdx, setExIdx] = useState(0);
   const [msgIdx, setMsgIdx] = useState(0);
@@ -605,7 +624,10 @@ export default function HomePage() {
         <h2 className={s['cta-h']}>STOP LOSING LEADS<br/><span className={s.c}>WHILE YOU SLEEP.</span></h2>
         <p className={s['cta-p']}>Every missed call is a missed appointment. GoElev8.ai texts them back in 60 seconds — automatically. Setup takes 48 hours.</p>
         <div className={s['cta-btns']}>
-          <a href="https://book.goelev8.ai/go" target="_blank" rel="noopener noreferrer" className={s['btn-primary']}>Book a Setup Call →</a>
+          <button className={s['btn-primary']} onClick={goToCheckout} disabled={checkoutLoading}>
+            {checkoutLoading ? 'Starting…' : 'Get Started — $200 Setup →'}
+          </button>
+          <a href="https://book.goelev8.ai/go" target="_blank" rel="noopener noreferrer" className={s['btn-outline']}>Book a Setup Call →</a>
           <button className={s['btn-outline']} onClick={() => scrollTo('vapi-strip')}>See It Work Live →</button>
         </div>
       </div>
