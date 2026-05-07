@@ -59,7 +59,10 @@ function verifyTwilioSignature(
 function admin() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) throw new Error('Supabase service role env vars missing');
+  if (!url || !key) {
+    console.error('[hush/sms] Supabase service role env vars missing — DB ops will be skipped');
+    return null;
+  }
   return createClient(url, key, {
     auth: { persistSession: false, autoRefreshToken: false },
   });
@@ -102,18 +105,44 @@ export async function POST(req: NextRequest) {
   const supabase = admin();
   const keywordText = body.toUpperCase().split(/\s+/)[0];
 
-  // Look up keyword (case-insensitive, active).
-  const { data: keyword } = await supabase
-    .from('hush_keywords')
-    .select('id, promoter_id, keyword, tier, price, booking_url, ai_reply, is_active')
-    .ilike('keyword', keywordText)
-    .eq('is_active', true)
-    .maybeSingle();
-
   let replyText: string;
   let promoterId: string | null = null;
   let keywordId: string | null = null;
   let matched = false;
+
+  // Try to match the keyword against the DB. Wrapped in try/catch so
+  // any DB error (missing service-role key, RLS reject, network blip)
+  // never breaks the webhook — Twilio always gets valid TwiML.
+  let keyword:
+    | {
+        id: string;
+        promoter_id: string;
+        keyword: string;
+        tier: string;
+        price: number;
+        booking_url: string;
+        ai_reply: string;
+        is_active: boolean;
+      }
+    | null = null;
+
+  if (supabase) {
+    try {
+      const { data, error } = await supabase
+        .from('hush_keywords')
+        .select('id, promoter_id, keyword, tier, price, booking_url, ai_reply, is_active')
+        .ilike('keyword', keywordText)
+        .eq('is_active', true)
+        .maybeSingle();
+      if (error) {
+        console.error('[hush/sms] keyword lookup failed:', error.message);
+      } else {
+        keyword = data;
+      }
+    } catch (err) {
+      console.error('[hush/sms] keyword lookup threw:', err);
+    }
+  }
 
   if (keyword) {
     matched = true;
@@ -121,43 +150,48 @@ export async function POST(req: NextRequest) {
     promoterId = keyword.promoter_id;
     replyText = `${keyword.ai_reply}\n\n${keyword.booking_url}`;
 
-    // Increment used_count (read-modify-write — racy under heavy concurrent
-    // load, but the demo never hits that volume; if/when we need atomic,
-    // add an `increment` RPC.)
-    const { data: latest } = await supabase
-      .from('hush_keywords')
-      .select('used_count')
-      .eq('id', keyword.id)
-      .single();
-    if (latest) {
-      await supabase
-        .from('hush_keywords')
-        .update({ used_count: (latest.used_count ?? 0) + 1 })
-        .eq('id', keyword.id);
-    }
+    // Increment used_count and auto-build the contact list. Best-effort —
+    // failures here don't change the reply.
+    if (supabase) {
+      try {
+        const { data: latest } = await supabase
+          .from('hush_keywords')
+          .select('used_count')
+          .eq('id', keyword.id)
+          .single();
+        if (latest) {
+          await supabase
+            .from('hush_keywords')
+            .update({ used_count: (latest.used_count ?? 0) + 1 })
+            .eq('id', keyword.id);
+        }
+      } catch (err) {
+        console.error('[hush/sms] used_count increment failed:', err);
+      }
 
-    // Auto-build the contact list. If a row exists for this promoter+phone,
-    // do nothing; otherwise insert a 'new' tier contact from hush_signup.
-    if (promoterId) {
-      const { data: existing } = await supabase
-        .from('hush_contacts')
-        .select('id')
-        .eq('promoter_id', promoterId)
-        .eq('phone', from)
-        .maybeSingle();
-      if (!existing) {
-        await supabase.from('hush_contacts').insert({
-          promoter_id: promoterId,
-          name: from, // placeholder until they share a name
-          phone: from,
-          tier: 'new',
-          source: 'hush_signup',
-        });
+      if (promoterId) {
+        try {
+          const { data: existing } = await supabase
+            .from('hush_contacts')
+            .select('id')
+            .eq('promoter_id', promoterId)
+            .eq('phone', from)
+            .maybeSingle();
+          if (!existing) {
+            await supabase.from('hush_contacts').insert({
+              promoter_id: promoterId,
+              name: from,
+              phone: from,
+              tier: 'new',
+              source: 'hush_signup',
+            });
+          }
+        } catch (err) {
+          console.error('[hush/sms] contact upsert failed:', err);
+        }
       }
     }
   } else if (keywordText === 'STOP' || keywordText === 'UNSUBSCRIBE') {
-    // Twilio handles STOP automatically at the carrier level; we just
-    // respond gracefully.
     replyText = "You're unsubscribed. Reply START to opt back in.";
   } else if (keywordText === 'HUSH') {
     // Demo fallback — keeps the live HUSH demo working until a promoter
@@ -167,28 +201,35 @@ export async function POST(req: NextRequest) {
     replyText = UNKNOWN_REPLY;
   }
 
-  // Log inbound.
-  await supabase.from('hush_messages').insert({
-    promoter_id: promoterId,
-    keyword_id: keywordId,
-    twilio_sid: messageSid,
-    from_phone: from,
-    to_phone: to,
-    body,
-    direction: 'inbound',
-    matched,
-  });
-
-  // Log outbound (the reply we're returning via TwiML).
-  await supabase.from('hush_messages').insert({
-    promoter_id: promoterId,
-    keyword_id: keywordId,
-    from_phone: to, // we're sending FROM the Hush number
-    to_phone: from,
-    body: replyText,
-    direction: 'outbound',
-    matched,
-  });
+  // Log both directions to hush_messages. Best-effort — silent skip if
+  // the service role isn't configured.
+  if (supabase) {
+    try {
+      await supabase.from('hush_messages').insert([
+        {
+          promoter_id: promoterId,
+          keyword_id: keywordId,
+          twilio_sid: messageSid,
+          from_phone: from,
+          to_phone: to,
+          body,
+          direction: 'inbound',
+          matched,
+        },
+        {
+          promoter_id: promoterId,
+          keyword_id: keywordId,
+          from_phone: to,
+          to_phone: from,
+          body: replyText,
+          direction: 'outbound',
+          matched,
+        },
+      ]);
+    } catch (err) {
+      console.error('[hush/sms] message log failed:', err);
+    }
+  }
 
   return twiml(replyText);
 }
