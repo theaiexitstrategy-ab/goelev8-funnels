@@ -4,16 +4,17 @@
 -- passes, bookings, streams, tips, credits ledger, boosts, posts,
 -- connections, CRM contacts, network, video interviews.
 --
--- NOTE: RLS is enabled on all tables but several lack INSERT/UPDATE policies
--- (hush_promoters, hush_models, hush_keywords, hush_passes, hush_connections,
--- hush_contacts, hush_network) — those tables will reject all writes until
--- policies are added. The credits trigger will not fire until an INSERT
--- policy exists on hush_credits_ledger. Add policies before any user-facing
--- write path goes live. See task list in the project.
+-- RLS is enabled on every hush_* table. User-initiated reads/writes go
+-- through these policies; financial flows (creating passes after Stripe
+-- checkout, granting credits after pack purchase, splitting tip revenue,
+-- etc.) run server-side with the service role and bypass RLS by design.
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- USERS (extends Supabase auth.users)
+-- ============================================================
+-- TABLES
+-- ============================================================
+
 CREATE TABLE hush_users (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   role TEXT NOT NULL DEFAULT 'guest' CHECK (role IN ('guest', 'promoter', 'model', 'admin')),
@@ -256,7 +257,10 @@ CREATE TABLE hush_interviews (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- RLS POLICIES
+-- ============================================================
+-- ENABLE RLS ON EVERY TABLE
+-- ============================================================
+
 ALTER TABLE hush_users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE hush_profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE hush_promoters ENABLE ROW LEVEL SECURITY;
@@ -264,29 +268,158 @@ ALTER TABLE hush_models ENABLE ROW LEVEL SECURITY;
 ALTER TABLE hush_events ENABLE ROW LEVEL SECURITY;
 ALTER TABLE hush_keywords ENABLE ROW LEVEL SECURITY;
 ALTER TABLE hush_passes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE hush_model_bookings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE hush_streams ENABLE ROW LEVEL SECURITY;
+ALTER TABLE hush_tips ENABLE ROW LEVEL SECURITY;
 ALTER TABLE hush_credits_ledger ENABLE ROW LEVEL SECURITY;
+ALTER TABLE hush_boosts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE hush_posts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE hush_connections ENABLE ROW LEVEL SECURITY;
 ALTER TABLE hush_contacts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE hush_network ENABLE ROW LEVEL SECURITY;
+ALTER TABLE hush_interviews ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Users read own data" ON hush_users FOR SELECT USING (auth.uid() = id);
-CREATE POLICY "Users update own data" ON hush_users FOR UPDATE USING (auth.uid() = id);
+-- ============================================================
+-- POLICIES
+-- ============================================================
+-- Note: service-role API routes (Stripe webhooks, payment intents,
+-- credit grants, tip splits) bypass RLS by design. The policies below
+-- govern only end-user-initiated reads and writes from the client.
 
-CREATE POLICY "Public profiles readable" ON hush_profiles FOR SELECT USING (is_public = TRUE OR auth.uid() = user_id);
-CREATE POLICY "Owner updates profile" ON hush_profiles FOR ALL USING (auth.uid() = user_id);
+-- hush_users
+CREATE POLICY "users_select_own" ON hush_users FOR SELECT USING (auth.uid() = id);
+CREATE POLICY "users_insert_self" ON hush_users FOR INSERT WITH CHECK (auth.uid() = id);
+CREATE POLICY "users_update_own" ON hush_users FOR UPDATE USING (auth.uid() = id);
 
-CREATE POLICY "Credits owner only" ON hush_credits_ledger FOR SELECT USING (auth.uid() = user_id);
+-- hush_profiles — public to read if is_public, owner full control
+CREATE POLICY "profiles_select_public_or_own" ON hush_profiles FOR SELECT USING (is_public = TRUE OR auth.uid() = user_id);
+CREATE POLICY "profiles_insert_self" ON hush_profiles FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "profiles_update_own" ON hush_profiles FOR UPDATE USING (auth.uid() = user_id);
+CREATE POLICY "profiles_delete_own" ON hush_profiles FOR DELETE USING (auth.uid() = user_id);
 
-CREATE POLICY "Events public read" ON hush_events FOR SELECT USING (TRUE);
-CREATE POLICY "Promoter manages events" ON hush_events FOR ALL USING (
+-- hush_promoters — public to read brand-level info, owner manages own row
+CREATE POLICY "promoters_select_public" ON hush_promoters FOR SELECT USING (TRUE);
+CREATE POLICY "promoters_insert_self" ON hush_promoters FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "promoters_update_own" ON hush_promoters FOR UPDATE USING (auth.uid() = user_id);
+CREATE POLICY "promoters_delete_own" ON hush_promoters FOR DELETE USING (auth.uid() = user_id);
+
+-- hush_models — public to read marketplace listings, owner manages own row
+CREATE POLICY "models_select_public" ON hush_models FOR SELECT USING (TRUE);
+CREATE POLICY "models_insert_self" ON hush_models FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "models_update_own" ON hush_models FOR UPDATE USING (auth.uid() = user_id);
+CREATE POLICY "models_delete_own" ON hush_models FOR DELETE USING (auth.uid() = user_id);
+
+-- hush_events — public read, owning promoter manages
+CREATE POLICY "events_select_public" ON hush_events FOR SELECT USING (TRUE);
+CREATE POLICY "events_promoter_manages" ON hush_events FOR ALL USING (
+  promoter_id IN (SELECT id FROM hush_promoters WHERE user_id = auth.uid())
+) WITH CHECK (
   promoter_id IN (SELECT id FROM hush_promoters WHERE user_id = auth.uid())
 );
 
-CREATE POLICY "Public posts" ON hush_posts FOR SELECT USING (is_public = TRUE OR auth.uid() = user_id);
-CREATE POLICY "Users post" ON hush_posts FOR INSERT WITH CHECK (auth.uid() = user_id);
+-- hush_keywords — public read for active keywords (so the SMS lookup works
+-- via service role anyway, but lets clients verify keyword availability),
+-- owning promoter manages
+CREATE POLICY "keywords_select_active" ON hush_keywords FOR SELECT USING (is_active = TRUE OR promoter_id IN (SELECT id FROM hush_promoters WHERE user_id = auth.uid()));
+CREATE POLICY "keywords_promoter_manages" ON hush_keywords FOR ALL USING (
+  promoter_id IN (SELECT id FROM hush_promoters WHERE user_id = auth.uid())
+) WITH CHECK (
+  promoter_id IN (SELECT id FROM hush_promoters WHERE user_id = auth.uid())
+);
 
+-- hush_passes — guest sees own, promoter sees passes for own events.
+-- Inserts happen via service role after Stripe checkout (bypass RLS).
+-- Updates (check-in) happen via service role from door-scan endpoint.
+CREATE POLICY "passes_select_guest_or_promoter" ON hush_passes FOR SELECT USING (
+  auth.uid() = guest_id
+  OR event_id IN (
+    SELECT e.id FROM hush_events e
+    JOIN hush_promoters p ON p.id = e.promoter_id
+    WHERE p.user_id = auth.uid()
+  )
+);
+
+-- hush_model_bookings — model sees own, promoter sees own bookings
+-- Inserts/updates via service role (booking flow + payout).
+CREATE POLICY "model_bookings_select_participant" ON hush_model_bookings FOR SELECT USING (
+  model_id IN (SELECT id FROM hush_models WHERE user_id = auth.uid())
+  OR promoter_id IN (SELECT id FROM hush_promoters WHERE user_id = auth.uid())
+);
+
+-- hush_streams — public read (it's a streaming feed), owning model manages
+CREATE POLICY "streams_select_public" ON hush_streams FOR SELECT USING (TRUE);
+CREATE POLICY "streams_model_manages" ON hush_streams FOR ALL USING (
+  model_id IN (SELECT id FROM hush_models WHERE user_id = auth.uid())
+) WITH CHECK (
+  model_id IN (SELECT id FROM hush_models WHERE user_id = auth.uid())
+);
+
+-- hush_tips — sender sees own, recipient model sees own. Inserts via
+-- service role (Stripe payment intent confirmation).
+CREATE POLICY "tips_select_participant" ON hush_tips FOR SELECT USING (
+  auth.uid() = from_user_id
+  OR model_id IN (SELECT id FROM hush_models WHERE user_id = auth.uid())
+);
+
+-- hush_credits_ledger — owner reads own ledger. All writes via service
+-- role (purchase webhooks, boost spend, etc.) — no client INSERT policy
+-- by design so balances can't be inflated client-side.
+CREATE POLICY "credits_ledger_select_own" ON hush_credits_ledger FOR SELECT USING (auth.uid() = user_id);
+
+-- hush_boosts — owner reads/manages own active boosts.
+CREATE POLICY "boosts_select_own" ON hush_boosts FOR SELECT USING (auth.uid() = user_id);
+
+-- hush_posts — public feed; owner full control over own posts.
+CREATE POLICY "posts_select_public_or_own" ON hush_posts FOR SELECT USING (is_public = TRUE OR auth.uid() = user_id);
+CREATE POLICY "posts_insert_self" ON hush_posts FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "posts_update_own" ON hush_posts FOR UPDATE USING (auth.uid() = user_id);
+CREATE POLICY "posts_delete_own" ON hush_posts FOR DELETE USING (auth.uid() = user_id);
+
+-- hush_connections — either side can read; sender creates, either deletes.
+CREATE POLICY "connections_select_either" ON hush_connections FOR SELECT USING (
+  auth.uid() = from_user_id OR auth.uid() = to_user_id
+);
+CREATE POLICY "connections_insert_self" ON hush_connections FOR INSERT WITH CHECK (auth.uid() = from_user_id);
+CREATE POLICY "connections_update_either" ON hush_connections FOR UPDATE USING (
+  auth.uid() = from_user_id OR auth.uid() = to_user_id
+);
+CREATE POLICY "connections_delete_either" ON hush_connections FOR DELETE USING (
+  auth.uid() = from_user_id OR auth.uid() = to_user_id
+);
+
+-- hush_contacts — promoter-owned CRM, only owning promoter sees/manages.
+CREATE POLICY "contacts_promoter_manages" ON hush_contacts FOR ALL USING (
+  promoter_id IN (SELECT id FROM hush_promoters WHERE user_id = auth.uid())
+) WITH CHECK (
+  promoter_id IN (SELECT id FROM hush_promoters WHERE user_id = auth.uid())
+);
+
+-- hush_network — Mogul sees own network, child promoter sees their parent.
+CREATE POLICY "network_select_participant" ON hush_network FOR SELECT USING (
+  mogul_id IN (SELECT id FROM hush_promoters WHERE user_id = auth.uid())
+  OR promoter_id IN (SELECT id FROM hush_promoters WHERE user_id = auth.uid())
+);
+CREATE POLICY "network_mogul_manages" ON hush_network FOR ALL USING (
+  mogul_id IN (SELECT id FROM hush_promoters WHERE user_id = auth.uid())
+) WITH CHECK (
+  mogul_id IN (SELECT id FROM hush_promoters WHERE user_id = auth.uid())
+);
+
+-- hush_interviews — promoter and model see own interviews.
+CREATE POLICY "interviews_select_participant" ON hush_interviews FOR SELECT USING (
+  promoter_id IN (SELECT id FROM hush_promoters WHERE user_id = auth.uid())
+  OR model_id IN (SELECT id FROM hush_models WHERE user_id = auth.uid())
+);
+CREATE POLICY "interviews_promoter_manages" ON hush_interviews FOR ALL USING (
+  promoter_id IN (SELECT id FROM hush_promoters WHERE user_id = auth.uid())
+) WITH CHECK (
+  promoter_id IN (SELECT id FROM hush_promoters WHERE user_id = auth.uid())
+);
+
+-- ============================================================
 -- FUNCTIONS & TRIGGERS
+-- ============================================================
+
 CREATE OR REPLACE FUNCTION update_credit_balance()
 RETURNS TRIGGER AS $$
 BEGIN
