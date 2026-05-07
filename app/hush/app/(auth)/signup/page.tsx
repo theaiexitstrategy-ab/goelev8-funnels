@@ -2,9 +2,13 @@
 // (c) 2026 GoElev8.ai | Aaron Bryant. All rights reserved.
 //
 // Hush sign-up. Same Supabase backend as goelev8.ai (signUp, shared
-// auth.users table) — Hush-themed UI. After successful signup the
-// user lands at /hush/app/onboarding to choose their role and finish
-// their profile.
+// auth.users table) — Hush-themed UI. Two outcomes:
+//   1. signUp returns a session (auto-confirm on this project) →
+//      redirect straight to /hush/app/onboarding.
+//   2. signUp returns no session (email confirmation required) →
+//      show "check your email" state. The confirmation email's link
+//      points back at /auth/callback?next=/hush/app/onboarding so
+//      the user lands in the right flow on click.
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -17,6 +21,7 @@ export default function HushSignUpPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [confirmSent, setConfirmSent] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,9 +29,15 @@ export default function HushSignUpPage() {
     setLoading(true);
 
     const supabase = createClient();
-    const { error: authError } = await supabase.auth.signUp({
+    const origin =
+      typeof window !== 'undefined' ? window.location.origin : '';
+
+    const { data, error: authError } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        emailRedirectTo: `${origin}/auth/callback?next=/hush/app/onboarding`,
+      },
     });
 
     if (authError) {
@@ -39,8 +50,62 @@ export default function HushSignUpPage() {
       return;
     }
 
-    router.push('/hush/app/onboarding');
+    if (data.session) {
+      // Auto-confirmed (or returning user) — go straight in.
+      router.push('/hush/app/onboarding');
+      return;
+    }
+
+    // Email confirmation required.
+    setConfirmSent(true);
+    setLoading(false);
   };
+
+  if (confirmSent) {
+    return (
+      <>
+        <h1
+          className="bg-hush-gold-logo text-fill-transparent animate-fade-up font-bebas text-[64px] leading-none tracking-wide"
+          style={{ filter: 'drop-shadow(0 0 24px rgba(201,168,76,0.4))' }}
+        >
+          HUSH
+        </h1>
+        <p
+          className="-mt-1 animate-fade-up font-bebas text-[11px] tracking-[0.35em] text-[rgba(201,168,76,0.5)]"
+          style={{ animationDelay: '0.1s' }}
+        >
+          AI
+        </p>
+        <p
+          className="mt-3 animate-fade-up font-cormorant text-[18px] italic text-hush-white"
+          style={{ animationDelay: '0.2s' }}
+        >
+          Check your email.
+        </p>
+        <p
+          className="mt-3 animate-fade-up text-center font-outfit text-[13px] leading-relaxed text-hush-muted2"
+          style={{ animationDelay: '0.3s' }}
+        >
+          We sent a confirmation link to{' '}
+          <span className="text-hush-gold">{email}</span>. Tap it to finish
+          creating your account.
+        </p>
+        <p
+          className="mt-6 animate-fade-up font-outfit text-[11px] leading-relaxed text-hush-muted"
+          style={{ animationDelay: '0.4s' }}
+        >
+          Don&apos;t see it? Check spam, or wait 30 seconds and try again.
+        </p>
+        <Link
+          href="/hush/app/signin"
+          className="mt-8 animate-fade-up font-bebas text-[14px] tracking-[0.2em] text-hush-gold"
+          style={{ animationDelay: '0.5s' }}
+        >
+          BACK TO SIGN IN
+        </Link>
+      </>
+    );
+  }
 
   return (
     <>
