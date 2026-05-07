@@ -34,19 +34,29 @@ export default function HushSignInPage() {
     setError('');
     setLoading(true);
 
-    const supabase = createClient();
-    const { error: authError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    try {
+      const supabase = createClient();
+      const { error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-    if (authError) {
-      setError(mapAuthError(authError));
+      if (authError) {
+        setError(mapAuthError(authError));
+        setLoading(false);
+        return;
+      }
+
+      router.push('/hush/app/onboarding');
+    } catch (err) {
+      console.error('[hush/signin] signInWithPassword threw:', err);
+      const msg =
+        err instanceof Error
+          ? err.message
+          : 'Could not reach the auth server. Check your connection and try again.';
+      setError(msg);
       setLoading(false);
-      return;
     }
-
-    router.push('/hush/app/onboarding');
   };
 
   return (

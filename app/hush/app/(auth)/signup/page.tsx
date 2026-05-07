@@ -28,37 +28,47 @@ export default function HushSignUpPage() {
     setError('');
     setLoading(true);
 
-    const supabase = createClient();
-    const origin =
-      typeof window !== 'undefined' ? window.location.origin : '';
+    try {
+      const supabase = createClient();
+      const origin =
+        typeof window !== 'undefined' ? window.location.origin : '';
 
-    const { data, error: authError } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: `${origin}/auth/callback?next=/hush/app/onboarding`,
-      },
-    });
+      const { data, error: authError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${origin}/auth/callback?next=/hush/app/onboarding`,
+        },
+      });
 
-    if (authError) {
-      if (authError.message?.includes('already registered')) {
-        setError('This email is already registered. Try signing in instead.');
-      } else {
-        setError(authError.message || 'Something went wrong. Please try again.');
+      if (authError) {
+        if (authError.message?.includes('already registered')) {
+          setError('This email is already registered. Try signing in instead.');
+        } else {
+          setError(authError.message || 'Something went wrong. Please try again.');
+        }
+        setLoading(false);
+        return;
       }
+
+      if (data.session) {
+        // Auto-confirmed (or returning user) — go straight in.
+        router.push('/hush/app/onboarding');
+        return;
+      }
+
+      // Email confirmation required.
+      setConfirmSent(true);
       setLoading(false);
-      return;
+    } catch (err) {
+      console.error('[hush/signup] signUp threw:', err);
+      const msg =
+        err instanceof Error
+          ? err.message
+          : 'Could not reach the auth server. Check your connection and try again.';
+      setError(msg);
+      setLoading(false);
     }
-
-    if (data.session) {
-      // Auto-confirmed (or returning user) — go straight in.
-      router.push('/hush/app/onboarding');
-      return;
-    }
-
-    // Email confirmation required.
-    setConfirmSent(true);
-    setLoading(false);
   };
 
   if (confirmSent) {
