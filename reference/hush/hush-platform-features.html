@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Hush AI — Platform Features</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --black:#040405;--deep:#07070a;--card:#0d0d11;--card2:#121216;
+  --gold:#C9A84C;--gold2:#e8c96a;--gold3:#a8862e;--gold4:#f5d98a;
+  --gdim:rgba(201,168,76,0.12);--gline:rgba(201,168,76,0.2);
+  --white:#f5f0e8;--muted:rgba(245,240,232,0.35);--muted2:rgba(245,240,232,0.6);
+  --green:#00e89a;--red:#ff4757;--cyan:#00d4ff;--purple:#a29bfe;
+}
+html,body{height:100%;background:#000;overflow:hidden;font-family:'Outfit',sans-serif;color:var(--white)}
+.shell{width:100%;height:100vh;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 40%,#120d04 0%,#040405 65%)}
+.phone{width:min(390px,100vw);height:min(844px,100vh);background:var(--black);border-radius:min(44px,5vw);overflow:hidden;position:relative;box-shadow:0 0 0 1px rgba(201,168,76,.18),0 0 80px rgba(201,168,76,.07),0 60px 140px rgba(0,0,0,.9)}
+.screen{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity .45s ease;overflow-y:auto;overflow-x:hidden;scrollbar-width:none}
+.screen::-webkit-scrollbar{display:none}
+.screen.active{opacity:1;pointer-events:all}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* NAV */
+.bot-nav{position:absolute;bottom:0;left:0;right:0;background:rgba(4,4,5,.96);backdrop-filter:blur(20px);border-top:1px solid var(--gline);display:flex;padding:10px 0 26px;z-index:100}
+.bn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px 0}
+.bn-ico{font-size:20px;opacity:.3;transition:opacity .2s}
+.bn-lbl{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);transition:color .2s}
+.bn-pip{width:4px;height:4px;border-radius:50%;background:var(--gold);opacity:0;transition:opacity .2s;margin:0 auto}
+.bn.active .bn-ico{opacity:1}
+.bn.active .bn-lbl{color:var(--gold)}
+.bn.active .bn-pip{opacity:1}
+
+/* SHARED */
+.top-bar{display:flex;align-items:center;justify-content:space-between;padding:52px 22px 18px;background:var(--black);border-bottom:1px solid var(--gline);position:sticky;top:0;z-index:10}
+.top-logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.15em;background:linear-gradient(135deg,var(--gold3),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.scroll-pad{padding:20px 20px 110px}
+.sec-lbl{font-size:10px;letter-spacing:.22em;color:var(--gold);text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 1.5s ease-in-out infinite;flex-shrink:0}
+.field-label{font-size:9px;letter-spacing:.18em;color:var(--muted);text-transform:uppercase;margin-bottom:5px;display:block}
+.field-input{width:100%;background:var(--card);border:1px solid var(--gline);border-radius:6px;padding:13px 14px;font-size:14px;color:var(--white);font-family:'Outfit',sans-serif;outline:none;transition:border-color .2s}
+.field-input:focus{border-color:var(--gold)}
+.field-input::placeholder{color:var(--muted)}
+.gold-btn{width:100%;padding:17px;background:linear-gradient(135deg,var(--gold3),var(--gold));border:none;border-radius:6px;font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:.18em;color:var(--black);cursor:pointer;transition:all .2s;box-shadow:0 6px 24px rgba(201,168,76,.22)}
+.gold-btn:active{transform:scale(.98)}
+.ghost-btn{width:100%;padding:14px;background:transparent;border:1px solid var(--gline);border-radius:6px;font-size:13px;color:var(--muted);cursor:pointer;margin-top:10px}
+
+/* ══════════════════════════════════
+   SCREEN 1 — MY NUMBER / TIER
+══════════════════════════════════ */
+#s1{background:var(--deep)}
+
+.number-hero{background:linear-gradient(135deg,rgba(201,168,76,.12),rgba(201,168,76,.04));border:1px solid var(--gline);border-radius:12px;padding:24px;margin-bottom:20px;text-align:center;position:relative;overflow:hidden}
+.number-hero::before{content:'';position:absolute;inset:0;background-image:repeating-linear-gradient(45deg,rgba(201,168,76,.03) 0,rgba(201,168,76,.03) 1px,transparent 1px,transparent 22px),repeating-linear-gradient(-45deg,rgba(201,168,76,.03) 0,rgba(201,168,76,.03) 1px,transparent 1px,transparent 22px)}
+.nh-tier{font-size:9px;letter-spacing:.25em;color:var(--gold);text-transform:uppercase;margin-bottom:8px;position:relative;z-index:1}
+.nh-number{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:.08em;background:linear-gradient(135deg,var(--gold3),var(--gold4));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 16px rgba(201,168,76,.3));position:relative;z-index:1}
+.nh-status{font-size:11px;color:var(--green);margin-top:6px;display:flex;align-items:center;justify-content:center;gap:6px;position:relative;z-index:1}
+.nh-shared{font-size:11px;color:var(--muted);margin-top:6px;position:relative;z-index:1}
+
+/* Tier cards */
+.tier-card{background:var(--card);border:1px solid rgba(201,168,76,.1);border-radius:10px;padding:16px;margin-bottom:10px;cursor:pointer;transition:all .2s;position:relative}
+.tier-card.current{border-color:var(--gold);background:linear-gradient(135deg,rgba(201,168,76,.1),rgba(201,168,76,.03))}
+.tier-card:active{transform:scale(.99)}
+.tc-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.tc-name{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.08em}
+.tc-price{font-family:'Bebas Neue',sans-serif;font-size:24px}
+.tc-hustle .tc-name,.tc-hustle .tc-price{color:var(--muted2)}
+.tc-pro .tc-name,.tc-pro .tc-price{background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.tc-mogul .tc-name,.tc-mogul .tc-price{background:linear-gradient(135deg,var(--gold3),var(--gold4));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.tc-number-feature{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted2);padding:10px 0;border-top:1px solid rgba(201,168,76,.08);margin-top:8px}
+.tc-current-badge{position:absolute;top:-8px;right:14px;background:var(--gold);color:var(--black);font-size:9px;font-weight:700;letter-spacing:.1em;padding:3px 10px;border-radius:20px}
+.tc-upgrade-btn{display:inline-block;margin-top:10px;padding:8px 18px;border:1px solid var(--gline);border-radius:20px;font-size:11px;color:var(--gold);cursor:pointer;letter-spacing:.08em}
+
+/* Pool status */
+.pool-status{background:var(--card);border:1px solid var(--gline);border-radius:8px;padding:14px 16px;margin-bottom:20px}
+.ps-title{font-size:10px;letter-spacing:.18em;color:var(--cyan);text-transform:uppercase;margin-bottom:10px}
+.ps-bar-wrap{margin-bottom:6px}
+.ps-bar{height:6px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;margin-bottom:4px}
+.ps-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--gold3),var(--gold2));width:68%}
+.ps-meta{display:flex;justify-content:space-between;font-size:10px;color:var(--muted)}
+.ps-note{font-size:11px;color:var(--muted2);line-height:1.5;margin-top:8px;padding-top:8px;border-top:1px solid rgba(201,168,76,.08)}
+
+/* ══════════════════════════════════
+   SCREEN 2 — CRM / CONTACTS
+══════════════════════════════════ */
+#s2{background:var(--deep)}
+
+.crm-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:20px}
+.crm-stat{background:var(--card);border:1px solid var(--gline);border-radius:8px;padding:14px 10px;text-align:center}
+.crm-stat-val{font-family:'Bebas Neue',sans-serif;font-size:28px;background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.crm-stat-lbl{font-size:9px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-top:2px}
+
+/* Import methods */
+.import-methods{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
+.im-card{background:var(--card);border:1px solid rgba(201,168,76,.1);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all .2s}
+.im-card:active{border-color:var(--gline);transform:scale(.99)}
+.im-ico{font-size:28px;flex-shrink:0}
+.im-body{}
+.im-title{font-size:14px;font-weight:500;color:var(--white);margin-bottom:2px}
+.im-sub{font-size:11px;color:var(--muted)}
+.im-arrow{color:var(--gold);font-size:20px;margin-left:auto}
+
+/* Contact rows */
+.contact-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.cr-av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#1a1408,#2a2010);border:1px solid var(--gline);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--gold);flex-shrink:0}
+.cr-info{flex:1}
+.cr-name{font-size:13px;font-weight:500;color:var(--white)}
+.cr-phone{font-size:11px;color:var(--muted)}
+.cr-tier{font-size:9px;padding:2px 8px;border-radius:20px;letter-spacing:.08em}
+.cr-tier.vip{background:var(--gdim);border:1px solid var(--gline);color:var(--gold)}
+.cr-tier.reg{background:rgba(245,240,232,.05);border:1px solid rgba(245,240,232,.1);color:var(--muted2)}
+.cr-tier.new{background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.2);color:var(--cyan)}
+
+/* Paste area */
+.paste-area{width:100%;background:var(--card);border:1px solid var(--gline);border-radius:8px;padding:14px;color:var(--white);font-family:'Outfit',sans-serif;font-size:13px;resize:none;height:100px;outline:none;line-height:1.6}
+.paste-area::placeholder{color:var(--muted)}
+
+/* Blast from CRM */
+.crm-blast-btn{width:100%;padding:16px;background:linear-gradient(135deg,var(--gold3),var(--gold));border:none;border-radius:6px;font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:.18em;color:var(--black);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:all .2s}
+
+/* ══════════════════════════════════
+   SCREEN 3 — EVENT MODELS MARKETPLACE
+══════════════════════════════════ */
+#s3{background:var(--deep)}
+
+.model-hero{background:linear-gradient(135deg,rgba(162,155,254,.1),rgba(162,155,254,.03));border:1px solid rgba(162,155,254,.2);border-radius:10px;padding:16px;margin-bottom:16px;display:flex;align-items:center;gap:14px}
+.mh-ico{font-size:32px}
+.mh-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.08em;color:var(--purple);margin-bottom:3px}
+.mh-sub{font-size:11px;color:var(--muted);line-height:1.5}
+
+/* Search/filter */
+.model-search{display:flex;gap:8px;margin-bottom:14px}
+.ms-input{flex:1;background:var(--card);border:1px solid var(--gline);border-radius:6px;padding:11px 14px;font-size:13px;color:var(--white);font-family:'Outfit',sans-serif;outline:none}
+.ms-input::placeholder{color:var(--muted)}
+.ms-filter{padding:11px 14px;background:var(--gdim);border:1px solid var(--gline);border-radius:6px;font-size:13px;color:var(--gold);cursor:pointer}
+
+.badge-tabs{display:flex;gap:8px;margin-bottom:16px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.badge-tab{padding:6px 14px;border-radius:20px;font-size:11px;cursor:pointer;white-space:nowrap;transition:all .2s;flex-shrink:0}
+.badge-tab.all{background:var(--gold);color:var(--black);font-weight:600}
+.badge-tab.elite{background:rgba(201,168,76,.12);border:1px solid var(--gline);color:var(--gold)}
+.badge-tab.featured{background:rgba(162,155,254,.1);border:1px solid rgba(162,155,254,.25);color:var(--purple)}
+.badge-tab.rising{background:rgba(0,232,154,.08);border:1px solid rgba(0,232,154,.2);color:var(--green)}
+
+/* Model marketplace card */
+.model-mkt-card{background:var(--card);border:1px solid rgba(201,168,76,.1);border-radius:12px;padding:16px;margin-bottom:12px;cursor:pointer;transition:all .2s}
+.model-mkt-card:active{border-color:var(--gline);transform:scale(.99)}
+
+.mmc-top{display:flex;gap:12px;margin-bottom:10px}
+.mmc-photo{width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:20px;flex-shrink:0;position:relative}
+.mmc-photo.elite{background:linear-gradient(135deg,var(--gold3),var(--gold));color:var(--black);border:2px solid var(--gold2)}
+.mmc-photo.featured{background:linear-gradient(135deg,rgba(162,155,254,.3),rgba(162,155,254,.1));color:var(--purple);border:2px solid rgba(162,155,254,.4)}
+.mmc-photo.rising{background:rgba(0,232,154,.1);color:var(--green);border:2px solid rgba(0,232,154,.3)}
+.mmc-badge{position:absolute;bottom:-4px;right:-4px;font-size:10px;padding:2px 7px;border-radius:20px;font-weight:700;white-space:nowrap}
+.mmc-badge.elite{background:linear-gradient(135deg,var(--gold3),var(--gold));color:var(--black)}
+.mmc-badge.featured{background:rgba(162,155,254,.25);border:1px solid rgba(162,155,254,.4);color:var(--purple)}
+.mmc-badge.rising{background:rgba(0,232,154,.12);border:1px solid rgba(0,232,154,.3);color:var(--green)}
+
+.mmc-info{flex:1;min-width:0}
+.mmc-name{font-size:16px;font-weight:500;color:var(--white);margin-bottom:2px}
+.mmc-stars{font-size:12px;color:var(--gold);margin-bottom:4px}
+.mmc-socials{display:flex;gap:6px;flex-wrap:wrap}
+.mmc-social{font-size:10px;padding:2px 8px;border-radius:20px;background:rgba(225,48,108,.1);border:1px solid rgba(225,48,108,.2);color:#e1306c}
+.mmc-social.tt{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.12);color:var(--white)}
+.mmc-social.sc{background:rgba(255,252,0,.08);border-color:rgba(255,252,0,.15);color:#FFFC00}
+
+.mmc-meta{display:flex;gap:12px;margin-bottom:10px}
+.mmc-meta-item{font-size:11px;color:var(--muted2);display:flex;align-items:center;gap:4px}
+
+.mmc-rates{display:flex;gap:8px;margin-bottom:12px}
+.mmc-rate{background:var(--deep);border:1px solid rgba(201,168,76,.1);border-radius:6px;padding:8px 12px;flex:1;text-align:center}
+.mmc-rate-val{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gold)}
+.mmc-rate-lbl{font-size:9px;color:var(--muted);letter-spacing:.08em;margin-top:1px}
+
+.mmc-btns{display:flex;gap:8px}
+.mmc-book{flex:1;padding:11px;background:linear-gradient(135deg,var(--gold3),var(--gold));border:none;border-radius:6px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:.1em;color:var(--black);cursor:pointer;transition:all .2s}
+.mmc-interview{flex:1;padding:11px;border:1px solid rgba(162,155,254,.3);border-radius:6px;font-size:12px;color:var(--purple);cursor:pointer;background:rgba(162,155,254,.06);text-align:center}
+
+/* Available indicator */
+.avail-dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:blink 1.5s ease-in-out infinite;display:inline-block;margin-right:4px}
+
+/* ══════════════════════════════════
+   SCREEN 4 — VIDEO INTERVIEW
+══════════════════════════════════ */
+#s4{background:#000}
+
+.video-header{position:absolute;top:0;left:0;right:0;padding:52px 20px 16px;background:linear-gradient(180deg,rgba(0,0,0,.8) 0%,transparent 100%);z-index:10;display:flex;align-items:center;gap:12px}
+.vh-back{width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--white);cursor:pointer}
+.vh-info{flex:1}
+.vh-name{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.1em;color:var(--white)}
+.vh-status{font-size:11px;color:var(--green);display:flex;align-items:center;gap:5px}
+
+/* Video frames */
+.video-main{width:100%;height:100%;background:linear-gradient(160deg,#0a0a14 0%,#050508 100%);position:relative;overflow:hidden}
+.video-grain{position:absolute;inset:0;opacity:.03;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.video-avatar-main{position:absolute;top:50%;left:50%;transform:translate(-50%,-60%);text-align:center}
+.vam-circle{width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,rgba(162,155,254,.2),rgba(162,155,254,.06));border:2px solid rgba(162,155,254,.3);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:44px;color:var(--purple);margin:0 auto 12px;animation:pulse 3s ease-in-out infinite}
+.vam-name{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--white)}
+.vam-badge{display:inline-block;margin-top:4px;font-size:10px;padding:3px 12px;border-radius:20px;background:linear-gradient(135deg,var(--gold3),var(--gold));color:var(--black);font-weight:700}
+
+/* Self view */
+.video-self{position:absolute;top:120px;right:16px;width:90px;height:120px;background:linear-gradient(135deg,#0e0a04,#080510);border:2px solid var(--gold);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font-size:11px;color:var(--muted);overflow:hidden}
+.vs-av{font-size:28px}
+
+/* Recording indicator */
+.rec-indicator{position:absolute;top:120px;left:16px;display:flex;align-items:center;gap:6px;background:rgba(255,71,87,.15);border:1px solid rgba(255,71,87,.3);border-radius:20px;padding:5px 12px}
+.rec-dot{width:8px;height:8px;border-radius:50%;background:var(--red);animation:blink .8s ease-in-out infinite}
+.rec-text{font-size:10px;letter-spacing:.15em;color:var(--red);text-transform:uppercase}
+.rec-time{font-size:10px;color:var(--red)}
+
+/* Timer display */
+.call-timer{position:absolute;bottom:160px;left:50%;transform:translateX(-50%);font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.12em;color:rgba(255,255,255,.6)}
+
+/* Chat overlay */
+.chat-overlay{position:absolute;bottom:80px;left:0;right:0;max-height:200px;overflow-y:auto;padding:0 16px;scrollbar-width:none}
+.chat-overlay::-webkit-scrollbar{display:none}
+.chat-msg{margin-bottom:8px;display:flex;gap:8px;align-items:flex-end}
+.chat-msg.self{flex-direction:row-reverse}
+.cm-av{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
+.cm-av.other{background:rgba(162,155,254,.2);color:var(--purple)}
+.cm-av.self{background:var(--gdim);border:1px solid var(--gline);color:var(--gold)}
+.cm-bubble{background:rgba(0,0,0,.6);backdrop-filter:blur(10px);border-radius:12px;padding:8px 12px;font-size:12px;color:var(--white);max-width:200px;line-height:1.4}
+.chat-msg.self .cm-bubble{background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.2)}
+
+/* Video controls */
+.video-controls{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(0deg,rgba(0,0,0,.9) 0%,transparent 100%);padding:20px 20px 40px;display:flex;flex-direction:column;gap:12px;z-index:10}
+
+.vc-chat-input{display:flex;gap:8px}
+.vci-input{flex:1;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:24px;padding:10px 16px;font-size:13px;color:var(--white);font-family:'Outfit',sans-serif;outline:none}
+.vci-input::placeholder{color:rgba(255,255,255,.3)}
+.vci-send{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--gold3),var(--gold));border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px}
+
+.vc-buttons{display:flex;justify-content:center;gap:16px}
+.vcb{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;transition:all .2s;border:none}
+.vcb.mute{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15)}
+.vcb.video{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15)}
+.vcb.end{background:var(--red);box-shadow:0 4px 20px rgba(255,71,87,.3)}
+.vcb.book{background:linear-gradient(135deg,var(--gold3),var(--gold));box-shadow:0 4px 20px rgba(201,168,76,.3)}
+
+/* ══════════════════════════════════
+   SCREEN 5 — TRANSACTIONS / WALLET
+══════════════════════════════════ */
+#s5{background:var(--deep)}
+
+.wallet-hero{background:linear-gradient(135deg,rgba(0,232,154,.08),rgba(0,232,154,.02));border:1px solid rgba(0,232,154,.2);border-radius:12px;padding:24px;margin-bottom:20px;text-align:center;position:relative;overflow:hidden}
+.wh-label{font-size:9px;letter-spacing:.25em;color:var(--green);text-transform:uppercase;margin-bottom:8px}
+.wh-balance{font-family:'Bebas Neue',sans-serif;font-size:56px;line-height:1;background:linear-gradient(135deg,#00c47a,var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 20px rgba(0,232,154,.3))}
+.wh-sub{font-size:11px;color:var(--muted);margin-top:6px}
+
+.wallet-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px}
+.wa-btn{background:var(--card);border:1px solid var(--gline);border-radius:8px;padding:14px;text-align:center;cursor:pointer;transition:all .2s}
+.wa-btn:active{transform:scale(.97)}
+.wa-ico{font-size:24px;margin-bottom:4px}
+.wa-lbl{font-size:11px;letter-spacing:.1em;color:var(--muted2);text-transform:uppercase}
+
+/* Transaction list */
+.txn-row{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.txn-ico{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.txn-ico.in{background:rgba(0,232,154,.1);border:1px solid rgba(0,232,154,.2)}
+.txn-ico.out{background:rgba(255,71,87,.08);border:1px solid rgba(255,71,87,.15)}
+.txn-ico.sms{background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.18)}
+.txn-ico.model{background:rgba(162,155,254,.08);border:1px solid rgba(162,155,254,.2)}
+.txn-body{flex:1}
+.txn-title{font-size:13px;color:var(--white);font-weight:500}
+.txn-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.txn-amount{font-family:'Bebas Neue',sans-serif;font-size:20px}
+.txn-amount.in{color:var(--green)}
+.txn-amount.out{color:var(--red)}
+.txn-amount.neutral{color:var(--muted2)}
+
+/* Stripe badge */
+.stripe-badge{display:flex;align-items:center;gap:8px;background:rgba(99,91,255,.08);border:1px solid rgba(99,91,255,.2);border-radius:6px;padding:10px 14px;margin-bottom:16px}
+.sb-text{font-size:11px;color:rgba(99,91,255,.9);line-height:1.5}
+</style>
+</head>
+<body>
+<div class="shell">
+<div class="phone">
+
+  <!-- ════ S1: MY NUMBER ════ -->
+  <div class="screen active" id="s1">
+    <div class="top-bar">
+      <div class="top-logo">MY NUMBER</div>
+      <div style="font-size:9px;letter-spacing:.15em;color:var(--muted);text-transform:uppercase">Hustle Plan</div>
+    </div>
+    <div class="scroll-pad">
+
+      <!-- Current number status -->
+      <div class="number-hero">
+        <div class="nh-tier">🤝 Shared Hush AI Line · Hustle Plan</div>
+        <div class="nh-number">(888) 302-0649</div>
+        <div class="nh-status"><div class="live-dot"></div>Active · Your keywords live on this number</div>
+        <div class="nh-shared">Guests text HUSHVIP · HUSHGA · HUSHNEW to this number<br>AI routes to your account automatically</div>
+      </div>
+
+      <!-- How shared line works -->
+      <div style="background:var(--card);border:1px solid var(--gline);border-radius:8px;padding:14px 16px;margin-bottom:20px">
+        <div style="font-size:10px;letter-spacing:.18em;color:var(--gold);text-transform:uppercase;margin-bottom:10px">How It Works On Hustle</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;align-items:flex-start;gap:10px;font-size:12px;color:var(--muted2)"><span style="color:var(--gold);flex-shrink:0">1.</span>Guest texts your keyword (HUSHVIP) to the Hush line</div>
+          <div style="display:flex;align-items:flex-start;gap:10px;font-size:12px;color:var(--muted2)"><span style="color:var(--gold);flex-shrink:0">2.</span>AI instantly recognizes your keyword prefix</div>
+          <div style="display:flex;align-items:flex-start;gap:10px;font-size:12px;color:var(--muted2)"><span style="color:var(--gold);flex-shrink:0">3.</span>Response fires with YOUR booking link and pricing</div>
+          <div style="display:flex;align-items:flex-start;gap:10px;font-size:12px;color:var(--muted2)"><span style="color:var(--gold);flex-shrink:0">4.</span>Guest never knows it's shared — it feels like your number</div>
+        </div>
+      </div>
+
+      <!-- Pre-approved pool status (admin view) -->
+      <div class="pool-status">
+        <div class="ps-title">⚡ Pre-Approved Number Pool</div>
+        <div class="ps-bar-wrap">
+          <div class="ps-bar"><div class="ps-fill"></div></div>
+          <div class="ps-meta"><span style="color:var(--gold)">34 numbers ready</span><span>50 pool target</span></div>
+        </div>
+        <div class="ps-note">Pro and Mogul subscribers get instantly assigned from this pool. Numbers are pre-approved by Twilio — zero wait time on upgrade. Pool auto-replenishes when below 20.</div>
+      </div>
+
+      <!-- Upgrade tiers -->
+      <div class="sec-lbl">Upgrade for Your Own Number</div>
+
+      <div class="tier-card tc-hustle current">
+        <div class="tc-current-badge">Current Plan</div>
+        <div class="tc-header">
+          <div class="tc-name">HUSTLE</div>
+          <div class="tc-price">$49<span style="font-family:'Outfit',sans-serif;font-size:12px;color:var(--muted)">/mo</span></div>
+        </div>
+        <div class="tc-number-feature">
+          <span style="font-size:16px">🤝</span>
+          <span>Shared Hush AI line · Your keywords, their number · Live instantly</span>
+        </div>
+      </div>
+
+      <div class="tier-card tc-pro" onclick="showUpgradeFlow('pro')">
+        <div class="tc-header">
+          <div class="tc-name">PRO</div>
+          <div class="tc-price">$99<span style="font-family:'Outfit',sans-serif;font-size:12px;color:var(--muted)">/mo</span></div>
+        </div>
+        <div class="tc-number-feature">
+          <span style="font-size:16px">📱</span>
+          <span style="color:var(--gold)">Your own dedicated number · Assigned instantly from pre-approved pool · Guests save YOUR number</span>
+        </div>
+        <div class="tc-upgrade-btn">Upgrade to Pro →</div>
+      </div>
+
+      <div class="tier-card tc-mogul" onclick="showUpgradeFlow('mogul')">
+        <div class="tc-header">
+          <div class="tc-name">MOGUL</div>
+          <div class="tc-price">$199<span style="font-family:'Outfit',sans-serif;font-size:12px;color:var(--muted)">/mo</span></div>
+        </div>
+        <div class="tc-number-feature">
+          <span style="font-size:16px">👑</span>
+          <span style="color:var(--gold4)">Dedicated number + vanity option · Backup number · hushai.com/yourname subdomain</span>
+        </div>
+        <div class="tc-upgrade-btn" style="border-color:rgba(245,217,138,.3);color:var(--gold4)">Upgrade to Mogul →</div>
+      </div>
+
+    </div>
+    <div class="bot-nav">
+      <div class="bn active" onclick="goTo('s1')"><div class="bn-ico">📱</div><div class="bn-pip"></div><div class="bn-lbl">Number</div></div>
+      <div class="bn" onclick="goTo('s2')"><div class="bn-ico">👥</div><div class="bn-pip"></div><div class="bn-lbl">CRM</div></div>
+      <div class="bn" onclick="goTo('s3')"><div class="bn-ico">💃</div><div class="bn-pip"></div><div class="bn-lbl">Models</div></div>
+      <div class="bn" onclick="goTo('s5')"><div class="bn-ico">💳</div><div class="bn-pip"></div><div class="bn-lbl">Wallet</div></div>
+    </div>
+  </div>
+
+  <!-- ════ S2: CRM ════ -->
+  <div class="screen" id="s2">
+    <div class="top-bar">
+      <div class="top-logo">MY CONTACTS</div>
+      <div style="font-size:10px;letter-spacing:.12em;color:var(--green)">247 Total</div>
+    </div>
+    <div class="scroll-pad">
+
+      <div class="crm-stats">
+        <div class="crm-stat"><div class="crm-stat-val">247</div><div class="crm-stat-lbl">Total</div></div>
+        <div class="crm-stat"><div class="crm-stat-val">48</div><div class="crm-stat-lbl">VIP</div></div>
+        <div class="crm-stat"><div class="crm-stat-val">57</div><div class="crm-stat-lbl">New</div></div>
+      </div>
+
+      <!-- Import methods -->
+      <div class="sec-lbl">Import Your List</div>
+      <div class="import-methods">
+        <div class="im-card" onclick="showImport('csv')">
+          <div class="im-ico">📄</div>
+          <div class="im-body">
+            <div class="im-title">Upload CSV</div>
+            <div class="im-sub">Import from spreadsheet · Name + phone required</div>
+          </div>
+          <div class="im-arrow">›</div>
+        </div>
+        <div class="im-card" onclick="showImport('paste')">
+          <div class="im-ico">📋</div>
+          <div class="im-body">
+            <div class="im-title">Paste Contacts</div>
+            <div class="im-sub">Copy from Notes, DMs, or anywhere</div>
+          </div>
+          <div class="im-arrow">›</div>
+        </div>
+        <div class="im-card" onclick="showImport('manual')">
+          <div class="im-ico">✏️</div>
+          <div class="im-body">
+            <div class="im-title">Add Manually</div>
+            <div class="im-sub">Enter name and phone one at a time</div>
+          </div>
+          <div class="im-arrow">›</div>
+        </div>
+      </div>
+
+      <!-- Blast CTA -->
+      <button class="crm-blast-btn" onclick="showCrmBlast()">
+        <span>📣</span> BLAST ALL 247 CONTACTS
+      </button>
+
+      <!-- Contact list -->
+      <div style="margin-top:20px">
+        <div class="sec-lbl"><div class="live-dot"></div>Recent Contacts</div>
+        <div class="contact-row">
+          <div class="cr-av">JB</div>
+          <div class="cr-info"><div class="cr-name">Jordan Banks</div><div class="cr-phone">(314) 555-0182</div></div>
+          <div class="cr-tier vip">VIP</div>
+        </div>
+        <div class="contact-row">
+          <div class="cr-av">KM</div>
+          <div class="cr-info"><div class="cr-name">Keisha Monroe</div><div class="cr-phone">(314) 555-0241</div></div>
+          <div class="cr-tier reg">Regular</div>
+        </div>
+        <div class="contact-row">
+          <div class="cr-av">DW</div>
+          <div class="cr-info"><div class="cr-name">Dre Williams</div><div class="cr-phone">(314) 555-0399</div></div>
+          <div class="cr-tier reg">Regular</div>
+        </div>
+        <div class="contact-row">
+          <div class="cr-av">TR</div>
+          <div class="cr-info"><div class="cr-name">Tasha Rivers</div><div class="cr-phone">(314) 555-0187</div></div>
+          <div class="cr-tier new">New</div>
+        </div>
+        <div class="contact-row">
+          <div class="cr-av">MT</div>
+          <div class="cr-info"><div class="cr-name">Marcus Taylor</div><div class="cr-phone">(314) 555-0511</div></div>
+          <div class="cr-tier vip">VIP</div>
+        </div>
+        <div style="text-align:center;padding:14px 0;font-size:11px;color:var(--muted)">+ 242 more contacts</div>
+      </div>
+
+    </div>
+
+    <!-- CSV Import overlay -->
+    <div id="csvOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:200;align-items:flex-end;justify-content:center;padding-bottom:20px">
+      <div style="background:var(--card);border:1px solid var(--gline);border-radius:16px 16px 8px 8px;padding:28px 24px;width:100%;max-width:390px">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.1em;color:var(--gold);margin-bottom:4px" id="importTitle">UPLOAD CSV</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:20px" id="importSub">Name and phone number columns required</div>
+        <div id="importBody"></div>
+        <button onclick="closeImport()" class="ghost-btn">Cancel</button>
+      </div>
+    </div>
+
+    <!-- CRM Blast overlay -->
+    <div id="crmBlastOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:200;align-items:flex-end;justify-content:center;padding-bottom:20px">
+      <div style="background:var(--card);border:1px solid var(--gline);border-radius:16px 16px 8px 8px;padding:28px 24px;width:100%;max-width:390px">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.1em;color:var(--gold);margin-bottom:4px">BLAST YOUR LIST</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:16px">Sending via Hush AI shared line · 247 contacts</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+          <div style="padding:7px 14px;border-radius:20px;font-size:11px;cursor:pointer;background:var(--gold);color:var(--black);font-weight:600">Everyone (247)</div>
+          <div style="padding:7px 14px;border-radius:20px;font-size:11px;cursor:pointer;background:var(--gdim);border:1px solid var(--gline);color:var(--gold)">VIP (48)</div>
+          <div style="padding:7px 14px;border-radius:20px;font-size:11px;cursor:pointer;background:rgba(245,240,232,.05);border:1px solid rgba(245,240,232,.1);color:var(--muted2)">Regular (142)</div>
+          <div style="padding:7px 14px;border-radius:20px;font-size:11px;cursor:pointer;background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.2);color:var(--cyan)">New (57)</div>
+        </div>
+        <textarea class="paste-area" style="margin-bottom:14px" placeholder="🖤 Hush STL is back this Saturday. Text HUSHVIP to lock in your VIP spot or HUSHGA for general. See you on the floor.">🖤 Hush STL is back this Saturday. Text HUSHVIP to lock in your VIP spot or HUSHGA for general. See you on the floor.</textarea>
+        <div style="font-size:10px;color:var(--muted);margin-bottom:14px;text-align:right">147 / 160 characters · SMS credits: 247 will be used</div>
+        <div style="display:flex;gap:10px">
+          <div onclick="sendCrmBlast()" style="flex:1;background:linear-gradient(135deg,var(--gold3),var(--gold));border-radius:4px;padding:14px;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.15em;color:var(--black);cursor:pointer" id="crmBlastBtn">SEND BLAST 🚀</div>
+          <div onclick="document.getElementById('crmBlastOverlay').style.display='none'" style="padding:14px 18px;border:1px solid var(--gline);border-radius:4px;color:var(--muted);cursor:pointer;font-size:13px">Cancel</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bot-nav">
+      <div class="bn" onclick="goTo('s1')"><div class="bn-ico">📱</div><div class="bn-pip"></div><div class="bn-lbl">Number</div></div>
+      <div class="bn active" onclick="goTo('s2')"><div class="bn-ico">👥</div><div class="bn-pip"></div><div class="bn-lbl">CRM</div></div>
+      <div class="bn" onclick="goTo('s3')"><div class="bn-ico">💃</div><div class="bn-pip"></div><div class="bn-lbl">Models</div></div>
+      <div class="bn" onclick="goTo('s5')"><div class="bn-ico">💳</div><div class="bn-pip"></div><div class="bn-lbl">Wallet</div></div>
+    </div>
+  </div>
+
+  <!-- ════ S3: MODEL MARKETPLACE ════ -->
+  <div class="screen" id="s3">
+    <div class="top-bar">
+      <div class="top-logo">EVENT MODELS</div>
+      <div onclick="goTo('s3b')" style="font-size:10px;letter-spacing:.1em;color:var(--gold);cursor:pointer;border:1px solid var(--gline);padding:4px 10px;border-radius:20px">+ Apply</div>
+    </div>
+    <div class="scroll-pad">
+
+      <div class="model-hero">
+        <div class="mh-ico">💃</div>
+        <div>
+          <div class="mh-title">MODEL MARKETPLACE</div>
+          <div class="mh-sub">Book verified Event Models for your events. Video interview before booking. All payments handled in-app. No personal info exchanged.</div>
+        </div>
+      </div>
+
+      <div class="model-search">
+        <input class="ms-input" placeholder="Search by name, city, or follower count...">
+        <div class="ms-filter">⚙</div>
+      </div>
+
+      <div class="badge-tabs">
+        <div class="badge-tab all">All (89)</div>
+        <div class="badge-tab elite">⭐ Elite (12)</div>
+        <div class="badge-tab featured">✦ Featured (31)</div>
+        <div class="badge-tab rising">↑ Rising (46)</div>
+      </div>
+
+      <!-- Model 1 — Elite -->
+      <div class="model-mkt-card" onclick="goTo('s3a')">
+        <div class="mmc-top">
+          <div class="mmc-photo elite">AB
+            <div class="mmc-badge elite">⭐ Elite</div>
+          </div>
+          <div class="mmc-info">
+            <div class="mmc-name">Alexis B. <span class="avail-dot"></span></div>
+            <div class="mmc-stars">★★★★★ 5.0 · <span style="color:var(--muted);font-size:11px">38 events · 100% show rate</span></div>
+            <div class="mmc-socials">
+              <div class="mmc-social">@alexisb_stl · 31.2K</div>
+              <div class="mmc-social tt">@alexis.b · 18K</div>
+            </div>
+          </div>
+        </div>
+        <div class="mmc-meta">
+          <div class="mmc-meta-item">📍 St. Louis, MO</div>
+          <div class="mmc-meta-item">🎥 Video intro available</div>
+          <div class="mmc-meta-item">✓ ID Verified</div>
+        </div>
+        <div class="mmc-rates">
+          <div class="mmc-rate"><div class="mmc-rate-val">$200</div><div class="mmc-rate-lbl">Cash/Event</div></div>
+          <div class="mmc-rate"><div class="mmc-rate-val">500</div><div class="mmc-rate-lbl">Credits/Event</div></div>
+          <div class="mmc-rate"><div class="mmc-rate-val">Available</div><div class="mmc-rate-lbl">Tonight</div></div>
+        </div>
+        <div class="mmc-btns">
+          <button class="mmc-book">💃 BOOK NOW — $200</button>
+          <div class="mmc-interview" onclick="event.stopPropagation();startInterview('Alexis B.','AB')">🎥 Interview</div>
+        </div>
+      </div>
+
+      <!-- Model 2 — Featured -->
+      <div class="model-mkt-card">
+        <div class="mmc-top">
+          <div class="mmc-photo featured">JR
+            <div class="mmc-badge featured">✦ Featured</div>
+          </div>
+          <div class="mmc-info">
+            <div class="mmc-name">Jasmine R. <span class="avail-dot"></span></div>
+            <div class="mmc-stars">★★★★★ 4.9 · <span style="color:var(--muted);font-size:11px">24 events · 96% show rate</span></div>
+            <div class="mmc-socials">
+              <div class="mmc-social">@jasminer_stl · 12.4K</div>
+              <div class="mmc-social sc">👻 8.1K</div>
+            </div>
+          </div>
+        </div>
+        <div class="mmc-meta">
+          <div class="mmc-meta-item">📍 St. Louis, MO</div>
+          <div class="mmc-meta-item">🎥 Video intro available</div>
+          <div class="mmc-meta-item">✓ ID Verified</div>
+        </div>
+        <div class="mmc-rates">
+          <div class="mmc-rate"><div class="mmc-rate-val">$150</div><div class="mmc-rate-lbl">Cash/Event</div></div>
+          <div class="mmc-rate"><div class="mmc-rate-val">350</div><div class="mmc-rate-lbl">Credits/Event</div></div>
+          <div class="mmc-rate" style="background:rgba(0,232,154,.06);border-color:rgba(0,232,154,.2)"><div class="mmc-rate-val" style="color:var(--green)">Tonight</div><div class="mmc-rate-lbl">Available</div></div>
+        </div>
+        <div class="mmc-btns">
+          <button class="mmc-book">💃 BOOK NOW — $150</button>
+          <div class="mmc-interview" onclick="startInterview('Jasmine R.','JR')">🎥 Interview</div>
+        </div>
+      </div>
+
+      <!-- Model 3 — Rising -->
+      <div class="model-mkt-card">
+        <div class="mmc-top">
+          <div class="mmc-photo rising">DW
+            <div class="mmc-badge rising">↑ Rising</div>
+          </div>
+          <div class="mmc-info">
+            <div class="mmc-name">Destiny W.</div>
+            <div class="mmc-stars">★★★★☆ 4.5 · <span style="color:var(--muted);font-size:11px">3 events · New to platform</span></div>
+            <div class="mmc-socials">
+              <div class="mmc-social">@destiny.w · 2.3K</div>
+            </div>
+          </div>
+        </div>
+        <div class="mmc-meta">
+          <div class="mmc-meta-item">📍 St. Louis, MO</div>
+          <div class="mmc-meta-item">🎥 Intro recorded</div>
+        </div>
+        <div class="mmc-rates">
+          <div class="mmc-rate"><div class="mmc-rate-val">$75</div><div class="mmc-rate-lbl">Cash/Event</div></div>
+          <div class="mmc-rate"><div class="mmc-rate-val">Entry</div><div class="mmc-rate-lbl">+ Credits</div></div>
+          <div class="mmc-rate"><div class="mmc-rate-val" style="color:var(--green)">Sat</div><div class="mmc-rate-lbl">Available</div></div>
+        </div>
+        <div class="mmc-btns">
+          <button class="mmc-book" style="background:linear-gradient(135deg,rgba(0,232,154,.6),rgba(0,232,154,.4));color:var(--black)">💃 BOOK — $75</button>
+          <div class="mmc-interview" onclick="startInterview('Destiny W.','DW')">🎥 Interview</div>
+        </div>
+      </div>
+
+    </div>
+    <div class="bot-nav">
+      <div class="bn" onclick="goTo('s1')"><div class="bn-ico">📱</div><div class="bn-pip"></div><div class="bn-lbl">Number</div></div>
+      <div class="bn" onclick="goTo('s2')"><div class="bn-ico">👥</div><div class="bn-pip"></div><div class="bn-lbl">CRM</div></div>
+      <div class="bn active" onclick="goTo('s3')"><div class="bn-ico">💃</div><div class="bn-pip"></div><div class="bn-lbl">Models</div></div>
+      <div class="bn" onclick="goTo('s5')"><div class="bn-ico">💳</div><div class="bn-pip"></div><div class="bn-lbl">Wallet</div></div>
+    </div>
+  </div>
+
+  <!-- ════ S4: VIDEO INTERVIEW ════ -->
+  <div class="screen" id="s4">
+    <div class="video-main">
+      <div class="video-grain"></div>
+      <div class="video-avatar-main">
+        <div class="vam-circle" id="vamCircle">AB</div>
+        <div class="vam-name" id="vamName">Alexis B.</div>
+        <div class="vam-badge" id="vamBadge">⭐ Elite · 5.0 Rating</div>
+      </div>
+      <div class="video-self">
+        <div class="vs-av">😊</div>
+        <div style="font-size:9px;letter-spacing:.08em;color:var(--muted)">You</div>
+      </div>
+      <div class="rec-indicator">
+        <div class="rec-dot"></div>
+        <div class="rec-text">REC</div>
+        <div class="rec-time" id="recTime">0:47</div>
+      </div>
+      <div class="call-timer" id="callTimer">0:47</div>
+    </div>
+
+    <div class="video-header">
+      <div class="vh-back" onclick="goTo('s3')">‹</div>
+      <div class="vh-info">
+        <div class="vh-name" id="vhName">ALEXIS B. — VIDEO INTERVIEW</div>
+        <div class="vh-status"><div class="live-dot"></div>Live · Recording · No contact info shared</div>
+      </div>
+    </div>
+
+    <!-- Chat messages -->
+    <div class="chat-overlay" id="chatOverlay">
+      <div class="chat-msg">
+        <div class="cm-av other">AB</div>
+        <div class="cm-bubble">Hey! Thanks for reaching out. Happy to tell you about my experience 🖤</div>
+      </div>
+      <div class="chat-msg self">
+        <div class="cm-av self">N</div>
+        <div class="cm-bubble">How many events have you worked in STL?</div>
+      </div>
+      <div class="chat-msg">
+        <div class="cm-av other">AB</div>
+        <div class="cm-bubble">38 total — mostly nightlife, a few day parties. I always bring energy and I'm always on time ✨</div>
+      </div>
+      <div class="chat-msg self">
+        <div class="cm-av self">N</div>
+        <div class="cm-bubble">What are you looking for tonight?</div>
+      </div>
+      <div class="chat-msg">
+        <div class="cm-av other">AB</div>
+        <div class="cm-bubble">$200 cash + entry. Payment through the app works great for me 👍</div>
+      </div>
+    </div>
+
+    <div class="video-controls">
+      <div class="vc-chat-input">
+        <input class="vci-input" id="chatInput" placeholder="Type a message...">
+        <button class="vci-send" onclick="sendChatMsg()">➤</button>
+      </div>
+      <div class="vc-buttons">
+        <button class="vcb mute" onclick="toggleMute(this)">🎤</button>
+        <button class="vcb end" onclick="goTo('s3')">📵</button>
+        <button class="vcb book" onclick="bookFromCall()">💃</button>
+        <button class="vcb video">📷</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ S5: WALLET / TRANSACTIONS ════ -->
+  <div class="screen" id="s5">
+    <div class="top-bar">
+      <div class="top-logo">WALLET</div>
+      <div style="font-size:10px;letter-spacing:.1em;color:var(--green)">All Secured</div>
+    </div>
+    <div class="scroll-pad">
+
+      <div class="wallet-hero">
+        <div class="wh-label">Available Balance</div>
+        <div class="wh-balance" id="walletBal">$2,847</div>
+        <div class="wh-sub">Ticket revenue · Service fees · Credits · All streams</div>
+      </div>
+
+      <div class="stripe-badge">
+        <span style="font-size:20px">🔒</span>
+        <div class="sb-text">All transactions processed by Stripe Connect. No personal banking info ever stored in Hush AI. Instant payouts to your bank account.</div>
+      </div>
+
+      <div class="wallet-actions">
+        <div class="wa-btn" onclick="animatePayout()">
+          <div class="wa-ico">💸</div>
+          <div class="wa-lbl">Payout Now</div>
+        </div>
+        <div class="wa-btn">
+          <div class="wa-ico">📦</div>
+          <div class="wa-lbl">Buy SMS Credits</div>
+        </div>
+        <div class="wa-btn">
+          <div class="wa-ico">📊</div>
+          <div class="wa-lbl">Revenue Report</div>
+        </div>
+        <div class="wa-btn">
+          <div class="wa-ico">⚙️</div>
+          <div class="wa-lbl">Bank Account</div>
+        </div>
+      </div>
+
+      <!-- Transaction history -->
+      <div class="sec-lbl">Transaction History</div>
+
+      <div class="txn-row">
+        <div class="txn-ico in">🎟</div>
+        <div class="txn-body"><div class="txn-title">Ticket Revenue — Hush STL Sat</div><div class="txn-sub">31 tickets · 3% platform fee deducted · Auto-deposit</div></div>
+        <div class="txn-amount in">+$2,263</div>
+      </div>
+      <div class="txn-row">
+        <div class="txn-ico in">🎫</div>
+        <div class="txn-body"><div class="txn-title">Service Fees Collected</div><div class="txn-sub">31 guests · avg $4.99 · Passed through</div></div>
+        <div class="txn-amount in">+$154</div>
+      </div>
+      <div class="txn-row">
+        <div class="txn-ico model">💃</div>
+        <div class="txn-body"><div class="txn-title">Model Payment — Alexis B.</div><div class="txn-sub">Auto-released on check-in · 10% booking fee deducted</div></div>
+        <div class="txn-amount out">-$180</div>
+      </div>
+      <div class="txn-row">
+        <div class="txn-ico sms">💬</div>
+        <div class="txn-body"><div class="txn-title">SMS Credit Pack — 500 credits</div><div class="txn-sub">247 used this month · 253 remaining</div></div>
+        <div class="txn-amount out">-$25</div>
+      </div>
+      <div class="txn-row">
+        <div class="txn-ico out">📅</div>
+        <div class="txn-body"><div class="txn-title">Monthly Subscription — Pro Plan</div><div class="txn-sub">Auto-renewed May 6, 2026</div></div>
+        <div class="txn-amount out">-$99</div>
+      </div>
+      <div class="txn-row">
+        <div class="txn-ico in">👑</div>
+        <div class="txn-body"><div class="txn-title">Network Override — 4 Promoters</div><div class="txn-sub">TK, Jay Renee, Meech, Savvy B · $20 each</div></div>
+        <div class="txn-amount in">+$80</div>
+      </div>
+      <div class="txn-row">
+        <div class="txn-ico in">🎟</div>
+        <div class="txn-body"><div class="txn-title">Ticket Revenue — Hush STL Apr 26</div><div class="txn-sub">28 tickets · Previous event</div></div>
+        <div class="txn-amount in">+$1,960</div>
+      </div>
+
+    </div>
+    <div class="bot-nav">
+      <div class="bn" onclick="goTo('s1')"><div class="bn-ico">📱</div><div class="bn-pip"></div><div class="bn-lbl">Number</div></div>
+      <div class="bn" onclick="goTo('s2')"><div class="bn-ico">👥</div><div class="bn-pip"></div><div class="bn-lbl">CRM</div></div>
+      <div class="bn" onclick="goTo('s3')"><div class="bn-ico">💃</div><div class="bn-pip"></div><div class="bn-lbl">Models</div></div>
+      <div class="bn active" onclick="goTo('s5')"><div class="bn-ico">💳</div><div class="bn-pip"></div><div class="bn-lbl">Wallet</div></div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<script>
+// ── NAV ──
+function goTo(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const t = document.getElementById(id);
+  if(t){ t.classList.add('active'); t.scrollTop = 0; }
+  if(id === 's4') startCallTimer();
+}
+
+// ── CALL TIMER ──
+let callInterval;
+let callSeconds = 47;
+function startCallTimer() {
+  clearInterval(callInterval);
+  callInterval = setInterval(() => {
+    callSeconds++;
+    const m = Math.floor(callSeconds/60);
+    const s = callSeconds%60;
+    const str = m+':'+(s<10?'0':'')+s;
+    const ct = document.getElementById('callTimer');
+    const rt = document.getElementById('recTime');
+    if(ct) ct.textContent = str;
+    if(rt) rt.textContent = str;
+  }, 1000);
+}
+
+// ── VIDEO INTERVIEW ──
+function startInterview(name, initials) {
+  const vhName = document.getElementById('vhName');
+  const vamName = document.getElementById('vamName');
+  const vamCircle = document.getElementById('vamCircle');
+  if(vhName) vhName.textContent = name.toUpperCase() + ' — VIDEO INTERVIEW';
+  if(vamName) vamName.textContent = name;
+  if(vamCircle) vamCircle.textContent = initials;
+  callSeconds = 0;
+  goTo('s4');
+}
+
+function toggleMute(btn) {
+  btn.textContent = btn.textContent === '🎤' ? '🔇' : '🎤';
+  btn.style.background = btn.textContent === '🔇' ? 'var(--red)' : 'rgba(255,255,255,.1)';
+}
+
+function sendChatMsg() {
+  const input = document.getElementById('chatInput');
+  if(!input || !input.value.trim()) return;
+  const overlay = document.getElementById('chatOverlay');
+  if(!overlay) return;
+  const msg = document.createElement('div');
+  msg.className = 'chat-msg self';
+  msg.innerHTML = `<div class="cm-av self">N</div><div class="cm-bubble">${input.value}</div>`;
+  overlay.appendChild(msg);
+  overlay.scrollTop = overlay.scrollHeight;
+  input.value = '';
+}
+
+function bookFromCall() {
+  const btn = document.querySelector('.vcb.book');
+  if(btn){
+    btn.textContent = '✓';
+    btn.style.background = 'var(--green)';
+    setTimeout(() => {
+      clearInterval(callInterval);
+      goTo('s5');
+    }, 800);
+  }
+}
+
+// ── CRM ──
+function showImport(type) {
+  const overlay = document.getElementById('csvOverlay');
+  const title = document.getElementById('importTitle');
+  const sub = document.getElementById('importSub');
+  const body = document.getElementById('importBody');
+  if(!overlay) return;
+
+  if(type === 'csv') {
+    if(title) title.textContent = 'UPLOAD CSV';
+    if(sub) sub.textContent = 'Name and phone number columns required';
+    if(body) body.innerHTML = `
+      <div style="border:2px dashed var(--gline);border-radius:8px;padding:32px;text-align:center;margin-bottom:16px;cursor:pointer" onclick="simulateCsvUpload()">
+        <div style="font-size:36px;margin-bottom:8px">📄</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.1em;color:var(--gold);margin-bottom:4px">TAP TO SELECT FILE</div>
+        <div style="font-size:11px;color:var(--muted)">.csv, .xlsx, .txt supported</div>
+      </div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.6">Format: Name, Phone (one per row). First name or full name accepted. Area code required on all numbers.</div>
+    `;
+  } else if(type === 'paste') {
+    if(title) title.textContent = 'PASTE CONTACTS';
+    if(sub) sub.textContent = 'Copy from Notes, DMs, or anywhere';
+    if(body) body.innerHTML = `
+      <textarea class="paste-area" style="margin-bottom:8px" placeholder="Paste names and numbers here...&#10;&#10;Jordan Banks (314) 555-0182&#10;Keisha Monroe 3145550241&#10;Dre Williams, 314-555-0399" id="pasteInput"></textarea>
+      <div style="font-size:10px;color:var(--muted);margin-bottom:16px">AI parses names and phone numbers automatically from any format</div>
+      <button class="gold-btn" onclick="simulatePasteImport()">PARSE & IMPORT</button>
+    `;
+  } else {
+    if(title) title.textContent = 'ADD CONTACT';
+    if(sub) sub.textContent = 'Enter name and phone number';
+    if(body) body.innerHTML = `
+      <div style="margin-bottom:12px">
+        <label class="field-label">Name</label>
+        <input class="field-input" placeholder="Full name" style="margin-bottom:0">
+      </div>
+      <div style="margin-bottom:16px">
+        <label class="field-label">Phone Number</label>
+        <input class="field-input" placeholder="(314) 000-0000" type="tel" style="margin-bottom:0">
+      </div>
+      <div style="margin-bottom:16px">
+        <label class="field-label">Tier</label>
+        <div style="display:flex;gap:8px">
+          <div onclick="selectTierBtn(this)" style="flex:1;text-align:center;padding:10px;background:var(--gold);color:var(--black);border-radius:6px;font-size:12px;cursor:pointer;font-weight:600">VIP</div>
+          <div onclick="selectTierBtn(this)" style="flex:1;text-align:center;padding:10px;background:var(--deep);border:1px solid var(--gline);color:var(--muted2);border-radius:6px;font-size:12px;cursor:pointer">Regular</div>
+          <div onclick="selectTierBtn(this)" style="flex:1;text-align:center;padding:10px;background:var(--deep);border:1px solid rgba(0,212,255,.2);color:var(--cyan);border-radius:6px;font-size:12px;cursor:pointer">New</div>
+        </div>
+      </div>
+      <button class="gold-btn" onclick="simulateManualAdd()">ADD TO LIST</button>
+    `;
+  }
+  overlay.style.display = 'flex';
+}
+
+function closeImport() {
+  document.getElementById('csvOverlay').style.display = 'none';
+}
+function simulateCsvUpload() {
+  const area = document.querySelector('#csvOverlay [onclick="simulateCsvUpload()"]');
+  if(area){ area.innerHTML = '<div style="font-size:36px;margin-bottom:8px">✅</div><div style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;letter-spacing:.1em;color:var(--green)">142 CONTACTS IMPORTED</div>'; }
+  setTimeout(closeImport, 1400);
+}
+function simulatePasteImport() {
+  const btn = document.querySelector('#csvOverlay .gold-btn');
+  if(btn){ btn.textContent='✓ 3 CONTACTS PARSED & ADDED'; btn.style.background='var(--green)'; }
+  setTimeout(closeImport, 1200);
+}
+function simulateManualAdd() {
+  const btn = document.querySelector('#csvOverlay .gold-btn');
+  if(btn){ btn.textContent='✓ CONTACT ADDED'; btn.style.background='var(--green)'; }
+  setTimeout(closeImport, 1200);
+}
+function selectTierBtn(el) {
+  el.parentElement.querySelectorAll('div').forEach(d => { d.style.background='var(--deep)'; d.style.fontWeight='400'; d.style.color='var(--muted2)'; });
+  el.style.background='var(--gold)'; el.style.color='var(--black)'; el.style.fontWeight='600';
+}
+
+function showCrmBlast() {
+  const o = document.getElementById('crmBlastOverlay');
+  if(o) o.style.display = 'flex';
+}
+function sendCrmBlast() {
+  const btn = document.getElementById('crmBlastBtn');
+  if(btn){ btn.textContent='✓ SENT TO 247 CONTACTS'; btn.style.background='var(--green)'; btn.style.color='var(--black)'; }
+  setTimeout(() => { document.getElementById('crmBlastOverlay').style.display='none'; }, 1400);
+}
+
+// ── WALLET ──
+function animatePayout() {
+  const bal = document.getElementById('walletBal');
+  if(!bal) return;
+  bal.style.color='var(--muted)';
+  bal.textContent = 'Processing...';
+  setTimeout(() => {
+    bal.style.color='';
+    bal.textContent = '$0';
+    setTimeout(() => {
+      const note = document.createElement('div');
+      note.style.cssText = 'position:fixed;top:100px;left:50%;transform:translateX(-50%);background:rgba(0,232,154,.15);border:1px solid rgba(0,232,154,.3);border-radius:8px;padding:12px 20px;font-size:13px;color:var(--green);z-index:999;text-align:center';
+      note.textContent = '✓ $2,847 sent to your bank · 1-2 business days';
+      document.body.appendChild(note);
+      setTimeout(() => note.remove(), 2500);
+    }, 300);
+  }, 1200);
+}
+
+// ── UPGRADE ──
+function showUpgradeFlow(plan) {
+  const note = document.createElement('div');
+  note.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:999;display:flex;align-items:flex-end;justify-content:center;padding-bottom:40px';
+  const price = plan==='pro'?'$99':'$199';
+  const name = plan==='pro'?'PRO':'MOGUL';
+  const feature = plan==='pro'?'Your own dedicated number assigned instantly from our pre-approved pool.':'Dedicated number + vanity option + backup line + hushai.com/yourname';
+  note.innerHTML = `
+    <div style="background:var(--card);border:1px solid var(--gline);border-radius:16px 16px 8px 8px;padding:28px 24px;width:100%;max-width:390px">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:.1em;background:linear-gradient(135deg,var(--gold3),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px">UPGRADE TO ${name}</div>
+      <div style="font-size:13px;color:var(--muted2);margin-bottom:20px;line-height:1.6">${feature}</div>
+      <div style="background:var(--gdim);border:1px solid var(--gline);border-radius:8px;padding:14px;margin-bottom:16px">
+        <div style="font-size:10px;color:var(--gold);letter-spacing:.15em;text-transform:uppercase;margin-bottom:4px">⚡ Your Number — Instant</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">Assigned from pre-approved pool</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px">No Twilio wait · No approval needed · Live in 60 seconds</div>
+      </div>
+      <div style="display:flex;gap:10px">
+        <div onclick="this.textContent='✓ UPGRADING...';this.style.background='var(--green)';setTimeout(()=>note.remove(),1200)" style="flex:1;background:linear-gradient(135deg,var(--gold3),var(--gold));border-radius:4px;padding:16px;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.15em;color:var(--black);cursor:pointer">UPGRADE — ${price}/MO</div>
+        <div onclick="note.remove()" style="padding:16px 18px;border:1px solid var(--gline);border-radius:4px;color:var(--muted);cursor:pointer;font-size:13px">Cancel</div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(note);
+  // Capture note in closure
+  const noteRef = note;
+  note.querySelector('[onclick*="UPGRADING"]').addEventListener('click', function() {
+    this.textContent = '✓ UPGRADING...';
+    this.style.background = 'var(--green)';
+    setTimeout(() => noteRef.remove(), 1200);
+  }, {once: true});
+}
+</script>
+</body>
+</html>

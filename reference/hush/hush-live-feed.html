@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Hush AI — Live</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --black:#040405;--deep:#07070a;--card:#0d0d11;--card2:#121216;
+  --gold:#C9A84C;--gold2:#e8c96a;--gold3:#a8862e;--gold4:#f5d98a;
+  --gdim:rgba(201,168,76,0.12);--gline:rgba(201,168,76,0.2);
+  --white:#f5f0e8;--muted:rgba(245,240,232,0.35);--muted2:rgba(245,240,232,0.6);
+  --green:#00e89a;--red:#ff4757;--cyan:#00d4ff;--purple:#a29bfe;
+  --live:#ff4757;--live-dim:rgba(255,71,87,0.15);--live-line:rgba(255,71,87,0.3);
+}
+html,body{height:100%;background:#000;overflow:hidden;font-family:'Outfit',sans-serif;color:var(--white)}
+.shell{width:100%;height:100vh;display:flex;align-items:center;justify-content:center;background:#000}
+.phone{width:min(390px,100vw);height:min(844px,100vh);background:var(--black);border-radius:min(44px,5vw);overflow:hidden;position:relative;box-shadow:0 0 0 1px rgba(255,71,87,.2),0 0 80px rgba(255,71,87,.06),0 60px 140px rgba(0,0,0,.9)}
+.screen{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity .4s ease;overflow-y:auto;overflow-x:hidden;scrollbar-width:none}
+.screen::-webkit-scrollbar{display:none}
+.screen.active{opacity:1;pointer-events:all}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+@keyframes livePulse{0%,100%{box-shadow:0 0 0 0 rgba(255,71,87,.4)}70%{box-shadow:0 0 0 10px rgba(255,71,87,0)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes msgSlide{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
+@keyframes emojiFloat{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-120px) scale(1.4)}}
+@keyframes viewerCount{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:scale(1)}}
+@keyframes earning{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes scanline{0%{transform:translateY(-100%)}100%{transform:translateY(100vh)}}
+
+/* NAV */
+.bot-nav{position:absolute;bottom:0;left:0;right:0;background:rgba(4,4,5,.97);backdrop-filter:blur(20px);border-top:1px solid rgba(255,71,87,.15);display:flex;padding:10px 0 26px;z-index:100}
+.bn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px 0}
+.bn-ico{font-size:20px;opacity:.3;transition:opacity .2s}
+.bn-lbl{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);transition:color .2s}
+.bn-pip{width:4px;height:4px;border-radius:50%;background:var(--live);opacity:0;transition:opacity .2s;margin:0 auto}
+.bn.active .bn-ico{opacity:1}
+.bn.active .bn-lbl{color:var(--live)}
+.bn.active .bn-pip{opacity:1}
+
+/* ══════════════════════════════════
+   S1 — CITY FEED
+══════════════════════════════════ */
+#s1{background:var(--deep)}
+
+.feed-header{
+  padding:52px 20px 0;background:var(--black);
+  border-bottom:1px solid rgba(255,71,87,.12);
+  position:sticky;top:0;z-index:10;
+}
+.fh-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.fh-logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.15em;background:linear-gradient(135deg,var(--red),#ff6b6b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.fh-city{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.fh-live-count{font-size:10px;color:var(--live);background:var(--live-dim);border:1px solid var(--live-line);border-radius:20px;padding:3px 10px;display:flex;align-items:center;gap:5px}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--live);animation:blink .8s ease-in-out infinite;flex-shrink:0}
+
+/* Feed tabs */
+.feed-tabs{display:flex;border-bottom:1px solid rgba(255,71,87,.1)}
+.feed-tab{flex:1;text-align:center;padding:10px 0;font-size:11px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;transition:all .2s}
+.feed-tab.active{color:var(--live);border-bottom-color:var(--live)}
+
+.feed-scroll{padding:14px 16px 110px}
+
+/* Live stream cards in feed */
+.live-card{
+  border-radius:14px;overflow:hidden;margin-bottom:14px;
+  position:relative;cursor:pointer;
+  box-shadow:0 8px 32px rgba(0,0,0,.5),0 0 0 1px rgba(255,71,87,.2);
+  transition:transform .2s;
+}
+.live-card:active{transform:scale(.99)}
+
+.lc-video{
+  height:200px;position:relative;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+}
+.lc-bg{position:absolute;inset:0;background:linear-gradient(160deg,#0e0508 0%,#050510 100%)}
+.lc-bg.party{background:linear-gradient(160deg,#1a0508 0%,#0a0215 50%,#050510 100%)}
+.lc-bg.floor{background:linear-gradient(160deg,#080a05 0%,#0a0a00 50%,#040405 100%)}
+.lc-grain{position:absolute;inset:0;opacity:.04;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.lc-scanline{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.lc-scanline::after{content:'';position:absolute;top:0;left:0;right:0;height:40px;background:linear-gradient(180deg,transparent,rgba(255,255,255,.015),transparent);animation:scanline 4s linear infinite}
+.lc-glow{position:absolute;width:300px;height:300px;border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%)}
+.lc-glow.red{background:radial-gradient(circle,rgba(255,71,87,.12) 0%,transparent 70%)}
+.lc-glow.gold{background:radial-gradient(circle,rgba(201,168,76,.1) 0%,transparent 70%)}
+
+.lc-content{position:relative;z-index:2;text-align:center}
+.lc-emoji{font-size:48px;animation:float 3s ease-in-out infinite;display:block;margin-bottom:8px}
+.lc-crowd{font-size:10px;letter-spacing:.15em;color:rgba(255,255,255,.4);text-transform:uppercase}
+
+/* Live badge */
+.live-badge{position:absolute;top:12px;left:12px;background:var(--live);border-radius:4px;padding:3px 8px;font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:.15em;color:var(--white);display:flex;align-items:center;gap:4px;animation:livePulse 2s ease-out infinite}
+.live-badge-dot{width:5px;height:5px;border-radius:50%;background:var(--white)}
+
+/* Viewer count */
+.viewer-badge{position:absolute;top:12px;right:12px;background:rgba(0,0,0,.6);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:4px 10px;font-size:11px;color:var(--white);display:flex;align-items:center;gap:5px}
+
+/* PPV badge */
+.ppv-badge{position:absolute;bottom:12px;right:12px;background:linear-gradient(135deg,var(--gold3),var(--gold));border-radius:20px;padding:5px 12px;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:.1em;color:var(--black)}
+
+/* Card info */
+.lc-info{background:var(--card);padding:14px 16px;border-top:1px solid rgba(255,71,87,.1)}
+.lci-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.lci-host{display:flex;align-items:center;gap:8px}
+.lci-av{width:32px;height:32px;border-radius:50%;border:2px solid var(--live);background:var(--deep);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:12px;color:var(--live)}
+.lci-name{font-size:13px;font-weight:500;color:var(--white)}
+.lci-event{font-size:10px;color:var(--muted)}
+.lci-watch{padding:7px 16px;border-radius:20px;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:.1em;cursor:pointer;transition:all .2s}
+.lci-watch.free{background:rgba(0,232,154,.15);border:1px solid rgba(0,232,154,.3);color:var(--green)}
+.lci-watch.paid{background:linear-gradient(135deg,var(--gold3),var(--gold));color:var(--black)}
+
+/* Post cards */
+.post-card{background:var(--card);border:1px solid rgba(255,255,255,.06);border-radius:12px;margin-bottom:12px;overflow:hidden;cursor:pointer}
+.post-header{display:flex;align-items:center;gap:10px;padding:12px 14px}
+.post-av{width:36px;height:36px;border-radius:50%;border:2px solid;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:13px;flex-shrink:0}
+.post-av.vip{border-color:var(--gold);background:var(--gdim);color:var(--gold)}
+.post-av.reg{border-color:rgba(245,240,232,.15);background:var(--card2);color:var(--muted2)}
+.post-av.model{border-color:var(--purple);background:rgba(162,155,254,.1);color:var(--purple)}
+.post-info{flex:1}
+.post-name{font-size:13px;font-weight:500;color:var(--white)}
+.post-meta{font-size:10px;color:var(--muted)}
+.post-tier{font-size:9px;padding:2px 7px;border-radius:20px;background:var(--gdim);border:1px solid var(--gline);color:var(--gold);letter-spacing:.08em}
+
+.post-visual{height:180px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.pv-bg{position:absolute;inset:0}
+.pv-content{position:relative;z-index:2;text-align:center}
+.pv-emoji{font-size:52px;display:block;margin-bottom:6px;animation:float 2.5s ease-in-out infinite}
+.pv-text{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;color:rgba(255,255,255,.7);max-width:200px;text-align:center;line-height:1.4}
+
+.post-footer{padding:12px 14px}
+.pf-caption{font-size:13px;color:var(--muted2);line-height:1.5;margin-bottom:10px}
+.pf-actions{display:flex;gap:16px}
+.pf-action{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--muted);cursor:pointer;transition:color .2s}
+.pf-action:active{color:var(--live)}
+.pf-action .count{font-weight:500}
+
+/* Stories row */
+.stories-row{display:flex;gap:10px;overflow-x:auto;padding:12px 16px 12px;scrollbar-width:none;border-bottom:1px solid rgba(255,255,255,.04);margin-bottom:4px}
+.stories-row::-webkit-scrollbar{display:none}
+.story-item{display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;cursor:pointer}
+.story-av{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:16px;position:relative}
+.story-av.unseen{background:linear-gradient(135deg,var(--live),#ff6b6b);padding:2px}
+.story-av.live-story{background:linear-gradient(135deg,var(--live),var(--purple));padding:2px;animation:livePulse 2s ease-out infinite}
+.story-av-inner{width:100%;height:100%;border-radius:50%;background:var(--card);display:flex;align-items:center;justify-content:center;border:2px solid var(--black)}
+.story-name{font-size:9px;color:var(--muted);letter-spacing:.04em;max-width:52px;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.story-live-tag{position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);background:var(--live);border-radius:4px;padding:1px 6px;font-size:8px;font-weight:700;letter-spacing:.08em;white-space:nowrap}
+
+/* ══════════════════════════════════
+   S2 — LIVE STREAM VIEWER
+══════════════════════════════════ */
+#s2{background:#000;display:flex;flex-direction:column}
+
+.stream-video{
+  flex:1;position:relative;overflow:hidden;
+  background:linear-gradient(160deg,#1a0508 0%,#0e0215 40%,#040510 100%);
+  min-height:0;
+}
+.sv-grain{position:absolute;inset:0;opacity:.03;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.sv-glow{position:absolute;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(255,71,87,.1) 0%,transparent 70%);top:40%;left:50%;transform:translate(-50%,-50%)}
+.sv-diamonds{position:absolute;inset:0;background-image:repeating-linear-gradient(45deg,rgba(255,71,87,.02) 0,rgba(255,71,87,.02) 1px,transparent 1px,transparent 28px),repeating-linear-gradient(-45deg,rgba(255,71,87,.02) 0,rgba(255,71,87,.02) 1px,transparent 1px,transparent 28px)}
+.sv-scanline{position:absolute;inset:0;overflow:hidden}
+.sv-scanline::after{content:'';position:absolute;top:0;left:0;right:0;height:60px;background:linear-gradient(180deg,transparent,rgba(255,255,255,.01),transparent);animation:scanline 5s linear infinite}
+
+.sv-content{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:2}
+.sv-party{text-align:center}
+.sv-party-emoji{font-size:64px;animation:float 3s ease-in-out infinite;display:block;margin-bottom:12px}
+.sv-party-text{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:18px;color:rgba(255,255,255,.5);letter-spacing:.04em}
+
+/* Stream header overlay */
+.sv-header{position:absolute;top:0;left:0;right:0;padding:52px 16px 16px;background:linear-gradient(180deg,rgba(0,0,0,.8) 0%,transparent 100%);z-index:10;display:flex;align-items:flex-start;justify-content:space-between}
+.svh-left{}
+.svh-back{width:34px;height:34px;border-radius:50%;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--white);cursor:pointer;margin-bottom:10px}
+.svh-host{display:flex;align-items:center;gap:8px}
+.svh-av{width:36px;height:36px;border-radius:50%;border:2px solid var(--live);background:rgba(255,71,87,.15);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:13px;color:var(--live)}
+.svh-info{}
+.svh-name{font-size:13px;font-weight:500;color:var(--white)}
+.svh-event{font-size:10px;color:rgba(255,255,255,.5)}
+.svh-right{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.svh-live{background:var(--live);border-radius:4px;padding:4px 10px;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:.15em;color:var(--white);display:flex;align-items:center;gap:4px;animation:livePulse 2s ease-out infinite}
+.svh-viewers{background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:4px 10px;font-size:11px;color:var(--white);display:flex;align-items:center;gap:5px;animation:viewerCount .4s ease both}
+.svh-earnings{background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.25);border-radius:20px;padding:4px 10px;font-size:11px;color:var(--gold);animation:earning .4s ease both}
+
+/* Floating emojis */
+.emoji-float-zone{position:absolute;right:12px;bottom:200px;width:40px;pointer-events:none;z-index:5;display:flex;flex-direction:column;gap:4px}
+.float-emoji{font-size:24px;animation:emojiFloat 2s ease-out forwards;opacity:0}
+
+/* Chat overlay */
+.sv-chat{position:absolute;bottom:80px;left:0;right:0;padding:0 12px;max-height:180px;overflow:hidden;z-index:5;display:flex;flex-direction:column;justify-content:flex-end;gap:6px;pointer-events:none}
+.chat-bubble{display:flex;align-items:flex-start;gap:7px;animation:msgSlide .3s ease both}
+.cb-av{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0;margin-top:1px}
+.cb-av.vip{background:var(--gdim);color:var(--gold);border:1px solid var(--gline)}
+.cb-av.reg{background:rgba(255,255,255,.08);color:var(--muted2)}
+.cb-av.model{background:rgba(162,155,254,.15);color:var(--purple)}
+.cb-msg{background:rgba(0,0,0,.55);backdrop-filter:blur(8px);border-radius:12px;padding:6px 10px;max-width:240px}
+.cb-name{font-size:9px;font-weight:700;letter-spacing:.06em;margin-bottom:2px}
+.cb-name.vip{color:var(--gold)}
+.cb-name.reg{color:var(--muted2)}
+.cb-name.model{color:var(--purple)}
+.cb-text{font-size:12px;color:var(--white);line-height:1.4}
+
+/* Stream controls */
+.sv-controls{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(0deg,rgba(0,0,0,.9) 0%,transparent 100%);padding:12px 16px 100px;z-index:10}
+.svc-input-row{display:flex;gap:8px;margin-bottom:0}
+.svc-input{flex:1;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:10px 16px;font-size:13px;color:var(--white);font-family:'Outfit',sans-serif;outline:none}
+.svc-input::placeholder{color:rgba(255,255,255,.3)}
+.svc-send{width:38px;height:38px;border-radius:50%;background:var(--live);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.svc-emoji-row{display:flex;gap:8px;justify-content:flex-end;margin-top:8px}
+.svc-emoji{font-size:24px;cursor:pointer;transition:transform .1s}
+.svc-emoji:active{transform:scale(1.3)}
+
+/* PPV gate overlay */
+.ppv-gate{position:absolute;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);z-index:20;display:flex;align-items:center;justify-content:center;padding:32px}
+.ppv-gate.hidden{display:none}
+.ppv-box{background:var(--card);border:1px solid var(--gline);border-radius:16px;padding:28px 24px;text-align:center;width:100%}
+.ppv-ico{font-size:48px;margin-bottom:14px;display:block;animation:float 3s ease-in-out infinite}
+.ppv-title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.06em;color:var(--white);margin-bottom:6px}
+.ppv-sub{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:15px;color:var(--muted);margin-bottom:20px;line-height:1.6}
+.ppv-event{background:var(--deep);border:1px solid var(--gline);border-radius:8px;padding:12px;margin-bottom:20px;text-align:left}
+.ppv-event-name{font-size:14px;font-weight:500;color:var(--white);margin-bottom:3px}
+.ppv-event-host{font-size:11px;color:var(--muted)}
+.ppv-event-live{font-size:11px;color:var(--live);display:flex;align-items:center;gap:5px;margin-top:6px}
+.ppv-prices{display:flex;gap:10px;margin-bottom:16px}
+.ppv-price{flex:1;background:var(--deep);border:1px solid rgba(201,168,76,.15);border-radius:8px;padding:14px 10px;text-align:center;cursor:pointer;transition:all .2s}
+.ppv-price.selected{border-color:var(--gold);background:var(--gdim)}
+.ppv-price-val{font-family:'Bebas Neue',sans-serif;font-size:28px;background:linear-gradient(135deg,var(--gold3),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.ppv-price-lbl{font-size:10px;color:var(--muted);margin-top:3px}
+.ppv-price-desc{font-size:10px;color:var(--muted2);margin-top:4px}
+.ppv-watch-btn{width:100%;padding:16px;background:linear-gradient(135deg,var(--gold3),var(--gold));border:none;border-radius:6px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.18em;color:var(--black);cursor:pointer;margin-bottom:8px;transition:all .2s;box-shadow:0 6px 24px rgba(201,168,76,.25)}
+.ppv-watch-btn:active{transform:scale(.98)}
+.ppv-free-note{font-size:11px;color:var(--muted);cursor:pointer}
+.ppv-free-note span{color:var(--gold)}
+
+/* ══════════════════════════════════
+   S3 — GO LIVE (BROADCASTER)
+══════════════════════════════════ */
+#s3{background:#000}
+
+.go-live-preview{
+  height:380px;position:relative;overflow:hidden;
+  background:linear-gradient(160deg,#0a0310 0%,#040510 100%);
+}
+.glp-glow{position:absolute;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(255,71,87,.08) 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%)}
+.glp-diamonds{position:absolute;inset:0;background-image:repeating-linear-gradient(45deg,rgba(255,71,87,.02) 0,rgba(255,71,87,.02) 1px,transparent 1px,transparent 26px),repeating-linear-gradient(-45deg,rgba(255,71,87,.02) 0,rgba(255,71,87,.02) 1px,transparent 1px,transparent 26px)}
+.glp-self{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;z-index:2}
+.glp-av{width:96px;height:96px;border-radius:50%;border:3px solid var(--live);background:rgba(255,71,87,.1);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--live);animation:livePulse 2s ease-out infinite}
+.glp-name{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--white)}
+.glp-status{font-size:11px;color:rgba(255,255,255,.4);letter-spacing:.08em}
+
+/* Camera controls bar */
+.glp-controls{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);display:flex;gap:12px;z-index:5}
+.glpc{width:44px;height:44px;border-radius:50%;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer}
+
+/* Live setup panel */
+.live-setup{padding:20px 20px 110px}
+
+.ls-section{background:var(--card);border:1px solid rgba(255,71,87,.1);border-radius:10px;padding:16px;margin-bottom:14px}
+.ls-title{font-size:10px;letter-spacing:.2em;color:var(--live);text-transform:uppercase;margin-bottom:12px}
+
+/* Privacy toggle row */
+.privacy-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.pr-label{font-size:13px;color:var(--white);font-weight:500}
+.pr-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.toggle{width:48px;height:26px;border-radius:13px;background:rgba(255,255,255,.1);position:relative;cursor:pointer;transition:all .3s;flex-shrink:0}
+.toggle.on{background:var(--live)}
+.toggle.gold-on{background:linear-gradient(135deg,var(--gold3),var(--gold))}
+.toggle-dot{width:20px;height:20px;border-radius:50%;background:var(--white);position:absolute;top:3px;left:3px;transition:all .3s;box-shadow:0 2px 4px rgba(0,0,0,.3)}
+.toggle.on .toggle-dot,.toggle.gold-on .toggle-dot{left:25px}
+
+/* PPV price selector */
+.ppv-selector{display:flex;gap:8px;margin-top:10px}
+.ppvs-opt{flex:1;background:var(--deep);border:1px solid rgba(255,71,87,.1);border-radius:6px;padding:10px 6px;text-align:center;cursor:pointer;transition:all .2s}
+.ppvs-opt.selected{border-color:var(--live);background:var(--live-dim)}
+.ppvs-price{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--white)}
+.ppvs-label{font-size:9px;color:var(--muted);letter-spacing:.06em;margin-top:2px}
+
+/* Revenue preview */
+.revenue-preview{background:linear-gradient(135deg,rgba(201,168,76,.08),rgba(201,168,76,.03));border:1px solid var(--gline);border-radius:8px;padding:14px;margin-top:10px}
+.rp-title{font-size:9px;letter-spacing:.18em;color:var(--gold);text-transform:uppercase;margin-bottom:10px}
+.rp-row{display:flex;justify-content:space-between;font-size:12px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.03)}
+.rp-row:last-child{border-bottom:none;padding-top:8px}
+.rp-label{color:var(--muted)}
+.rp-val{color:var(--white);font-weight:500}
+.rp-val.gold{color:var(--gold)}
+.rp-val.green{color:var(--green)}
+
+/* Go live button */
+.go-live-btn{
+  width:100%;padding:20px;
+  background:linear-gradient(135deg,var(--red),#ff6b6b);
+  border:none;border-radius:6px;
+  font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.22em;
+  color:var(--white);cursor:pointer;
+  box-shadow:0 8px 32px rgba(255,71,87,.35);
+  transition:all .2s;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+}
+.go-live-btn:active{transform:scale(.98)}
+.glb-dot{width:10px;height:10px;border-radius:50%;background:var(--white);animation:blink .8s ease-in-out infinite}
+</style>
+</head>
+<body>
+<div class="shell">
+<div class="phone">
+
+  <!-- ════ S1: CITY FEED ════ -->
+  <div class="screen active" id="s1">
+    <div class="feed-header">
+      <div class="fh-top">
+        <div class="fh-logo">HUSH LIVE</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="fh-city">📍 St. Louis</div>
+          <div class="fh-live-count"><div class="live-dot"></div>3 LIVE NOW</div>
+        </div>
+      </div>
+
+      <!-- Stories -->
+      <div class="stories-row">
+        <div class="story-item" onclick="goTo('s2')">
+          <div class="story-av live-story">
+            <div class="story-av-inner" style="background:rgba(255,71,87,.15);color:var(--live);font-family:'Bebas Neue',sans-serif;font-size:16px">N</div>
+            <div class="story-live-tag">LIVE</div>
+          </div>
+          <div class="story-name">Niddy</div>
+        </div>
+        <div class="story-item" onclick="goTo('s2')">
+          <div class="story-av live-story">
+            <div class="story-av-inner" style="background:rgba(162,155,254,.15);color:var(--purple);font-family:'Bebas Neue',sans-serif;font-size:16px">AB</div>
+            <div class="story-live-tag">LIVE</div>
+          </div>
+          <div class="story-name">Alexis B.</div>
+        </div>
+        <div class="story-item">
+          <div class="story-av unseen">
+            <div class="story-av-inner" style="background:var(--card2);color:var(--gold);font-family:'Bebas Neue',sans-serif;font-size:15px">JB</div>
+          </div>
+          <div class="story-name">Jordan B.</div>
+        </div>
+        <div class="story-item">
+          <div class="story-av unseen">
+            <div class="story-av-inner" style="background:var(--card2);color:var(--muted2);font-family:'Bebas Neue',sans-serif;font-size:15px">KM</div>
+          </div>
+          <div class="story-name">Keisha M.</div>
+        </div>
+        <div class="story-item">
+          <div class="story-av unseen">
+            <div class="story-av-inner" style="background:var(--card2);color:var(--cyan);font-family:'Bebas Neue',sans-serif;font-size:15px">TR</div>
+          </div>
+          <div class="story-name">Tasha R.</div>
+        </div>
+        <div class="story-item">
+          <div class="story-av" style="border:2px dashed rgba(255,255,255,.15)">
+            <div class="story-av-inner" style="background:transparent;font-size:20px">+</div>
+          </div>
+          <div class="story-name" onclick="goTo('s3')">Go Live</div>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="feed-tabs">
+        <div class="feed-tab active">🔴 Live</div>
+        <div class="feed-tab">📸 Posts</div>
+        <div class="feed-tab">🔥 Trending</div>
+      </div>
+    </div>
+
+    <div class="feed-scroll">
+
+      <!-- Live stream card 1 — Niddy PPV -->
+      <div class="live-card" onclick="goTo('s2')">
+        <div class="lc-video">
+          <div class="lc-bg party"></div>
+          <div class="lc-grain"></div>
+          <div class="lc-scanline"></div>
+          <div class="lc-glow red"></div>
+          <div class="lc-content">
+            <span class="lc-emoji">🎉</span>
+            <div class="lc-crowd">Hush STL · Live from the floor</div>
+          </div>
+          <div class="live-badge"><div class="live-badge-dot"></div>LIVE</div>
+          <div class="viewer-badge">👁 847 watching</div>
+          <div class="ppv-badge">$10 to Watch</div>
+        </div>
+        <div class="lc-info">
+          <div class="lci-top">
+            <div class="lci-host">
+              <div class="lci-av">N</div>
+              <div>
+                <div class="lci-name">Niddy</div>
+                <div class="lci-event">Hush STL — Saturday Night · Venue 9</div>
+              </div>
+            </div>
+            <div class="lci-watch paid" onclick="event.stopPropagation();goTo('s2')">Watch $10</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live stream card 2 — Model free -->
+      <div class="live-card" onclick="openFreeStream()">
+        <div class="lc-video">
+          <div class="lc-bg floor"></div>
+          <div class="lc-grain"></div>
+          <div class="lc-glow gold"></div>
+          <div class="lc-content">
+            <span class="lc-emoji">💃</span>
+            <div class="lc-crowd">Getting ready for tonight 🖤</div>
+          </div>
+          <div class="live-badge"><div class="live-badge-dot"></div>LIVE</div>
+          <div class="viewer-badge">👁 312 watching</div>
+        </div>
+        <div class="lc-info">
+          <div class="lci-top">
+            <div class="lci-host">
+              <div class="lci-av" style="border-color:var(--purple);color:var(--purple)">AB</div>
+              <div>
+                <div class="lci-name">Alexis Blue</div>
+                <div class="lci-event">Event Model · Pre-show stream</div>
+              </div>
+            </div>
+            <div class="lci-watch free">Watch Free</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Post card 1 -->
+      <div class="post-card">
+        <div class="post-header">
+          <div class="post-av vip">JB</div>
+          <div class="post-info">
+            <div class="post-name">Jordan Banks</div>
+            <div class="post-meta">23 min ago · Hush STL</div>
+          </div>
+          <div class="post-tier">👑 VIP</div>
+        </div>
+        <div class="post-visual">
+          <div class="pv-bg" style="background:linear-gradient(160deg,#0e0a04,#05050f)"></div>
+          <div style="position:absolute;inset:0;background-image:repeating-linear-gradient(45deg,rgba(201,168,76,.03) 0,rgba(201,168,76,.03) 1px,transparent 1px,transparent 22px),repeating-linear-gradient(-45deg,rgba(201,168,76,.03) 0,rgba(201,168,76,.03) 1px,transparent 1px,transparent 22px)"></div>
+          <div class="pv-content">
+            <span class="pv-emoji">🥂</span>
+            <div class="pv-text">VIP section is different. I see why people keep coming back to Hush.</div>
+          </div>
+        </div>
+        <div class="post-footer">
+          <div class="pf-caption">The vibe tonight is UNMATCHED 🖤 Shoutout @Niddy for always delivering. If you're not here you're missing it. #HushSTL #VIPLife</div>
+          <div class="pf-actions">
+            <div class="pf-action" onclick="likePost(this)">❤️ <span class="count">142</span></div>
+            <div class="pf-action">💬 <span class="count">23</span></div>
+            <div class="pf-action">📤 Share</div>
+            <div class="pf-action">🎟 <span class="count" style="color:var(--gold)">Get In</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Post card 2 — Model -->
+      <div class="post-card">
+        <div class="post-header">
+          <div class="post-av model">AB</div>
+          <div class="post-info">
+            <div class="post-name">Alexis Blue</div>
+            <div class="post-meta">1 hr ago · Pre-event</div>
+          </div>
+          <div class="post-tier" style="color:var(--purple);background:rgba(162,155,254,.1);border-color:rgba(162,155,254,.25)">⭐ Elite Model</div>
+        </div>
+        <div class="post-visual">
+          <div class="pv-bg" style="background:linear-gradient(160deg,#0e0508,#05050f)"></div>
+          <div style="position:absolute;inset:0;background-image:repeating-linear-gradient(45deg,rgba(162,155,254,.03) 0,rgba(162,155,254,.03) 1px,transparent 1px,transparent 22px),repeating-linear-gradient(-45deg,rgba(162,155,254,.03) 0,rgba(162,155,254,.03) 1px,transparent 1px,transparent 22px)"></div>
+          <div class="pv-content">
+            <span class="pv-emoji" style="animation-delay:.5s">✨</span>
+            <div class="pv-text">Ready for tonight's Hush event. Come find me on the floor 🖤</div>
+          </div>
+        </div>
+        <div class="post-footer">
+          <div class="pf-caption">Night starts in 2 hours. Already booked through Hush AI — love how easy the whole process is. See you tonight St. Louis ✨ #HushSTL #EventModel</div>
+          <div class="pf-actions">
+            <div class="pf-action" onclick="likePost(this)">❤️ <span class="count">389</span></div>
+            <div class="pf-action">💬 <span class="count">47</span></div>
+            <div class="pf-action">📤 Share</div>
+            <div class="pf-action">💃 <span class="count" style="color:var(--purple)">Her Profile</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Post card 3 — Guest from home watching stream -->
+      <div class="post-card">
+        <div class="post-header">
+          <div class="post-av reg" style="border-color:var(--cyan);color:var(--cyan)">MR</div>
+          <div class="post-info">
+            <div class="post-name">Marcus R. · Chicago</div>
+            <div class="post-meta">45 min ago · Watching stream</div>
+          </div>
+          <div class="post-tier" style="color:var(--cyan);background:rgba(0,212,255,.06);border-color:rgba(0,212,255,.2)">📺 Streaming</div>
+        </div>
+        <div class="post-visual">
+          <div class="pv-bg" style="background:linear-gradient(160deg,#050a10,#040405)"></div>
+          <div class="pv-content">
+            <span class="pv-emoji">😤</span>
+            <div class="pv-text">In Chicago watching Hush STL live rn. I NEED to be there in person next time.</div>
+          </div>
+        </div>
+        <div class="post-footer">
+          <div class="pf-caption">Paid $10 to watch the Hush STL stream and honestly worth every penny 😭 Someone tell me when Hush comes to Chicago. I'm ready. #HushAI #FOMO</div>
+          <div class="pf-actions">
+            <div class="pf-action" onclick="likePost(this)">❤️ <span class="count">94</span></div>
+            <div class="pf-action">💬 <span class="count">31</span></div>
+            <div class="pf-action">📤 Share</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="bot-nav">
+      <div class="bn active" onclick="goTo('s1')"><div class="bn-ico">📱</div><div class="bn-pip"></div><div class="bn-lbl">Feed</div></div>
+      <div class="bn" onclick="goTo('s2')"><div class="bn-ico">🔴</div><div class="bn-pip"></div><div class="bn-lbl">Watch Live</div></div>
+      <div class="bn" onclick="goTo('s3')"><div class="bn-ico">🎥</div><div class="bn-pip"></div><div class="bn-lbl">Go Live</div></div>
+    </div>
+  </div>
+
+  <!-- ════ S2: STREAM VIEWER ════ -->
+  <div class="screen" id="s2">
+    <div class="stream-video">
+      <div class="sv-grain"></div>
+      <div class="sv-glow"></div>
+      <div class="sv-diamonds"></div>
+      <div class="sv-scanline"></div>
+      <div class="sv-content">
+        <div class="sv-party">
+          <span class="sv-party-emoji">🎉</span>
+          <div class="sv-party-text">Hush STL — Saturday Night<br>Live from Venue 9</div>
+        </div>
+      </div>
+
+      <!-- Header -->
+      <div class="sv-header">
+        <div class="svh-left">
+          <div class="svh-back" onclick="goTo('s1')">‹</div>
+          <div class="svh-host">
+            <div class="svh-av">N</div>
+            <div class="svh-info">
+              <div class="svh-name">Niddy</div>
+              <div class="svh-event">Hush STL · Venue 9</div>
+            </div>
+          </div>
+        </div>
+        <div class="svh-right">
+          <div class="svh-live"><div class="live-badge-dot"></div>LIVE</div>
+          <div class="svh-viewers">👁 <span id="viewerCount">847</span></div>
+          <div class="svh-earnings" id="earningsDisplay">+$847 earned</div>
+        </div>
+      </div>
+
+      <!-- Floating emojis zone -->
+      <div class="emoji-float-zone" id="emojiZone"></div>
+
+      <!-- Live chat -->
+      <div class="sv-chat" id="liveChat">
+        <div class="chat-bubble">
+          <div class="cb-av vip">JB</div>
+          <div class="cb-msg"><div class="cb-name vip">Jordan B.</div><div class="cb-text">This vibe is CRAZY tonight 🔥</div></div>
+        </div>
+        <div class="chat-bubble">
+          <div class="cb-av model">AB</div>
+          <div class="cb-msg"><div class="cb-name model">Alexis Blue</div><div class="cb-text">On my way now! See everyone soon 💃</div></div>
+        </div>
+        <div class="chat-bubble">
+          <div class="cb-av reg">MR</div>
+          <div class="cb-msg"><div class="cb-name reg">Marcus · Chicago</div><div class="cb-text">Watching from Chi — wish I was there 😭</div></div>
+        </div>
+        <div class="chat-bubble">
+          <div class="cb-av reg">TW</div>
+          <div class="cb-msg"><div class="cb-name reg">Tia W.</div><div class="cb-text">Best $10 I've spent all weekend lol</div></div>
+        </div>
+        <div class="chat-bubble">
+          <div class="cb-av vip">KM</div>
+          <div class="cb-msg"><div class="cb-name vip">Keisha M.</div><div class="cb-text">👑👑👑</div></div>
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div class="sv-controls">
+        <div class="svc-input-row">
+          <input class="svc-input" id="chatInputStream" placeholder="Say something..." onkeydown="if(event.key==='Enter')sendStreamChat()">
+          <button class="svc-send" onclick="sendStreamChat()">➤</button>
+        </div>
+        <div class="svc-emoji-row">
+          <span class="svc-emoji" onclick="fireEmoji('🔥')">🔥</span>
+          <span class="svc-emoji" onclick="fireEmoji('❤️')">❤️</span>
+          <span class="svc-emoji" onclick="fireEmoji('🥂')">🥂</span>
+          <span class="svc-emoji" onclick="fireEmoji('💃')">💃</span>
+          <span class="svc-emoji" onclick="fireEmoji('👑')">👑</span>
+          <span class="svc-emoji" onclick="fireEmoji('🎉')">🎉</span>
+        </div>
+      </div>
+
+      <!-- PPV Gate -->
+      <div class="ppv-gate" id="ppvGate">
+        <div class="ppv-box">
+          <span class="ppv-ico">🎉</span>
+          <div class="ppv-title">JOIN THE PARTY</div>
+          <div class="ppv-sub">Experience Hush STL live — from anywhere in the world.</div>
+          <div class="ppv-event">
+            <div class="ppv-event-name">Hush STL — Saturday Night</div>
+            <div class="ppv-event-host">Hosted by Niddy · Venue 9, St. Louis</div>
+            <div class="ppv-event-live"><div class="live-dot"></div>847 people watching right now</div>
+          </div>
+          <div class="ppv-prices">
+            <div class="ppv-price selected" id="ppvOpt1" onclick="selectPPV(1)">
+              <div class="ppv-price-val">$5</div>
+              <div class="ppv-price-lbl">Tonight Only</div>
+              <div class="ppv-price-desc">Watch live stream</div>
+            </div>
+            <div class="ppv-price" id="ppvOpt2" onclick="selectPPV(2)">
+              <div class="ppv-price-val">$10</div>
+              <div class="ppv-price-lbl">Full Access</div>
+              <div class="ppv-price-desc">Stream + replay</div>
+            </div>
+          </div>
+          <button class="ppv-watch-btn" id="ppvBtn" onclick="unlockStream()">WATCH FOR $5 — UNLOCK NOW</button>
+          <div class="ppv-free-note">Have credits? <span onclick="unlockWithCredits()">Use 50✦ instead →</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bot-nav">
+      <div class="bn" onclick="goTo('s1')"><div class="bn-ico">📱</div><div class="bn-pip"></div><div class="bn-lbl">Feed</div></div>
+      <div class="bn active" onclick="goTo('s2')"><div class="bn-ico">🔴</div><div class="bn-pip"></div><div class="bn-lbl">Watch Live</div></div>
+      <div class="bn" onclick="goTo('s3')"><div class="bn-ico">🎥</div><div class="bn-pip"></div><div class="bn-lbl">Go Live</div></div>
+    </div>
+  </div>
+
+  <!-- ════ S3: GO LIVE ════ -->
+  <div class="screen" id="s3">
+    <!-- Camera preview -->
+    <div class="go-live-preview">
+      <div class="glp-glow"></div>
+      <div class="glp-diamonds"></div>
+      <div class="glp-self">
+        <div class="glp-av">N</div>
+        <div class="glp-name">Niddy</div>
+        <div class="glp-status">Camera preview · Tap below to go live</div>
+      </div>
+      <div class="glp-controls">
+        <div class="glpc">🔄</div>
+        <div class="glpc">🎤</div>
+        <div class="glpc">💡</div>
+        <div class="glpc">⚙️</div>
+      </div>
+    </div>
+
+    <!-- Live setup -->
+    <div class="live-setup">
+
+      <!-- Title -->
+      <div class="ls-section">
+        <div class="ls-title">Stream Title</div>
+        <input style="width:100%;background:var(--deep);border:1px solid rgba(255,71,87,.15);border-radius:6px;padding:12px;color:var(--white);font-family:'Outfit',sans-serif;font-size:14px;outline:none" placeholder="e.g. Hush STL Saturday Night 🖤" value="Hush STL — Saturday Night 🔥">
+      </div>
+
+      <!-- Who can see -->
+      <div class="ls-section">
+        <div class="ls-title">Who Sees This</div>
+        <div class="privacy-row">
+          <div>
+            <div class="pr-label">Everyone on Hush</div>
+            <div class="pr-sub">Any city · Any user · Maximum reach</div>
+          </div>
+          <div class="toggle on" onclick="this.classList.toggle('on')"><div class="toggle-dot"></div></div>
+        </div>
+        <div class="privacy-row" style="margin-bottom:0">
+          <div>
+            <div class="pr-label">Show in City Feed</div>
+            <div class="pr-sub">Featured in St. Louis discovery</div>
+          </div>
+          <div class="toggle on" onclick="this.classList.toggle('on')"><div class="toggle-dot"></div></div>
+        </div>
+      </div>
+
+      <!-- PPV settings -->
+      <div class="ls-section">
+        <div class="ls-title">Charge to Watch?</div>
+        <div class="privacy-row">
+          <div>
+            <div class="pr-label">Pay-Per-View</div>
+            <div class="pr-sub">Viewers pay to watch your stream</div>
+          </div>
+          <div class="toggle gold-on" id="ppvToggle" onclick="togglePPV()"><div class="toggle-dot"></div></div>
+        </div>
+        <div id="ppvPriceSelector">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Set your price</div>
+          <div class="ppv-selector">
+            <div class="ppvs-opt" onclick="setPPVPrice(this,'$5','5')"><div class="ppvs-price">$5</div><div class="ppvs-label">Standard</div></div>
+            <div class="ppvs-opt selected" onclick="setPPVPrice(this,'$10','10')"><div class="ppvs-price">$10</div><div class="ppvs-label">Popular</div></div>
+            <div class="ppvs-opt" onclick="setPPVPrice(this,'$15','15')"><div class="ppvs-price">$15</div><div class="ppvs-label">Premium</div></div>
+            <div class="ppvs-opt" onclick="setPPVPrice(this,'$25','25')"><div class="ppvs-price">$25</div><div class="ppvs-label">VIP Only</div></div>
+          </div>
+          <div class="revenue-preview">
+            <div class="rp-title">Revenue Preview · If 200 Viewers Pay</div>
+            <div class="rp-row"><div class="rp-label">Gross revenue</div><div class="rp-val" id="grossRev">$2,000</div></div>
+            <div class="rp-row"><div class="rp-label">Hush AI (20%)</div><div class="rp-val">-$400</div></div>
+            <div class="rp-row"><div class="rp-label">Your earnings</div><div class="rp-val green" id="netRev">$1,600</div></div>
+            <div class="rp-row" style="margin-top:4px;border-top:1px solid rgba(255,255,255,.04)"><div class="rp-label">500 viewers</div><div class="rp-val gold" id="bigRev">$4,000</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Credits boost -->
+      <div class="ls-section" style="border-color:rgba(255,179,71,.15)">
+        <div class="ls-title" style="color:#FFB347">Boost This Stream</div>
+        <div class="privacy-row" style="margin-bottom:0">
+          <div>
+            <div class="pr-label">Auto-boost when going live</div>
+            <div class="pr-sub">50✦ · Push to top of city feed</div>
+          </div>
+          <div class="toggle" onclick="this.classList.toggle('on')"><div class="toggle-dot"></div></div>
+        </div>
+      </div>
+
+      <button class="go-live-btn" onclick="startLive()">
+        <div class="glb-dot"></div>
+        GO LIVE NOW
+      </button>
+
+    </div>
+
+    <div class="bot-nav">
+      <div class="bn" onclick="goTo('s1')"><div class="bn-ico">📱</div><div class="bn-pip"></div><div class="bn-lbl">Feed</div></div>
+      <div class="bn" onclick="goTo('s2')"><div class="bn-ico">🔴</div><div class="bn-pip"></div><div class="bn-lbl">Watch Live</div></div>
+      <div class="bn active" onclick="goTo('s3')"><div class="bn-ico">🎥</div><div class="bn-pip"></div><div class="bn-lbl">Go Live</div></div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<script>
+// ── NAV ──
+function goTo(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const t = document.getElementById(id);
+  if(t){ t.classList.add('active'); t.scrollTop = 0; }
+  if(id === 's2') initStream();
+}
+
+function openFreeStream() {
+  goTo('s2');
+  setTimeout(() => {
+    const gate = document.getElementById('ppvGate');
+    if(gate) gate.classList.add('hidden');
+  }, 100);
+}
+
+// ── STREAM VIEWER ──
+let viewerNum = 847;
+let earningNum = 847;
+let streamInterval;
+let chatMessages = [
+  {av:'DW',type:'reg',name:'Dre W.',text:'The DJ is going crazy rn 🔥🔥'},
+  {av:'TK',type:'vip',name:'TK · VIP',text:'This is why Hush is different from everything else'},
+  {av:'SB',type:'model',name:'Savvy B.',text:'Pulling up in 20 💃'},
+  {av:'RJ',type:'reg',name:'Rico J.',text:'Watching from Houston. When does Hush come here???'},
+  {av:'AL',type:'reg',name:'Alicia L.',text:'Someone text me HUSHVIP right now 😭'},
+  {av:'MK',type:'vip',name:'Mike K.',text:'👑👑👑'},
+  {av:'ZN',type:'reg',name:'Zara N.',text:'Just paid my $10 best decision tonight lol'},
+  {av:'PD',type:'vip',name:'Pam D.',text:'VIP section looking beautiful tonight ✨'},
+];
+let chatIdx = 0;
+
+function initStream() {
+  clearInterval(streamInterval);
+  viewerNum = 847;
+  earningNum = 847;
+  updateViewerDisplay();
+
+  streamInterval = setInterval(() => {
+    viewerNum += Math.floor(Math.random() * 6) - 1;
+    if(viewerNum < 800) viewerNum = 800;
+    earningNum = viewerNum;
+    updateViewerDisplay();
+
+    // Add chat message
+    if(chatIdx < chatMessages.length) {
+      addChatMessage(chatMessages[chatIdx]);
+      chatIdx++;
+    } else {
+      chatIdx = 0;
+    }
+  }, 2500);
+}
+
+function updateViewerDisplay() {
+  const vc = document.getElementById('viewerCount');
+  const ed = document.getElementById('earningsDisplay');
+  if(vc) vc.textContent = viewerNum.toLocaleString();
+  if(ed) ed.textContent = '+$' + earningNum.toLocaleString() + ' earned';
+}
+
+function addChatMessage(msg) {
+  const chat = document.getElementById('liveChat');
+  if(!chat) return;
+  const div = document.createElement('div');
+  div.className = 'chat-bubble';
+  div.innerHTML = `<div class="cb-av ${msg.type}">${msg.av}</div><div class="cb-msg"><div class="cb-name ${msg.type}">${msg.name}</div><div class="cb-text">${msg.text}</div></div>`;
+  chat.appendChild(div);
+  if(chat.children.length > 6) chat.removeChild(chat.children[0]);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function sendStreamChat() {
+  const input = document.getElementById('chatInputStream');
+  if(!input || !input.value.trim()) return;
+  addChatMessage({av:'N',type:'vip',name:'Niddy',text:input.value});
+  input.value = '';
+}
+
+// ── EMOJI REACTIONS ──
+function fireEmoji(emoji) {
+  const zone = document.getElementById('emojiZone');
+  if(!zone) return;
+  const el = document.createElement('div');
+  el.className = 'float-emoji';
+  el.textContent = emoji;
+  el.style.animationDelay = Math.random() * .3 + 's';
+  zone.appendChild(el);
+  setTimeout(() => el.remove(), 2500);
+  viewerNum += Math.floor(Math.random() * 3) + 1;
+  updateViewerDisplay();
+}
+
+// ── PPV GATE ──
+let selectedPPVPrice = 5;
+function selectPPV(n) {
+  document.getElementById('ppvOpt1').classList.toggle('selected', n===1);
+  document.getElementById('ppvOpt2').classList.toggle('selected', n===2);
+  selectedPPVPrice = n===1 ? 5 : 10;
+  const btn = document.getElementById('ppvBtn');
+  if(btn) btn.textContent = `WATCH FOR $${selectedPPVPrice} — UNLOCK NOW`;
+}
+
+function unlockStream() {
+  const btn = document.getElementById('ppvBtn');
+  if(btn){
+    btn.textContent = '⚡ PROCESSING...';
+    btn.style.opacity = '.7';
+    btn.style.pointerEvents = 'none';
+    setTimeout(() => {
+      document.getElementById('ppvGate').classList.add('hidden');
+      initStream();
+    }, 1200);
+  }
+}
+
+function unlockWithCredits() {
+  document.getElementById('ppvGate').classList.add('hidden');
+  initStream();
+}
+
+// ── GO LIVE SETUP ──
+function togglePPV() {
+  const toggle = document.getElementById('ppvToggle');
+  const selector = document.getElementById('ppvPriceSelector');
+  toggle.classList.toggle('gold-on');
+  if(selector) selector.style.display = toggle.classList.contains('gold-on') ? 'block' : 'none';
+}
+
+let ppvPrice = 10;
+function setPPVPrice(el, price, num) {
+  el.parentElement.querySelectorAll('.ppvs-opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  ppvPrice = parseInt(num);
+  const viewers200 = ppvPrice * 200;
+  const viewers500 = ppvPrice * 500;
+  const gr = document.getElementById('grossRev');
+  const nr = document.getElementById('netRev');
+  const br = document.getElementById('bigRev');
+  if(gr) gr.textContent = '$' + viewers200.toLocaleString();
+  if(nr) nr.textContent = '$' + Math.floor(viewers200 * 0.8).toLocaleString();
+  if(br) br.textContent = '$' + Math.floor(viewers500 * 0.8).toLocaleString();
+}
+
+function startLive() {
+  const btn = document.querySelector('.go-live-btn');
+  if(!btn) return;
+  btn.innerHTML = '<div class="glb-dot"></div> LIVE · 0 WATCHING';
+  btn.style.background = 'var(--green)';
+  btn.style.color = 'var(--black)';
+  btn.style.pointerEvents = 'none';
+  setTimeout(() => goTo('s2'), 1200);
+}
+
+// ── FEED INTERACTIONS ──
+function likePost(el) {
+  const count = el.querySelector('.count');
+  if(!count) return;
+  const current = parseInt(count.textContent);
+  count.textContent = (current + 1).toString();
+  el.style.color = 'var(--live)';
+}
+
+// Cleanup
+document.querySelectorAll('.screen').forEach(s => {
+  s.addEventListener('scroll', () => {}, {passive:true});
+});
+</script>
+</body>
+</html>

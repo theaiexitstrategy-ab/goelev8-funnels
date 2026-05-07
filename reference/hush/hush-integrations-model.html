@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Hush AI — Platform Story</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --black:#040405;--deep:#07070a;--card:#0d0d11;--card2:#121216;
+  --gold:#C9A84C;--gold2:#e8c96a;--gold3:#a8862e;--gold4:#f5d98a;
+  --gdim:rgba(201,168,76,0.12);--gline:rgba(201,168,76,0.2);
+  --white:#f5f0e8;--muted:rgba(245,240,232,0.35);--muted2:rgba(245,240,232,0.6);
+  --green:#00e89a;--red:#ff4757;--cyan:#00d4ff;--purple:#a29bfe;
+  --posh:#FF6B6B;--eb:#F05537;--of:#00AFF0;
+}
+html,body{height:100%;background:#000;overflow:hidden;font-family:'Outfit',sans-serif;color:var(--white)}
+.shell{width:100%;height:100vh;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 40%,#120d04 0%,#040405 65%)}
+.phone{width:min(390px,100vw);height:min(844px,100vh);background:var(--black);border-radius:min(44px,5vw);overflow:hidden;position:relative;box-shadow:0 0 0 1px rgba(201,168,76,.18),0 0 80px rgba(201,168,76,.07),0 60px 140px rgba(0,0,0,.9)}
+.screen{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity .45s ease;overflow-y:auto;overflow-x:hidden;scrollbar-width:none}
+.screen::-webkit-scrollbar{display:none}
+.screen.active{opacity:1;pointer-events:all}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes shimmer{0%,100%{opacity:.7}50%{opacity:1}}
+@keyframes flow{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+
+/* NAV */
+.bot-nav{position:absolute;bottom:0;left:0;right:0;background:rgba(4,4,5,.96);backdrop-filter:blur(20px);border-top:1px solid var(--gline);display:flex;padding:10px 0 26px;z-index:100}
+.bn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px 0}
+.bn-ico{font-size:20px;opacity:.3;transition:opacity .2s}
+.bn-lbl{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);transition:color .2s}
+.bn-pip{width:4px;height:4px;border-radius:50%;background:var(--gold);opacity:0;transition:opacity .2s;margin:0 auto}
+.bn.active .bn-ico{opacity:1}
+.bn.active .bn-lbl{color:var(--gold)}
+.bn.active .bn-pip{opacity:1}
+
+.top-bar{display:flex;align-items:center;justify-content:space-between;padding:52px 22px 18px;background:var(--black);border-bottom:1px solid var(--gline);position:sticky;top:0;z-index:10}
+.top-logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.15em;background:linear-gradient(135deg,var(--gold3),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.scroll-pad{padding:20px 20px 110px}
+.sec-lbl{font-size:10px;letter-spacing:.22em;color:var(--gold);text-transform:uppercase;margin-bottom:12px}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 1.5s ease-in-out infinite;display:inline-block}
+.gold-btn{width:100%;padding:17px;background:linear-gradient(135deg,var(--gold3),var(--gold));border:none;border-radius:6px;font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:.18em;color:var(--black);cursor:pointer;transition:all .2s}
+.gold-btn:active{transform:scale(.98)}
+
+/* ══════════════════════
+   S1 — INTEGRATION STORY
+══════════════════════ */
+#s1{background:var(--deep)}
+
+/* Platform logos */
+.platform-row{display:flex;gap:8px;margin-bottom:20px}
+.plat-card{flex:1;border-radius:10px;padding:14px 10px;text-align:center;cursor:pointer;transition:all .2s;position:relative}
+.plat-card.posh-card{background:rgba(255,107,107,.08);border:1px solid rgba(255,107,107,.2)}
+.plat-card.eb-card{background:rgba(240,85,55,.08);border:1px solid rgba(240,85,55,.2)}
+.plat-card.hush-card{background:var(--gdim);border:1px solid var(--gline)}
+.plat-logo{font-size:28px;margin-bottom:6px}
+.plat-name{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:.08em}
+.plat-card.posh-card .plat-name{color:var(--posh)}
+.plat-card.eb-card .plat-name{color:var(--eb)}
+.plat-card.hush-card .plat-name{background:linear-gradient(135deg,var(--gold3),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.plat-role{font-size:10px;color:var(--muted);margin-top:3px;letter-spacing:.04em}
+.plat-crown{position:absolute;top:-8px;right:-4px;font-size:16px}
+
+/* Funnel flow */
+.funnel-section{margin-bottom:20px}
+.funnel-title{font-size:10px;letter-spacing:.2em;color:var(--gold);text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+
+.funnel-step{display:flex;gap:12px;align-items:flex-start;margin-bottom:0;position:relative}
+.funnel-step::after{content:'';position:absolute;left:19px;top:38px;bottom:-14px;width:2px;background:linear-gradient(180deg,var(--gline),transparent)}
+.funnel-step:last-child::after{display:none}
+.fs-num{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:16px;flex-shrink:0;position:relative;z-index:1}
+.fs-num.posh{background:rgba(255,107,107,.15);border:2px solid rgba(255,107,107,.3);color:var(--posh)}
+.fs-num.eb{background:rgba(240,85,55,.15);border:2px solid rgba(240,85,55,.3);color:var(--eb)}
+.fs-num.hush{background:var(--gdim);border:2px solid var(--gline);color:var(--gold)}
+.fs-num.convert{background:rgba(0,232,154,.1);border:2px solid rgba(0,232,154,.3);color:var(--green)}
+.fs-body{flex:1;padding-bottom:20px}
+.fs-platform{font-size:9px;letter-spacing:.18em;text-transform:uppercase;margin-bottom:3px}
+.fs-platform.posh{color:var(--posh)}
+.fs-platform.eb{color:var(--eb)}
+.fs-platform.hush{color:var(--gold)}
+.fs-platform.convert{color:var(--green)}
+.fs-title{font-size:14px;font-weight:500;color:var(--white);margin-bottom:4px}
+.fs-desc{font-size:12px;color:var(--muted);line-height:1.6}
+.fs-tag{display:inline-block;font-size:10px;padding:3px 9px;border-radius:20px;margin-top:6px}
+.fs-tag.discovery{background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.2);color:var(--posh)}
+.fs-tag.hush-tag{background:var(--gdim);border:1px solid var(--gline);color:var(--gold)}
+.fs-tag.own{background:rgba(0,232,154,.1);border:1px solid rgba(0,232,154,.25);color:var(--green)}
+
+/* Side by side comparison */
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--gline);border-radius:10px;overflow:hidden;margin-bottom:20px}
+.cg-col{background:var(--black);padding:16px 14px}
+.cg-header{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.08em;text-align:center;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid}
+.cg-header.posh-h{color:rgba(245,240,232,.3);border-color:rgba(245,240,232,.1)}
+.cg-header.hush-h{background:linear-gradient(135deg,var(--gold3),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;border-color:var(--gline)}
+.cg-item{margin-bottom:10px}
+.cg-label{font-size:9px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:3px}
+.cg-label.posh-l{color:rgba(245,240,232,.25)}
+.cg-label.hush-l{color:var(--gold)}
+.cg-val{font-size:12px;line-height:1.5}
+.cg-val.posh-v{color:rgba(245,240,232,.35)}
+.cg-val.hush-v{color:var(--white)}
+.cg-val .x{color:var(--red)}
+.cg-val .ck{color:var(--green)}
+
+/* The killer line */
+.killer-line{background:linear-gradient(135deg,rgba(201,168,76,.1),rgba(201,168,76,.03));border:1px solid var(--gline);border-left:4px solid var(--gold);border-radius:4px;padding:18px 20px;margin-bottom:20px}
+.kl-text{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:19px;line-height:1.55;color:var(--white)}
+.kl-text strong{color:var(--gold);font-style:normal}
+
+/* Live flyer mockup */
+.posh-listing-mock{background:var(--card);border:1px solid rgba(255,107,107,.15);border-radius:10px;padding:16px;margin-bottom:12px}
+.plm-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.plm-logo{font-size:10px;letter-spacing:.2em;color:var(--posh);text-transform:uppercase}
+.plm-event{font-size:15px;font-weight:500;color:var(--white);margin-bottom:4px}
+.plm-detail{font-size:11px;color:var(--muted)}
+.plm-hush-hook{background:linear-gradient(135deg,rgba(201,168,76,.12),rgba(201,168,76,.04));border:1px solid var(--gline);border-radius:6px;padding:10px 12px;margin-top:10px}
+.plm-hook-label{font-size:9px;letter-spacing:.18em;color:var(--gold);text-transform:uppercase;margin-bottom:4px}
+.plm-hook-text{font-size:12px;color:var(--muted2);line-height:1.5}
+.plm-hook-number{font-family:'Bebas Neue',sans-serif;font-size:18px;background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-top:4px}
+
+/* ══════════════════════
+   S2 — MODEL PROFILE
+══════════════════════ */
+#s2{background:var(--deep)}
+
+.model-cover{height:160px;background:linear-gradient(160deg,#0e0508 0%,#05050f 100%);position:relative;overflow:hidden;flex-shrink:0}
+.model-cover::before{content:'';position:absolute;inset:0;background-image:repeating-linear-gradient(45deg,rgba(162,155,254,.03) 0,rgba(162,155,254,.03) 1px,transparent 1px,transparent 22px),repeating-linear-gradient(-45deg,rgba(162,155,254,.03) 0,rgba(162,155,254,.03) 1px,transparent 1px,transparent 22px)}
+.model-cover-glow{position:absolute;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(162,155,254,.1) 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%)}
+
+.model-av-wrap{position:relative;margin-top:-52px;margin-left:20px;display:inline-block;margin-bottom:12px}
+.model-av{width:100px;height:100px;border-radius:50%;border:3px solid var(--purple);background:linear-gradient(135deg,rgba(162,155,254,.2),rgba(162,155,254,.05));display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--purple);box-shadow:0 8px 24px rgba(0,0,0,.6)}
+.model-av-badge{position:absolute;bottom:0;right:-4px;padding:4px 10px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.08em;background:linear-gradient(135deg,var(--gold3),var(--gold));color:var(--black)}
+
+.model-body{padding:0 20px 110px}
+.model-stage-name{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;color:var(--white);margin-bottom:2px}
+.model-persona-tag{display:inline-flex;align-items:center;gap:6px;font-size:10px;letter-spacing:.12em;color:var(--purple);background:rgba(162,155,254,.1);border:1px solid rgba(162,155,254,.2);border-radius:20px;padding:4px 12px;margin-bottom:6px}
+.privacy-shield{display:inline-flex;align-items:center;gap:6px;font-size:10px;letter-spacing:.1em;color:var(--green);background:rgba(0,232,154,.08);border:1px solid rgba(0,232,154,.2);border-radius:20px;padding:4px 12px;margin-bottom:16px}
+
+/* Verification tier */
+.verify-card{background:linear-gradient(135deg,rgba(162,155,254,.1),rgba(162,155,254,.03));border:1px solid rgba(162,155,254,.2);border-radius:10px;padding:16px;margin-bottom:16px}
+.vc-title{font-size:10px;letter-spacing:.2em;color:var(--purple);text-transform:uppercase;margin-bottom:12px}
+.vc-tiers{display:flex;flex-direction:column;gap:8px}
+.vc-tier-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(162,155,254,.06)}
+.vc-tier-row:last-child{border-bottom:none}
+.vtr-badge{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.vtr-badge.done{background:rgba(0,232,154,.15);border:1px solid rgba(0,232,154,.3)}
+.vtr-badge.active{background:linear-gradient(135deg,var(--gold3),var(--gold));animation:shimmer 2s ease-in-out infinite}
+.vtr-badge.pending{background:var(--card);border:1px solid rgba(255,255,255,.1)}
+.vtr-info{flex:1}
+.vtr-name{font-size:12px;font-weight:500;color:var(--white)}
+.vtr-desc{font-size:10px;color:var(--muted)}
+.vtr-status{font-size:10px}
+.vtr-status.done{color:var(--green)}
+.vtr-status.active{color:var(--gold)}
+.vtr-status.pending{color:var(--muted)}
+
+/* Model stats */
+.model-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:1px solid var(--gline);border-radius:8px;overflow:hidden;margin-bottom:16px}
+.ms-stat{padding:12px 0;text-align:center;border-right:1px solid var(--gline)}
+.ms-stat:last-child{border-right:none}
+.ms-val{font-family:'Bebas Neue',sans-serif;font-size:22px;background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.ms-lbl{font-size:8px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-top:2px}
+
+/* Social links section */
+.socials-section{margin-bottom:16px}
+.ss-title{font-size:10px;letter-spacing:.2em;color:var(--gold);text-transform:uppercase;margin-bottom:10px}
+.social-row{display:flex;align-items:center;justify-content:space-between;background:var(--card);border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:12px 14px;margin-bottom:8px;cursor:pointer;transition:border-color .2s}
+.social-row:active{border-color:var(--gline)}
+.sr-left{display:flex;align-items:center;gap:10px}
+.sr-ico{font-size:22px}
+.sr-platform{font-size:10px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase}
+.sr-handle{font-size:14px;font-weight:500;color:var(--white)}
+.sr-meta{font-size:11px;color:var(--muted)}
+.sr-right{display:flex;align-items:center;gap:8px}
+.sr-followers{font-size:11px;color:var(--gold);font-weight:500}
+.sr-arrow{color:var(--muted);font-size:16px}
+.sr-verified{font-size:11px;color:var(--green)}
+
+/* OnlyFans special row */
+.of-row{background:linear-gradient(135deg,rgba(0,175,240,.08),rgba(0,175,240,.03));border:1px solid rgba(0,175,240,.2);border-radius:8px;padding:14px;margin-bottom:8px;cursor:pointer}
+.of-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.of-brand{display:flex;align-items:center;gap:8px}
+.of-ico{font-size:22px}
+.of-name{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.08em;color:var(--of)}
+.of-verified-badge{font-size:9px;padding:2px 8px;border-radius:20px;background:rgba(0,175,240,.12);border:1px solid rgba(0,175,240,.25);color:var(--of);letter-spacing:.08em}
+.of-privacy-note{font-size:11px;color:var(--muted2);line-height:1.5;margin-bottom:8px}
+.of-stats{display:flex;gap:16px}
+.of-stat{font-size:11px;color:var(--muted2)}
+.of-stat strong{color:var(--of)}
+.of-cta{display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid rgba(0,175,240,.1)}
+.of-cta-text{font-size:11px;color:var(--of)}
+.of-lock{font-size:14px}
+
+/* Legal name vault */
+.vault-card{background:rgba(0,0,0,.4);border:1px solid rgba(0,232,154,.15);border-radius:8px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:12px}
+.vault-ico{font-size:24px;flex-shrink:0}
+.vault-body{}
+.vault-title{font-size:12px;font-weight:500;color:var(--green);margin-bottom:3px}
+.vault-desc{font-size:11px;color:var(--muted);line-height:1.5}
+
+/* Payout status */
+.payout-row{background:var(--card);border:1px solid var(--gline);border-radius:8px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.pr-left{}
+.pr-label{font-size:10px;letter-spacing:.15em;color:var(--gold);text-transform:uppercase;margin-bottom:4px}
+.pr-name{font-size:14px;color:var(--white);font-weight:500}
+.pr-note{font-size:10px;color:var(--muted);margin-top:2px}
+.pr-amount{font-family:'Bebas Neue',sans-serif;font-size:28px;background:linear-gradient(135deg,var(--green),#00c47a);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+
+/* ══════════════════════
+   S3 — MODEL ONBOARDING
+══════════════════════ */
+#s3{background:var(--black)}
+
+.mob-hero{display:flex;flex-direction:column;align-items:center;text-align:center;padding:52px 28px 32px;position:relative;overflow:hidden}
+.mob-hero::before{content:'';position:absolute;inset:0;background-image:repeating-linear-gradient(45deg,rgba(162,155,254,.03) 0,rgba(162,155,254,.03) 1px,transparent 1px,transparent 26px),repeating-linear-gradient(-45deg,rgba(162,155,254,.03) 0,rgba(162,155,254,.03) 1px,transparent 1px,transparent 26px)}
+.mob-glow{position:absolute;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(162,155,254,.06) 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%)}
+.mob-ico{font-size:64px;position:relative;z-index:2;margin-bottom:16px;animation:fadeUp .8s ease both}
+.mob-title{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:.06em;color:var(--white);position:relative;z-index:2;animation:fadeUp .8s .1s ease both;line-height:1.1;margin-bottom:8px}
+.mob-sub{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:16px;color:var(--muted);position:relative;z-index:2;animation:fadeUp .8s .2s ease both;line-height:1.6;max-width:300px}
+
+.mob-body{padding:0 24px 110px;animation:fadeUp .8s .3s ease both}
+
+/* Privacy promise */
+.privacy-promise{background:linear-gradient(135deg,rgba(0,232,154,.08),rgba(0,232,154,.02));border:1px solid rgba(0,232,154,.2);border-radius:10px;padding:16px;margin-bottom:20px}
+.pp-title{font-size:10px;letter-spacing:.2em;color:var(--green);text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.pp-items{display:flex;flex-direction:column;gap:8px}
+.pp-item{display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--muted2);line-height:1.5}
+.pp-check{color:var(--green);flex-shrink:0;font-size:14px;margin-top:-1px}
+
+/* Stage name setup */
+.stage-setup{background:var(--card);border:1px solid var(--gline);border-radius:10px;padding:18px;margin-bottom:16px}
+.ss-step-title{font-size:10px;letter-spacing:.18em;color:var(--gold);text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.ss-step-num{width:20px;height:20px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--black)}
+
+.field-label{font-size:9px;letter-spacing:.18em;color:var(--muted);text-transform:uppercase;margin-bottom:5px;display:block}
+.field-input{width:100%;background:var(--deep);border:1px solid var(--gline);border-radius:6px;padding:13px 14px;font-size:14px;color:var(--white);font-family:'Outfit',sans-serif;outline:none;transition:border-color .2s;margin-bottom:10px}
+.field-input:focus{border-color:var(--gold)}
+.field-input::placeholder{color:var(--muted)}
+
+.stage-preview{background:var(--deep);border:1px solid var(--gline);border-radius:6px;padding:12px;display:flex;align-items:center;gap:10px}
+.sp-av{width:40px;height:40px;border-radius:50%;background:rgba(162,155,254,.15);border:2px solid rgba(162,155,254,.3);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--purple);flex-shrink:0}
+.sp-name{font-size:14px;font-weight:500;color:var(--white)}
+.sp-badge{font-size:10px;color:var(--purple);background:rgba(162,155,254,.1);border:1px solid rgba(162,155,254,.2);border-radius:20px;padding:2px 8px;margin-top:3px;display:inline-block}
+
+/* Verification methods */
+.verify-methods{background:var(--card);border:1px solid var(--gline);border-radius:10px;padding:18px;margin-bottom:16px}
+.vm-option{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer;transition:all .2s}
+.vm-option:last-child{border-bottom:none}
+.vm-option:active .vmo-ico{transform:scale(1.1)}
+.vmo-ico{font-size:24px;flex-shrink:0}
+.vmo-body{flex:1}
+.vmo-title{font-size:13px;font-weight:500;color:var(--white);margin-bottom:2px}
+.vmo-sub{font-size:11px;color:var(--muted);line-height:1.4}
+.vmo-badge{font-size:9px;padding:2px 8px;border-radius:20px;letter-spacing:.08em;margin-top:4px;display:inline-block}
+.vmo-badge.ig{background:rgba(225,48,108,.1);border:1px solid rgba(225,48,108,.2);color:#e1306c}
+.vmo-badge.of{background:rgba(0,175,240,.1);border:1px solid rgba(0,175,240,.2);color:var(--of)}
+.vmo-badge.both{background:var(--gdim);border:1px solid var(--gline);color:var(--gold)}
+.vmo-select{width:22px;height:22px;border-radius:50%;border:2px solid var(--gline);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s}
+.vmo-select.checked{background:var(--gold);border-color:var(--gold)}
+
+/* Payout setup */
+.payout-setup{background:var(--card);border:1px solid var(--gline);border-radius:10px;padding:18px;margin-bottom:16px}
+.stripe-legal-note{background:rgba(0,232,154,.06);border:1px solid rgba(0,232,154,.15);border-radius:6px;padding:12px;margin-top:12px}
+.sln-title{font-size:10px;letter-spacing:.15em;color:var(--green);text-transform:uppercase;margin-bottom:6px}
+.sln-text{font-size:11px;color:var(--muted2);line-height:1.6}
+
+.complete-btn{width:100%;padding:20px;background:linear-gradient(135deg,rgba(162,155,254,.6),rgba(162,155,254,.4));border:1px solid rgba(162,155,254,.3);border-radius:6px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.2em;color:var(--white);cursor:pointer;transition:all .2s;box-shadow:0 8px 32px rgba(162,155,254,.15)}
+.complete-btn:active{transform:scale(.98)}
+</style>
+</head>
+<body>
+<div class="shell">
+<div class="phone">
+
+  <!-- ════ S1: INTEGRATION STORY ════ -->
+  <div class="screen active" id="s1">
+    <div class="top-bar">
+      <div class="top-logo">HOW IT ALL FITS</div>
+      <div style="font-size:10px;letter-spacing:.1em;color:var(--muted)">The Full Picture</div>
+    </div>
+    <div class="scroll-pad">
+
+      <!-- Three platforms -->
+      <div class="platform-row">
+        <div class="plat-card posh-card">
+          <div class="plat-logo">🎫</div>
+          <div class="plat-name">POSH</div>
+          <div class="plat-role">Discovery</div>
+        </div>
+        <div class="plat-card eb-card">
+          <div class="plat-logo">🎟</div>
+          <div class="plat-name">EVENTBRITE</div>
+          <div class="plat-role">Discovery</div>
+        </div>
+        <div class="plat-card hush-card">
+          <div class="plat-crown">👑</div>
+          <div class="plat-logo">🖤</div>
+          <div class="plat-name">HUSH AI</div>
+          <div class="plat-role">Ownership</div>
+        </div>
+      </div>
+
+      <!-- Killer line -->
+      <div class="killer-line">
+        <div class="kl-text">"Posh fills the room.<br><strong>Hush AI owns everyone in it.</strong>"</div>
+      </div>
+
+      <!-- Full funnel -->
+      <div class="funnel-section">
+        <div class="funnel-title">The Complete Guest Journey</div>
+
+        <div class="funnel-step">
+          <div class="fs-num posh">P</div>
+          <div class="fs-body">
+            <div class="fs-platform posh">Posh.vip</div>
+            <div class="fs-title">Guest Discovers Your Event</div>
+            <div class="fs-desc">They're browsing Posh looking for something to do. Your event shows up. They see the flyer, the venue, the date.</div>
+            <span class="fs-tag discovery">Posh owns this moment</span>
+          </div>
+        </div>
+
+        <div class="funnel-step">
+          <div class="fs-num eb">E</div>
+          <div class="fs-body">
+            <div class="fs-platform eb">Eventbrite</div>
+            <div class="fs-title">Or They Find You on Eventbrite</div>
+            <div class="fs-desc">General admission available publicly. But VIP access? That's only through Hush. Creates immediate exclusivity.</div>
+            <span class="fs-tag discovery">Eventbrite owns this moment</span>
+          </div>
+        </div>
+
+        <div class="funnel-step">
+          <div class="fs-num hush">H</div>
+          <div class="fs-body">
+            <div class="fs-platform hush">Hush AI</div>
+            <div class="fs-title">They See Your Hush AI Hook</div>
+            <div class="fs-desc">In the event description — "Text HUSHVIP to (888) 302-0649 for VIP access and exclusive perks." One line. That's the bridge.</div>
+            <span class="fs-tag hush-tag">The handoff begins</span>
+          </div>
+        </div>
+
+        <div class="funnel-step">
+          <div class="fs-num convert">→</div>
+          <div class="fs-body">
+            <div class="fs-platform convert">Hush AI Takes Over</div>
+            <div class="fs-title">Guest Texts. AI Responds Instantly.</div>
+            <div class="fs-desc">Booking link fires. Guest purchases. Gets their digital pass. Creates their Hush profile. They're now YOUR guest — not Posh's, not Eventbrite's. Yours. Forever.</div>
+            <span class="fs-tag own">You own this forever</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Side by side -->
+      <div class="sec-lbl">What Each Platform Actually Gives You</div>
+      <div class="compare-grid">
+        <div class="cg-col">
+          <div class="cg-header posh-h">POSH / EB</div>
+          <div class="cg-item">
+            <div class="cg-label posh-l">Guest data</div>
+            <div class="cg-val posh-v"><span class="x">✕</span> They keep it</div>
+          </div>
+          <div class="cg-item">
+            <div class="cg-label posh-l">How you get paid</div>
+            <div class="cg-val posh-v"><span class="x">✕</span> One-time payout</div>
+          </div>
+          <div class="cg-item">
+            <div class="cg-label posh-l">AI follow-up</div>
+            <div class="cg-val posh-v"><span class="x">✕</span> None</div>
+          </div>
+          <div class="cg-item">
+            <div class="cg-label posh-l">Guest profile</div>
+            <div class="cg-val posh-v"><span class="x">✕</span> Their platform</div>
+          </div>
+          <div class="cg-item">
+            <div class="cg-label posh-l">Next event</div>
+            <div class="cg-val posh-v"><span class="x">✕</span> Start over</div>
+          </div>
+        </div>
+        <div class="cg-col">
+          <div class="cg-header hush-h">HUSH AI</div>
+          <div class="cg-item">
+            <div class="cg-label hush-l">Guest data</div>
+            <div class="cg-val hush-v"><span class="ck">✓</span> Yours forever</div>
+          </div>
+          <div class="cg-item">
+            <div class="cg-label hush-l">How you get paid</div>
+            <div class="cg-val hush-v"><span class="ck">✓</span> Monthly recurring</div>
+          </div>
+          <div class="cg-item">
+            <div class="cg-label hush-l">AI follow-up</div>
+            <div class="cg-val hush-v"><span class="ck">✓</span> Instant · Automatic</div>
+          </div>
+          <div class="cg-item">
+            <div class="cg-label hush-l">Guest profile</div>
+            <div class="cg-val hush-v"><span class="ck">✓</span> Your community</div>
+          </div>
+          <div class="cg-item">
+            <div class="cg-label hush-l">Next event</div>
+            <div class="cg-val hush-v"><span class="ck">✓</span> Auto re-engage</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Posh listing mockup -->
+      <div class="sec-lbl">What a Posh Listing Looks Like With Hush</div>
+      <div class="posh-listing-mock">
+        <div class="plm-header">
+          <div>
+            <div class="plm-logo">POSH · ST. LOUIS</div>
+            <div style="height:6px"></div>
+            <div class="plm-event">Hush STL — Saturday Night</div>
+            <div class="plm-detail">Venue 9 · Sat May 10 · Doors 10PM · 21+</div>
+          </div>
+          <div style="background:rgba(255,107,107,.15);border:1px solid rgba(255,107,107,.2);border-radius:6px;padding:8px 10px;text-align:center">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--posh)">$35</div>
+            <div style="font-size:9px;color:var(--muted)">GA Ticket</div>
+          </div>
+        </div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:8px;line-height:1.6">St. Louis' most exclusive Saturday night experience. Limited capacity. Upscale dress code enforced.</div>
+        <div class="plm-hush-hook">
+          <div class="plm-hook-label">🖤 Want VIP Access?</div>
+          <div class="plm-hook-text">Skip the line, get a welcome drink, and access the reserved section. Text <strong style="color:var(--gold)">HUSHVIP</strong> to our Hush AI line for exclusive VIP booking:</div>
+          <div class="plm-hook-number">(888) 302-0649</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:4px">AI responds instantly · VIP spots limited to 12</div>
+        </div>
+      </div>
+
+      <div style="background:var(--card);border:1px solid rgba(0,232,154,.15);border-radius:8px;padding:14px 16px;margin-bottom:8px">
+        <div style="font-size:10px;letter-spacing:.15em;color:var(--green);text-transform:uppercase;margin-bottom:6px">The Result</div>
+        <div style="font-size:13px;color:var(--muted2);line-height:1.6">Every guest Posh sends you becomes a Hush member you own. Posh gets their listing fee. You get the relationship, the data, and the recurring revenue. You never fight them — you use them.</div>
+      </div>
+
+    </div>
+    <div class="bot-nav">
+      <div class="bn active" onclick="goTo('s1')"><div class="bn-ico">🔗</div><div class="bn-pip"></div><div class="bn-lbl">Platforms</div></div>
+      <div class="bn" onclick="goTo('s2')"><div class="bn-ico">💃</div><div class="bn-pip"></div><div class="bn-lbl">Model Profile</div></div>
+      <div class="bn" onclick="goTo('s3')"><div class="bn-ico">✨</div><div class="bn-pip"></div><div class="bn-lbl">Model Join</div></div>
+    </div>
+  </div>
+
+  <!-- ════ S2: MODEL PROFILE ════ -->
+  <div class="screen" id="s2">
+    <div class="model-cover">
+      <div class="model-cover-glow"></div>
+    </div>
+
+    <div class="model-av-wrap">
+      <div class="model-av">AB</div>
+      <div class="model-av-badge">⭐ Elite</div>
+    </div>
+
+    <div class="model-body">
+      <div class="model-stage-name">Alexis Blue</div>
+      <div class="model-persona-tag">✦ Creator Profile · Stage Name</div>
+      <div class="privacy-shield">🔒 Identity Protected · Legal Name Secured</div>
+
+      <!-- Verification tier -->
+      <div class="verify-card">
+        <div class="vc-title">Verification Status</div>
+        <div class="vc-tiers">
+          <div class="vc-tier-row">
+            <div class="vtr-badge done">✓</div>
+            <div class="vtr-info">
+              <div class="vtr-name">Social Verified</div>
+              <div class="vtr-desc">Instagram confirmed · Real follower count validated</div>
+            </div>
+            <div class="vtr-status done">Complete</div>
+          </div>
+          <div class="vc-tier-row">
+            <div class="vtr-badge active">★</div>
+            <div class="vtr-info">
+              <div class="vtr-name">Creator Verified</div>
+              <div class="vtr-desc">OnlyFans linked as identity proof · Full profile unlocked</div>
+            </div>
+            <div class="vtr-status active">Active</div>
+          </div>
+          <div class="vc-tier-row">
+            <div class="vtr-badge pending">👑</div>
+            <div class="vtr-info">
+              <div class="vtr-name">Elite Status</div>
+              <div class="vtr-desc">38 events · 5.0 rating · 100% show rate</div>
+            </div>
+            <div class="vtr-status done">Earned</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="model-stats">
+        <div class="ms-stat"><div class="ms-val">38</div><div class="ms-lbl">Events</div></div>
+        <div class="ms-stat"><div class="ms-val">5.0</div><div class="ms-lbl">Rating</div></div>
+        <div class="ms-stat"><div class="ms-val">100%</div><div class="ms-lbl">Show Rate</div></div>
+        <div class="ms-stat"><div class="ms-val">$200</div><div class="ms-lbl">Rate</div></div>
+      </div>
+
+      <!-- Social links -->
+      <div class="socials-section">
+        <div class="ss-title">Creator Portfolio</div>
+
+        <div class="social-row" onclick="tapSocial('ig')">
+          <div class="sr-left">
+            <span class="sr-ico">📸</span>
+            <div>
+              <div class="sr-platform">Instagram</div>
+              <div class="sr-handle">@alexisb_stl</div>
+            </div>
+          </div>
+          <div class="sr-right">
+            <div class="sr-followers">31.2K</div>
+            <div class="sr-verified">✓</div>
+            <div class="sr-arrow">›</div>
+          </div>
+        </div>
+
+        <div class="social-row" onclick="tapSocial('tt')">
+          <div class="sr-left">
+            <span class="sr-ico">🎵</span>
+            <div>
+              <div class="sr-platform">TikTok</div>
+              <div class="sr-handle">@alexis.b</div>
+            </div>
+          </div>
+          <div class="sr-right">
+            <div class="sr-followers">18.7K</div>
+            <div class="sr-verified">✓</div>
+            <div class="sr-arrow">›</div>
+          </div>
+        </div>
+
+        <div class="social-row" onclick="tapSocial('sc')">
+          <div class="sr-left">
+            <span class="sr-ico">👻</span>
+            <div>
+              <div class="sr-platform">Snapchat</div>
+              <div class="sr-handle">@alexisblue</div>
+            </div>
+          </div>
+          <div class="sr-right">
+            <div class="sr-arrow">›</div>
+          </div>
+        </div>
+
+        <div class="social-row" onclick="tapSocial('x')">
+          <div class="sr-left">
+            <span class="sr-ico">𝕏</span>
+            <div>
+              <div class="sr-platform">X / Twitter</div>
+              <div class="sr-handle">@alexisblue_</div>
+            </div>
+          </div>
+          <div class="sr-right">
+            <div class="sr-followers">4.2K</div>
+            <div class="sr-arrow">›</div>
+          </div>
+        </div>
+
+        <!-- OnlyFans special card -->
+        <div class="of-row" onclick="tapSocial('of')">
+          <div class="of-header">
+            <div class="of-brand">
+              <span class="of-ico">🔵</span>
+              <div class="of-name">ONLYFANS</div>
+            </div>
+            <div class="of-verified-badge">Creator Verified ✓</div>
+          </div>
+          <div class="of-privacy-note">Profile linked for identity verification and promoter booking decisions. Stage name used throughout — legal name protected.</div>
+          <div class="of-stats">
+            <div class="of-stat"><strong>12.4K</strong> subscribers</div>
+            <div class="of-stat"><strong>847</strong> posts</div>
+            <div class="of-stat"><strong>Top 3%</strong> creator</div>
+          </div>
+          <div class="of-cta">
+            <div class="of-cta-text">View creator profile →</div>
+            <div class="of-lock">🔓</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Legal name vault -->
+      <div class="vault-card">
+        <div class="vault-ico">🔐</div>
+        <div class="vault-body">
+          <div class="vault-title">Legal Identity — Secured by Hush AI</div>
+          <div class="vault-desc">Real name held in encrypted Stripe vault for tax and payout compliance only. Never displayed. Never shared with promoters. Model controls her public identity completely.</div>
+        </div>
+      </div>
+
+      <!-- Payout -->
+      <div class="payout-row">
+        <div class="pr-left">
+          <div class="pr-label">Payout Status</div>
+          <div class="pr-name">Alexis Blue · Stage Name</div>
+          <div class="pr-note">Stripe pays to verified bank · Legal name used internally only</div>
+        </div>
+        <div class="pr-amount">$1,840</div>
+      </div>
+
+      <button class="gold-btn" onclick="bookModel()">💃 BOOK ALEXIS BLUE — $200</button>
+
+    </div>
+
+    <div class="bot-nav">
+      <div class="bn" onclick="goTo('s1')"><div class="bn-ico">🔗</div><div class="bn-pip"></div><div class="bn-lbl">Platforms</div></div>
+      <div class="bn active" onclick="goTo('s2')"><div class="bn-ico">💃</div><div class="bn-pip"></div><div class="bn-lbl">Model Profile</div></div>
+      <div class="bn" onclick="goTo('s3')"><div class="bn-ico">✨</div><div class="bn-pip"></div><div class="bn-lbl">Model Join</div></div>
+    </div>
+  </div>
+
+  <!-- ════ S3: MODEL ONBOARDING ════ -->
+  <div class="screen" id="s3">
+    <div class="mob-hero">
+      <div class="mob-glow"></div>
+      <div class="mob-ico">💃</div>
+      <div class="mob-title">JOIN AS AN<br>EVENT MODEL</div>
+      <div class="mob-sub">Build your profile. Get booked. Get paid. Your real name stays private — always.</div>
+    </div>
+
+    <div class="mob-body">
+
+      <!-- Privacy promise -->
+      <div class="privacy-promise">
+        <div class="pp-title">🔒 Your Privacy Promise</div>
+        <div class="pp-items">
+          <div class="pp-item"><span class="pp-check">✓</span>Use your stage name or creator persona — never your real name</div>
+          <div class="pp-item"><span class="pp-check">✓</span>Legal name held securely for Stripe payouts only — never shown</div>
+          <div class="pp-item"><span class="pp-check">✓</span>No personal contact info ever shared with promoters</div>
+          <div class="pp-item"><span class="pp-check">✓</span>All communication and payments handled inside Hush AI</div>
+          <div class="pp-item"><span class="pp-check">✓</span>You control who sees your OnlyFans and social links</div>
+        </div>
+      </div>
+
+      <!-- Stage name setup -->
+      <div class="stage-setup">
+        <div class="ss-step-title">
+          <div class="ss-step-num">1</div>
+          Create Your Public Identity
+        </div>
+        <label class="field-label">Stage Name / Creator Name</label>
+        <input class="field-input" id="stageName" placeholder="e.g. Alexis Blue, Jasmine Rose..." oninput="updatePreview()" value="Alexis Blue">
+        <label class="field-label">Your City</label>
+        <input class="field-input" placeholder="St. Louis, MO" value="St. Louis, MO" style="margin-bottom:14px">
+        <div class="stage-preview">
+          <div class="sp-av" id="previewAv">AB</div>
+          <div>
+            <div class="sp-name" id="previewName">Alexis Blue</div>
+            <div class="sp-badge">New Model · Building Profile</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Verification -->
+      <div class="verify-methods">
+        <div class="ss-step-title" style="margin-bottom:12px">
+          <div class="ss-step-num">2</div>
+          Verify Your Identity
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:14px;line-height:1.6">Connect your social accounts to verify you're real. No government ID required — your creator presence is your identity.</div>
+
+        <div class="vm-option" onclick="toggleVerify(this)">
+          <div class="vmo-ico">📸</div>
+          <div class="vmo-body">
+            <div class="vmo-title">Connect Instagram</div>
+            <div class="vmo-sub">Minimum 1K followers · Confirms real presence · Gets you Social Verified badge</div>
+            <div class="vmo-badge ig">Social Verified ✓</div>
+          </div>
+          <div class="vmo-select checked">✓</div>
+        </div>
+
+        <div class="vm-option" onclick="toggleVerify(this)">
+          <div class="vmo-ico">🔵</div>
+          <div class="vmo-body">
+            <div class="vmo-title">Link OnlyFans Profile</div>
+            <div class="vmo-sub">Active creator account · Substitutes as full identity verification · Unlocks Creator Verified badge and full profile</div>
+            <div class="vmo-badge of">Creator Verified ✓</div>
+          </div>
+          <div class="vmo-select checked">✓</div>
+        </div>
+
+        <div class="vm-option" onclick="toggleVerify(this)">
+          <div class="vmo-ico">🎵</div>
+          <div class="vmo-body">
+            <div class="vmo-title">Connect TikTok</div>
+            <div class="vmo-sub">Optional · Adds to your portfolio · Shows promoters your content style</div>
+            <div class="vmo-badge both">Portfolio ✓</div>
+          </div>
+          <div class="vmo-select">+</div>
+        </div>
+
+      </div>
+
+      <!-- Payout setup -->
+      <div class="payout-setup">
+        <div class="ss-step-title" style="margin-bottom:12px">
+          <div class="ss-step-num">3</div>
+          Set Up Your Payouts
+        </div>
+        <label class="field-label">Legal Name (For Stripe / Tax Only)</label>
+        <input class="field-input" placeholder="Your real legal name" type="text" style="border-color:rgba(0,232,154,.2)">
+        <label class="field-label">Bank Account</label>
+        <input class="field-input" placeholder="Connect via Stripe · Secure · Encrypted">
+        <div class="stripe-legal-note">
+          <div class="sln-title">🔐 How This Stays Private</div>
+          <div class="sln-text">Your legal name is stored in Stripe's encrypted vault — used only for tax compliance and bank payouts. It never appears on your profile, never shown to promoters, never used publicly anywhere in Hush AI. Your stage name is the only identity anyone sees.</div>
+        </div>
+      </div>
+
+      <!-- Rates -->
+      <div style="background:var(--card);border:1px solid var(--gline);border-radius:10px;padding:18px;margin-bottom:16px">
+        <div class="ss-step-title" style="margin-bottom:12px">
+          <div class="ss-step-num">4</div>
+          Set Your Rates
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div>
+            <label class="field-label">Cash Rate / Event</label>
+            <input class="field-input" value="$150" style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--gold)">
+          </div>
+          <div>
+            <label class="field-label">Hush Credits</label>
+            <input class="field-input" value="350 credits" style="font-size:13px;color:var(--cyan)">
+          </div>
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.6">Hush AI takes 10% booking fee. You keep the rest. Payment releases automatically when you check in at the door.</div>
+      </div>
+
+      <button class="complete-btn" onclick="completeOnboarding()">💃 CREATE MY MODEL PROFILE</button>
+
+    </div>
+
+    <div class="bot-nav">
+      <div class="bn" onclick="goTo('s1')"><div class="bn-ico">🔗</div><div class="bn-pip"></div><div class="bn-lbl">Platforms</div></div>
+      <div class="bn" onclick="goTo('s2')"><div class="bn-ico">💃</div><div class="bn-pip"></div><div class="bn-lbl">Model Profile</div></div>
+      <div class="bn active" onclick="goTo('s3')"><div class="bn-ico">✨</div><div class="bn-pip"></div><div class="bn-lbl">Model Join</div></div>
+    </div>
+  </div>
+
+  <!-- Social tap overlay -->
+  <div id="socialOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:200;align-items:flex-end;justify-content:center;padding-bottom:40px">
+    <div style="background:var(--card);border:1px solid var(--gline);border-radius:16px 16px 8px 8px;padding:28px 24px;width:100%;max-width:390px">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.1em;margin-bottom:4px" id="overlayTitle">INSTAGRAM</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:16px" id="overlayHandle">@alexisb_stl · 31.2K followers</div>
+      <div id="overlayContent"></div>
+      <button onclick="document.getElementById('socialOverlay').style.display='none'" style="width:100%;padding:14px;background:transparent;border:1px solid var(--gline);border-radius:6px;font-size:13px;color:var(--muted);cursor:pointer;margin-top:10px">Close</button>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<script>
+function goTo(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const t = document.getElementById(id);
+  if(t){ t.classList.add('active'); t.scrollTop = 0; }
+}
+
+// Social tap handler
+function tapSocial(type) {
+  const overlay = document.getElementById('socialOverlay');
+  const title = document.getElementById('overlayTitle');
+  const handle = document.getElementById('overlayHandle');
+  const content = document.getElementById('overlayContent');
+
+  const data = {
+    ig: {
+      title:'INSTAGRAM',
+      handle:'@alexisb_stl · 31.2K followers',
+      content:`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:14px">${Array(9).fill(0).map((_,i)=>`<div style="aspect-ratio:1;background:linear-gradient(135deg,#${Math.floor(Math.random()*0x333333+0x111111).toString(16).padStart(6,'0')},#${Math.floor(Math.random()*0x222222+0x0a0a0a).toString(16).padStart(6,'0')});border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:20px">${['🖤','✨','🎉','💃','🥂','🎭','👑','🌙','🔥'][i]}</div>`).join('')}</div><div style="font-size:12px;color:var(--muted2);line-height:1.6">Verified Instagram profile · 31.2K real followers · Used as Social Verified identity confirmation</div>`
+    },
+    tt: {
+      title:'TIKTOK',
+      handle:'@alexis.b · 18.7K followers',
+      content:`<div style="background:var(--deep);border:1px solid var(--gline);border-radius:8px;padding:14px;margin-bottom:12px;text-align:center"><div style="font-size:32px;margin-bottom:8px">🎵</div><div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--white)">@alexis.b</div><div style="font-size:12px;color:var(--muted);margin-top:4px">18.7K followers · Nightlife & lifestyle content</div></div><div style="font-size:12px;color:var(--muted2);line-height:1.6">TikTok profile linked as portfolio addition. Shows promoters content style and audience reach.</div>`
+    },
+    sc: {
+      title:'SNAPCHAT',
+      handle:'@alexisblue',
+      content:`<div style="background:rgba(255,252,0,.06);border:1px solid rgba(255,252,0,.15);border-radius:8px;padding:14px;margin-bottom:12px;text-align:center"><div style="font-size:32px;margin-bottom:8px">👻</div><div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#FFFC00">@alexisblue</div></div><div style="font-size:12px;color:var(--muted2);line-height:1.6">Snapchat linked as social proof. Profile visible to promoters as part of the creator portfolio.</div>`
+    },
+    x: {
+      title:'X / TWITTER',
+      handle:'@alexisblue_ · 4.2K followers',
+      content:`<div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:14px;margin-bottom:12px;text-align:center"><div style="font-size:32px;margin-bottom:8px">𝕏</div><div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--white)">@alexisblue_</div><div style="font-size:12px;color:var(--muted);margin-top:4px">4.2K followers</div></div>`
+    },
+    of: {
+      title:'ONLYFANS',
+      handle:'Creator Verified · Top 3% · 12.4K subscribers',
+      content:`<div style="background:rgba(0,175,240,.06);border:1px solid rgba(0,175,240,.2);border-radius:8px;padding:16px;margin-bottom:12px"><div style="font-size:10px;letter-spacing:.18em;color:var(--of);text-transform:uppercase;margin-bottom:8px">Creator Portfolio</div><div style="display:flex;gap:16px;margin-bottom:10px"><div style="text-align:center"><div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--of)">12.4K</div><div style="font-size:9px;color:var(--muted)">Subscribers</div></div><div style="text-align:center"><div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--of)">847</div><div style="font-size:9px;color:var(--muted)">Posts</div></div><div style="text-align:center"><div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--of)">Top 3%</div><div style="font-size:9px;color:var(--muted)">Creator</div></div></div><div style="font-size:12px;color:var(--muted2);line-height:1.6">OnlyFans profile used as creator identity verification. Confirms real professional presence. Stage name used throughout — legal identity protected by Hush AI vault.</div></div><div style="background:rgba(0,232,154,.06);border:1px solid rgba(0,232,154,.15);border-radius:6px;padding:10px 12px"><div style="font-size:10px;color:var(--green);letter-spacing:.12em;margin-bottom:4px">🔒 PRIVACY NOTE</div><div style="font-size:11px;color:var(--muted2);line-height:1.5">Profile link available to help promoters make informed booking decisions. Model stage name maintained throughout. Real identity never disclosed.</div></div>`
+    }
+  };
+
+  const d = data[type];
+  if(!d) return;
+  title.textContent = d.title;
+  handle.textContent = d.handle;
+  content.innerHTML = d.content;
+  overlay.style.display = 'flex';
+}
+
+// Onboarding interactions
+function updatePreview() {
+  const name = document.getElementById('stageName')?.value || '';
+  const initials = name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase() || '?';
+  const av = document.getElementById('previewAv');
+  const pn = document.getElementById('previewName');
+  if(av) av.textContent = initials;
+  if(pn) pn.textContent = name || 'Your Stage Name';
+}
+
+function toggleVerify(row) {
+  const dot = row.querySelector('.vmo-select');
+  if(!dot) return;
+  const isChecked = dot.classList.contains('checked');
+  if(isChecked){ dot.classList.remove('checked'); dot.textContent='+'; dot.style.background=''; }
+  else{ dot.classList.add('checked'); dot.textContent='✓'; dot.style.background='var(--gold)'; dot.style.borderColor='var(--gold)'; }
+}
+
+function completeOnboarding() {
+  const btn = document.querySelector('.complete-btn');
+  if(btn){
+    btn.textContent = '⚡ CREATING YOUR PROFILE...';
+    btn.style.background = 'rgba(0,232,154,.3)';
+    btn.style.borderColor = 'rgba(0,232,154,.4)';
+    btn.style.pointerEvents = 'none';
+    setTimeout(() => {
+      btn.textContent = '✓ PROFILE CREATED · READY TO BOOK';
+      btn.style.background = 'rgba(0,232,154,.2)';
+      setTimeout(() => goTo('s2'), 1000);
+    }, 1800);
+  }
+}
+
+function bookModel() {
+  const btn = document.querySelector('.gold-btn');
+  if(btn){
+    btn.textContent = '✓ BOOKED · $200 · PAYMENT ON CHECK-IN';
+    btn.style.background = 'var(--green)';
+    btn.style.color = 'var(--black)';
+    btn.style.pointerEvents = 'none';
+  }
+}
+</script>
+</body>
+</html>

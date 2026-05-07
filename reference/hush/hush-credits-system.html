@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Hush AI — Credits</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --black:#040405;--deep:#07070a;--card:#0d0d11;--card2:#121216;
+  --gold:#C9A84C;--gold2:#e8c96a;--gold3:#a8862e;--gold4:#f5d98a;
+  --gdim:rgba(201,168,76,0.12);--gline:rgba(201,168,76,0.2);
+  --white:#f5f0e8;--muted:rgba(245,240,232,0.35);--muted2:rgba(245,240,232,0.6);
+  --green:#00e89a;--red:#ff4757;--cyan:#00d4ff;--purple:#a29bfe;
+  --credit:#FFB347;--credit2:#FF8C00;--credit-dim:rgba(255,179,71,0.12);--credit-line:rgba(255,179,71,0.25);
+}
+html,body{height:100%;background:#000;overflow:hidden;font-family:'Outfit',sans-serif;color:var(--white)}
+.shell{width:100%;height:100vh;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 40%,#0f0a02 0%,#040405 65%)}
+.phone{width:min(390px,100vw);height:min(844px,100vh);background:var(--black);border-radius:min(44px,5vw);overflow:hidden;position:relative;box-shadow:0 0 0 1px rgba(255,179,71,.15),0 0 80px rgba(255,179,71,.06),0 60px 140px rgba(0,0,0,.9)}
+.screen{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity .45s ease;overflow-y:auto;overflow-x:hidden;scrollbar-width:none}
+.screen::-webkit-scrollbar{display:none}
+.screen.active{opacity:1;pointer-events:all}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes creditPulse{0%,100%{filter:drop-shadow(0 0 12px rgba(255,179,71,.4))}50%{filter:drop-shadow(0 0 28px rgba(255,179,71,.7))}}
+@keyframes countUp{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:scale(1)}}
+@keyframes shimmer{0%{background-position:200% center}100%{background-position:-200% center}}
+@keyframes boost{0%{transform:scale(1)}50%{transform:scale(1.04)}100%{transform:scale(1)}}
+
+/* NAV */
+.bot-nav{position:absolute;bottom:0;left:0;right:0;background:rgba(4,4,5,.97);backdrop-filter:blur(20px);border-top:1px solid var(--credit-line);display:flex;padding:10px 0 26px;z-index:100}
+.bn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px 0}
+.bn-ico{font-size:20px;opacity:.3;transition:opacity .2s}
+.bn-lbl{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);transition:color .2s}
+.bn-pip{width:4px;height:4px;border-radius:50%;background:var(--credit);opacity:0;transition:opacity .2s;margin:0 auto}
+.bn.active .bn-ico{opacity:1}
+.bn.active .bn-lbl{color:var(--credit)}
+.bn.active .bn-pip{opacity:1}
+
+.top-bar{display:flex;align-items:center;justify-content:space-between;padding:52px 22px 18px;background:var(--black);border-bottom:1px solid var(--credit-line);position:sticky;top:0;z-index:10}
+.top-logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.15em;background:linear-gradient(135deg,var(--credit2),var(--credit));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.scroll-pad{padding:20px 20px 110px}
+.sec-lbl{font-size:10px;letter-spacing:.22em;color:var(--credit);text-transform:uppercase;margin-bottom:12px}
+.gold-btn{width:100%;padding:17px;background:linear-gradient(135deg,var(--credit2),var(--credit));border:none;border-radius:6px;font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:.18em;color:var(--black);cursor:pointer;transition:all .2s;box-shadow:0 6px 24px rgba(255,179,71,.25)}
+.gold-btn:active{transform:scale(.98)}
+
+/* ══════════════════════════════
+   S1 — CREDITS HUB / WALLET
+══════════════════════════════ */
+#s1{background:var(--deep)}
+
+/* Balance hero */
+.credit-hero{
+  background:linear-gradient(135deg,rgba(255,179,71,.1),rgba(255,140,0,.05));
+  border:1px solid var(--credit-line);border-radius:14px;
+  padding:28px 24px;margin-bottom:20px;text-align:center;
+  position:relative;overflow:hidden;
+}
+.credit-hero::before{
+  content:'';position:absolute;inset:0;
+  background-image:repeating-linear-gradient(45deg,rgba(255,179,71,.03) 0,rgba(255,179,71,.03) 1px,transparent 1px,transparent 22px),repeating-linear-gradient(-45deg,rgba(255,179,71,.03) 0,rgba(255,179,71,.03) 1px,transparent 1px,transparent 22px);
+}
+.ch-coin{font-size:52px;margin-bottom:10px;position:relative;z-index:1;animation:creditPulse 3s ease-in-out infinite}
+.ch-eyebrow{font-size:9px;letter-spacing:.25em;color:var(--credit);text-transform:uppercase;margin-bottom:6px;position:relative;z-index:1}
+.ch-balance{font-family:'Bebas Neue',sans-serif;font-size:72px;line-height:1;background:linear-gradient(135deg,var(--credit2),var(--credit));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 20px rgba(255,179,71,.4));position:relative;z-index:1;animation:countUp .6s ease both}
+.ch-label{font-size:12px;color:var(--muted);margin-top:4px;position:relative;z-index:1}
+.ch-monthly{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:14px;padding-top:14px;border-top:1px solid var(--credit-line);position:relative;z-index:1}
+.ch-monthly-val{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--credit)}
+.ch-monthly-lbl{font-size:11px;color:var(--muted)}
+.ch-rollover{font-size:10px;color:var(--green);background:rgba(0,232,154,.08);border:1px solid rgba(0,232,154,.2);border-radius:20px;padding:3px 10px;margin-top:6px;position:relative;z-index:1;display:inline-block}
+
+/* Profile type badge */
+.profile-type{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--credit-line);border-radius:8px;padding:12px 16px;margin-bottom:20px}
+.pt-ico{font-size:24px;flex-shrink:0}
+.pt-body{flex:1}
+.pt-name{font-size:13px;font-weight:500;color:var(--white)}
+.pt-role{font-size:11px;color:var(--credit);margin-top:2px}
+.pt-badge{font-size:9px;padding:3px 10px;border-radius:20px;background:linear-gradient(135deg,var(--credit2),var(--credit));color:var(--black);font-weight:700;letter-spacing:.08em;white-space:nowrap}
+
+/* Quick actions */
+.quick-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.qa-btn{background:var(--card);border:1px solid var(--credit-line);border-radius:10px;padding:14px;text-align:center;cursor:pointer;transition:all .2s}
+.qa-btn:active{transform:scale(.97);border-color:var(--credit)}
+.qa-ico{font-size:26px;margin-bottom:6px}
+.qa-lbl{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:.08em;color:var(--credit)}
+.qa-sub{font-size:10px;color:var(--muted);margin-top:2px}
+
+/* Active boosts */
+.active-boost{background:var(--card);border:1px solid var(--credit-line);border-radius:8px;padding:14px;margin-bottom:10px;display:flex;gap:12px;align-items:center}
+.ab-ico{font-size:22px;flex-shrink:0}
+.ab-body{flex:1}
+.ab-title{font-size:13px;font-weight:500;color:var(--white);margin-bottom:2px}
+.ab-time{font-size:11px;color:var(--credit)}
+.ab-bar{height:4px;background:rgba(255,255,255,.06);border-radius:2px;margin-top:6px;overflow:hidden}
+.ab-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--credit2),var(--credit))}
+.ab-cost{font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--credit);flex-shrink:0}
+
+/* Transaction history */
+.txn-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.tr-ico{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.tr-ico.earn{background:rgba(0,232,154,.1);border:1px solid rgba(0,232,154,.2)}
+.tr-ico.spend{background:var(--credit-dim);border:1px solid var(--credit-line)}
+.tr-ico.buy{background:rgba(255,179,71,.1);border:1px solid var(--credit-line)}
+.tr-body{flex:1}
+.tr-title{font-size:13px;color:var(--white);font-weight:500}
+.tr-sub{font-size:11px;color:var(--muted)}
+.tr-amt{font-family:'Bebas Neue',sans-serif;font-size:18px}
+.tr-amt.pos{color:var(--green)}
+.tr-amt.neg{color:var(--credit)}
+
+/* ══════════════════════════════
+   S2 — BUY CREDITS
+══════════════════════════════ */
+#s2{background:var(--deep)}
+
+.buy-hero{text-align:center;padding:24px;background:linear-gradient(135deg,rgba(255,179,71,.08),transparent);border-bottom:1px solid var(--credit-line);margin-bottom:20px}
+.bh-title{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:.06em;background:linear-gradient(135deg,var(--credit2),var(--credit));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.bh-sub{font-size:12px;color:var(--muted);margin-top:4px}
+
+.credit-packs{display:flex;flex-direction:column;gap:12px;margin-bottom:20px}
+.pack-card{background:var(--card);border:1px solid rgba(255,179,71,.12);border-radius:12px;padding:18px;cursor:pointer;transition:all .2s;position:relative}
+.pack-card.selected{border-color:var(--credit);background:var(--credit-dim)}
+.pack-card.popular{border-color:var(--credit)}
+.pack-card:active{transform:scale(.99)}
+.pack-badge{position:absolute;top:-8px;right:14px;background:linear-gradient(135deg,var(--credit2),var(--credit));color:var(--black);font-size:9px;font-weight:700;letter-spacing:.1em;padding:3px 10px;border-radius:20px}
+.pack-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.pack-credits{font-family:'Bebas Neue',sans-serif;font-size:36px;background:linear-gradient(135deg,var(--credit2),var(--credit));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1}
+.pack-credits-lbl{font-size:12px;color:var(--muted);margin-top:2px}
+.pack-price{text-align:right}
+.pack-price-val{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--white)}
+.pack-per{font-size:10px;color:var(--muted);margin-top:2px}
+.pack-bar{height:3px;background:rgba(255,255,255,.06);border-radius:2px;margin-bottom:10px;overflow:hidden}
+.pack-bar-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--credit2),var(--credit))}
+.pack-what{display:flex;flex-wrap:wrap;gap:6px}
+.pack-tag{font-size:10px;padding:3px 9px;border-radius:20px;background:var(--credit-dim);border:1px solid var(--credit-line);color:var(--credit);letter-spacing:.04em}
+
+/* Tier credit table */
+.tier-table{background:var(--card);border:1px solid var(--credit-line);border-radius:10px;overflow:hidden;margin-bottom:20px}
+.tt-header{background:rgba(255,179,71,.08);display:grid;grid-template-columns:1fr 1fr 1fr 1fr;border-bottom:1px solid var(--credit-line)}
+.tt-header div{padding:10px 8px;font-size:9px;letter-spacing:.12em;color:var(--credit);text-transform:uppercase;text-align:center}
+.tt-row{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;border-bottom:1px solid rgba(255,179,71,.05)}
+.tt-row:last-child{border-bottom:none}
+.tt-row div{padding:11px 8px;font-size:11px;text-align:center;color:var(--muted2)}
+.tt-row div:first-child{color:var(--white);font-weight:500;text-align:left;padding-left:12px}
+.tt-row.highlight{background:rgba(255,179,71,.05)}
+.tt-row.highlight div{color:var(--credit)}
+
+/* ══════════════════════════════
+   S3 — BOOST MARKETPLACE
+══════════════════════════════ */
+#s3{background:var(--deep)}
+
+.boost-category{margin-bottom:24px}
+.bc-title{font-size:10px;letter-spacing:.2em;color:var(--credit);text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.bc-icon{font-size:14px}
+
+.boost-card{background:var(--card);border:1px solid rgba(255,179,71,.1);border-radius:10px;padding:16px;margin-bottom:10px;transition:all .2s;cursor:pointer}
+.boost-card:active{border-color:var(--credit);transform:scale(.99)}
+.boost-card.active-boost-card{border-color:var(--credit);background:var(--credit-dim);animation:boost 2s ease-in-out infinite}
+
+.bc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.bc-name{font-size:14px;font-weight:500;color:var(--white);margin-bottom:3px}
+.bc-desc{font-size:11px;color:var(--muted);line-height:1.5}
+.bc-cost{text-align:right;flex-shrink:0;margin-left:12px}
+.bc-credits{font-family:'Bebas Neue',sans-serif;font-size:26px;background:linear-gradient(135deg,var(--credit2),var(--credit));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1}
+.bc-credits-lbl{font-size:9px;color:var(--muted);letter-spacing:.08em;margin-top:1px}
+
+.bc-meta{display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.bc-tag{font-size:10px;padding:3px 9px;border-radius:20px}
+.bc-tag.promoter{background:var(--gdim);border:1px solid var(--gline);color:var(--gold)}
+.bc-tag.model{background:rgba(162,155,254,.1);border:1px solid rgba(162,155,254,.25);color:var(--purple)}
+.bc-tag.guest{background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.2);color:var(--cyan)}
+.bc-tag.duration{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:var(--muted2)}
+
+.bc-boost-btn{display:flex;align-items:center;justify-content:space-between;background:linear-gradient(135deg,rgba(255,179,71,.12),rgba(255,179,71,.06));border:1px solid var(--credit-line);border-radius:6px;padding:10px 14px}
+.bc-boost-label{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:.12em;color:var(--credit)}
+.bc-boost-action{font-size:11px;color:var(--credit);display:flex;align-items:center;gap:4px}
+
+/* Auto-boost toggle */
+.auto-toggle{display:flex;align-items:center;justify-content:space-between;padding:10px 0;margin-top:6px;border-top:1px solid rgba(255,255,255,.04)}
+.at-label{font-size:11px;color:var(--muted2)}
+.toggle{width:44px;height:24px;border-radius:12px;background:rgba(255,255,255,.1);position:relative;cursor:pointer;transition:all .3s}
+.toggle.on{background:linear-gradient(135deg,var(--credit2),var(--credit))}
+.toggle-dot{width:18px;height:18px;border-radius:50%;background:var(--white);position:absolute;top:3px;left:3px;transition:all .3s;box-shadow:0 2px 4px rgba(0,0,0,.3)}
+.toggle.on .toggle-dot{left:23px}
+
+/* ══════════════════════════════
+   S4 — MODEL UNLOCK
+══════════════════════════════ */
+#s4{background:var(--black);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;position:relative;overflow:hidden}
+
+.unlock-hero{
+  width:100%;padding:52px 28px 32px;
+  text-align:center;position:relative;overflow:hidden;
+  background:linear-gradient(180deg,rgba(162,155,254,.08) 0%,transparent 100%);
+  border-bottom:1px solid rgba(162,155,254,.15);
+}
+.uh-glow{position:absolute;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(162,155,254,.08) 0%,transparent 70%);top:0;left:50%;transform:translateX(-50%)}
+.uh-diamonds{position:absolute;inset:0;background-image:repeating-linear-gradient(45deg,rgba(162,155,254,.02) 0,rgba(162,155,254,.02) 1px,transparent 1px,transparent 24px),repeating-linear-gradient(-45deg,rgba(162,155,254,.02) 0,rgba(162,155,254,.02) 1px,transparent 1px,transparent 24px)}
+.uh-ico{font-size:64px;position:relative;z-index:2;margin-bottom:14px;animation:creditPulse 3s ease-in-out infinite}
+.uh-title{font-family:'Bebas Neue',sans-serif;font-size:38px;letter-spacing:.06em;color:var(--white);position:relative;z-index:2;line-height:1.1;margin-bottom:8px}
+.uh-sub{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:16px;color:var(--muted);position:relative;z-index:2;line-height:1.6}
+
+.unlock-body{width:100%;padding:24px 24px 110px}
+
+/* What you unlock */
+.unlock-perks{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+.up-row{display:flex;align-items:flex-start;gap:12px;background:var(--card);border:1px solid rgba(162,155,254,.1);border-radius:8px;padding:14px}
+.up-ico{font-size:22px;flex-shrink:0}
+.up-body{}
+.up-title{font-size:13px;font-weight:500;color:var(--white);margin-bottom:2px}
+.up-desc{font-size:11px;color:var(--muted);line-height:1.5}
+.up-badge{display:inline-block;font-size:9px;padding:2px 8px;border-radius:20px;margin-top:4px;background:rgba(162,155,254,.12);border:1px solid rgba(162,155,254,.25);color:var(--purple);letter-spacing:.08em}
+
+/* Credit requirement */
+.credit-req{background:linear-gradient(135deg,rgba(255,179,71,.12),rgba(255,179,71,.04));border:1px solid var(--credit-line);border-radius:10px;padding:20px;margin-bottom:16px;text-align:center}
+.cr-eyebrow{font-size:9px;letter-spacing:.25em;color:var(--credit);text-transform:uppercase;margin-bottom:8px}
+.cr-amount{font-family:'Bebas Neue',sans-serif;font-size:56px;line-height:1;background:linear-gradient(135deg,var(--credit2),var(--credit));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 16px rgba(255,179,71,.4))}
+.cr-lbl{font-size:12px;color:var(--muted);margin-top:4px}
+.cr-balance-check{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid var(--credit-line)}
+.cr-have{font-size:12px;color:var(--muted2)}
+.cr-have strong{color:var(--credit)}
+.cr-status{font-size:12px;padding:4px 12px;border-radius:20px}
+.cr-status.enough{background:rgba(0,232,154,.1);border:1px solid rgba(0,232,154,.25);color:var(--green)}
+.cr-status.need-more{background:rgba(255,71,87,.08);border:1px solid rgba(255,71,87,.2);color:var(--red)}
+
+/* One-time unlock breakdown */
+.unlock-breakdown{background:var(--card);border:1px solid var(--gline);border-radius:8px;padding:14px;margin-bottom:16px}
+.ub-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:12px}
+.ub-row:last-child{border-bottom:none}
+.ub-label{color:var(--muted)}
+.ub-val{color:var(--white);font-weight:500}
+.ub-val.credit{color:var(--credit)}
+
+.unlock-btn{width:100%;padding:20px;background:linear-gradient(135deg,rgba(162,155,254,.7),rgba(162,155,254,.5));border:1px solid rgba(162,155,254,.35);border-radius:6px;font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:.2em;color:var(--white);cursor:pointer;box-shadow:0 8px 32px rgba(162,155,254,.15);transition:all .2s;margin-bottom:10px}
+.unlock-btn:active{transform:scale(.98)}
+.buy-credits-link{text-align:center;font-size:12px;color:var(--muted);cursor:pointer;padding:8px}
+.buy-credits-link span{color:var(--credit)}
+</style>
+</head>
+<body>
+<div class="shell">
+<div class="phone">
+
+  <!-- ════ S1: CREDITS WALLET ════ -->
+  <div class="screen active" id="s1">
+    <div class="top-bar">
+      <div class="top-logo">✦ HUSH CREDITS</div>
+      <div style="font-size:10px;letter-spacing:.1em;color:var(--credit);cursor:pointer" onclick="goTo('s2')">Buy →</div>
+    </div>
+    <div class="scroll-pad">
+
+      <!-- Balance -->
+      <div class="credit-hero">
+        <div class="ch-coin">✦</div>
+        <div class="ch-eyebrow">Your Credit Balance</div>
+        <div class="ch-balance" id="mainBalance">847</div>
+        <div class="ch-label">Hush Credits · Never expire</div>
+        <div class="ch-monthly">
+          <div class="ch-monthly-val">+300</div>
+          <div class="ch-monthly-lbl">monthly allowance · Pro Plan</div>
+        </div>
+        <div class="ch-rollover">↻ Unused credits roll over · Max 600</div>
+      </div>
+
+      <!-- Profile type -->
+      <div class="profile-type">
+        <div class="pt-ico">🎉</div>
+        <div class="pt-body">
+          <div class="pt-name">Niddy · Party Profile + Promoter</div>
+          <div class="pt-role">Pro Plan · Mogul Network Access</div>
+        </div>
+        <div class="pt-badge">PRO</div>
+      </div>
+
+      <!-- Quick actions -->
+      <div class="quick-actions">
+        <div class="qa-btn" onclick="goTo('s3')">
+          <div class="qa-ico">⚡</div>
+          <div class="qa-lbl">Boost</div>
+          <div class="qa-sub">Events & Profile</div>
+        </div>
+        <div class="qa-btn" onclick="goTo('s2')">
+          <div class="qa-ico">✦</div>
+          <div class="qa-lbl">Buy Credits</div>
+          <div class="qa-sub">4 pack options</div>
+        </div>
+        <div class="qa-btn" onclick="goTo('s4')">
+          <div class="qa-ico">💃</div>
+          <div class="qa-lbl">Model Unlock</div>
+          <div class="qa-sub">500 credits</div>
+        </div>
+        <div class="qa-btn">
+          <div class="qa-ico">📊</div>
+          <div class="qa-lbl">History</div>
+          <div class="qa-sub">See all spend</div>
+        </div>
+      </div>
+
+      <!-- Active boosts -->
+      <div class="sec-lbl">Active Boosts</div>
+
+      <div class="active-boost">
+        <div class="ab-ico">⚡</div>
+        <div class="ab-body">
+          <div class="ab-title">Event Boost — Hush STL Saturday</div>
+          <div class="ab-time">18 hours remaining · Top of city feed</div>
+          <div class="ab-bar"><div class="ab-fill" style="width:75%"></div></div>
+        </div>
+        <div class="ab-cost">50✦</div>
+      </div>
+
+      <div class="active-boost">
+        <div class="ab-ico">👑</div>
+        <div class="ab-body">
+          <div class="ab-title">Profile Boost — Promoter Spotlight</div>
+          <div class="ab-time">3 days remaining · Featured in St. Louis</div>
+          <div class="ab-bar"><div class="ab-fill" style="width:43%"></div></div>
+        </div>
+        <div class="ab-cost">200✦</div>
+      </div>
+
+      <!-- Transaction history -->
+      <div class="sec-lbl" style="margin-top:8px">Recent Activity</div>
+
+      <div class="txn-row">
+        <div class="tr-ico earn">✓</div>
+        <div class="tr-body"><div class="tr-title">Monthly Allowance — Pro Plan</div><div class="tr-sub">Auto-credited May 1</div></div>
+        <div class="tr-amt pos">+300✦</div>
+      </div>
+      <div class="txn-row">
+        <div class="tr-ico spend">⚡</div>
+        <div class="tr-body"><div class="tr-title">Event Boost — 24 Hours</div><div class="tr-sub">Hush STL Saturday Night</div></div>
+        <div class="tr-amt neg">-50✦</div>
+      </div>
+      <div class="txn-row">
+        <div class="tr-ico buy">✦</div>
+        <div class="tr-body"><div class="tr-title">Standard Pack Purchase</div><div class="tr-sub">300 credits · $24.99</div></div>
+        <div class="tr-amt pos">+300✦</div>
+      </div>
+      <div class="txn-row">
+        <div class="tr-ico spend">👑</div>
+        <div class="tr-body"><div class="tr-title">Profile Boost — 7 Days</div><div class="tr-sub">Promoter Spotlight · St. Louis</div></div>
+        <div class="tr-amt neg">-200✦</div>
+      </div>
+      <div class="txn-row">
+        <div class="tr-ico spend">📣</div>
+        <div class="tr-body"><div class="tr-title">Platform Blast — City Reach</div><div class="tr-sub">500 guests reached in St. Louis</div></div>
+        <div class="tr-amt neg">-100✦</div>
+      </div>
+      <div class="txn-row">
+        <div class="tr-ico earn">🎉</div>
+        <div class="tr-body"><div class="tr-title">Welcome Bonus — New Account</div><div class="tr-sub">One-time party profile bonus</div></div>
+        <div class="tr-amt pos">+50✦</div>
+      </div>
+
+    </div>
+    <div class="bot-nav">
+      <div class="bn active" onclick="goTo('s1')"><div class="bn-ico">✦</div><div class="bn-pip"></div><div class="bn-lbl">Wallet</div></div>
+      <div class="bn" onclick="goTo('s2')"><div class="bn-ico">🛒</div><div class="bn-pip"></div><div class="bn-lbl">Buy</div></div>
+      <div class="bn" onclick="goTo('s3')"><div class="bn-ico">⚡</div><div class="bn-pip"></div><div class="bn-lbl">Boosts</div></div>
+      <div class="bn" onclick="goTo('s4')"><div class="bn-ico">💃</div><div class="bn-pip"></div><div class="bn-lbl">Model</div></div>
+    </div>
+  </div>
+
+  <!-- ════ S2: BUY CREDITS ════ -->
+  <div class="screen" id="s2">
+    <div class="top-bar">
+      <div class="top-logo">BUY CREDITS</div>
+      <div style="font-size:12px;color:var(--credit)">Balance: <strong>847✦</strong></div>
+    </div>
+    <div class="scroll-pad">
+
+      <div class="buy-hero">
+        <div class="bh-title">POWER UP YOUR PROFILE</div>
+        <div class="bh-sub">Credits boost events, unlock model status, reach more guests. Never expire.</div>
+      </div>
+
+      <div class="credit-packs">
+
+        <div class="pack-card" id="pack1" onclick="selectPack(1)">
+          <div class="pack-top">
+            <div><div class="pack-credits">100<div class="pack-credits-lbl">Credits</div></div></div>
+            <div class="pack-price"><div class="pack-price-val">$9.99</div><div class="pack-per">$0.10 per credit</div></div>
+          </div>
+          <div class="pack-bar"><div class="pack-bar-fill" style="width:25%"></div></div>
+          <div class="pack-what">
+            <div class="pack-tag">2× 24hr Event Boost</div>
+            <div class="pack-tag">1× Profile Boost</div>
+          </div>
+        </div>
+
+        <div class="pack-card popular selected" id="pack2" onclick="selectPack(2)">
+          <div class="pack-badge">Most Popular</div>
+          <div class="pack-top">
+            <div><div class="pack-credits">300<div class="pack-credits-lbl">Credits</div></div></div>
+            <div class="pack-price"><div class="pack-price-val">$24.99</div><div class="pack-per">$0.08 per credit</div></div>
+          </div>
+          <div class="pack-bar"><div class="pack-bar-fill" style="width:50%"></div></div>
+          <div class="pack-what">
+            <div class="pack-tag">6× 24hr Boosts</div>
+            <div class="pack-tag">1× 7-Day Boost</div>
+            <div class="pack-tag">3× City Blasts</div>
+          </div>
+        </div>
+
+        <div class="pack-card" id="pack3" onclick="selectPack(3)">
+          <div class="pack-top">
+            <div><div class="pack-credits">750<div class="pack-credits-lbl">Credits</div></div></div>
+            <div class="pack-price"><div class="pack-price-val">$49.99</div><div class="pack-per">$0.07 per credit</div></div>
+          </div>
+          <div class="pack-bar"><div class="pack-bar-fill" style="width:75%"></div></div>
+          <div class="pack-what">
+            <div class="pack-tag">Model Unlock (500✦)</div>
+            <div class="pack-tag">5× City Boosts</div>
+            <div class="pack-tag">City Expansion</div>
+          </div>
+        </div>
+
+        <div class="pack-card" id="pack4" onclick="selectPack(4)">
+          <div class="pack-badge" style="background:linear-gradient(135deg,#1a1408,var(--gold))">Best Value</div>
+          <div class="pack-top">
+            <div><div class="pack-credits">2,000<div class="pack-credits-lbl">Credits</div></div></div>
+            <div class="pack-price"><div class="pack-price-val">$99.99</div><div class="pack-per">$0.05 per credit</div></div>
+          </div>
+          <div class="pack-bar"><div class="pack-bar-fill" style="width:100%"></div></div>
+          <div class="pack-what">
+            <div class="pack-tag">Full Season Boost</div>
+            <div class="pack-tag">3× City Expansions</div>
+            <div class="pack-tag">Model Unlock + More</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Tier allowances -->
+      <div class="sec-lbl">Monthly Allowances by Plan</div>
+      <div class="tier-table">
+        <div class="tt-header">
+          <div>Plan</div><div>Monthly ✦</div><div>Rollover</div><div>Model?</div>
+        </div>
+        <div class="tt-row">
+          <div>Free</div><div>0✦</div><div>—</div><div>Buy 500✦</div>
+        </div>
+        <div class="tt-row">
+          <div>Hustle $49</div><div>100✦</div><div>No</div><div>Buy 500✦</div>
+        </div>
+        <div class="tt-row highlight">
+          <div>Pro $99 ←</div><div>300✦</div><div>2× Max</div><div>Buy 500✦</div>
+        </div>
+        <div class="tt-row">
+          <div>Mogul $199</div><div>750✦</div><div>2× Max</div><div>Buy 500✦</div>
+        </div>
+      </div>
+
+      <button class="gold-btn" onclick="purchaseCredits()">BUY 300 CREDITS — $24.99</button>
+
+    </div>
+    <div class="bot-nav">
+      <div class="bn" onclick="goTo('s1')"><div class="bn-ico">✦</div><div class="bn-pip"></div><div class="bn-lbl">Wallet</div></div>
+      <div class="bn active" onclick="goTo('s2')"><div class="bn-ico">🛒</div><div class="bn-pip"></div><div class="bn-lbl">Buy</div></div>
+      <div class="bn" onclick="goTo('s3')"><div class="bn-ico">⚡</div><div class="bn-pip"></div><div class="bn-lbl">Boosts</div></div>
+      <div class="bn" onclick="goTo('s4')"><div class="bn-ico">💃</div><div class="bn-pip"></div><div class="bn-lbl">Model</div></div>
+    </div>
+  </div>
+
+  <!-- ════ S3: BOOST MARKETPLACE ════ -->
+  <div class="screen" id="s3">
+    <div class="top-bar">
+      <div class="top-logo">BOOST MARKETPLACE</div>
+      <div style="font-size:12px;color:var(--credit)">847✦ available</div>
+    </div>
+    <div class="scroll-pad">
+
+      <!-- PROMOTER BOOSTS -->
+      <div class="boost-category">
+        <div class="bc-title"><div class="bc-icon">🎉</div>For Promoters</div>
+
+        <div class="boost-card active-boost-card" onclick="activateBoost(this,'Event Boost',50)">
+          <div class="bc-top">
+            <div>
+              <div class="bc-name">⚡ Event Boost</div>
+              <div class="bc-desc">Push your event to the top of the city discovery feed. Every guest in your city sees it first for 24 hours.</div>
+            </div>
+            <div class="bc-cost"><div class="bc-credits">50</div><div class="bc-credits-lbl">credits</div></div>
+          </div>
+          <div class="bc-meta">
+            <div class="bc-tag promoter">Promoter</div>
+            <div class="bc-tag duration">24 Hours</div>
+          </div>
+          <div class="bc-boost-btn">
+            <div class="bc-boost-label">⚡ BOOST NOW · ACTIVE</div>
+            <div class="bc-boost-action">Running ✓</div>
+          </div>
+          <div class="auto-toggle">
+            <div class="at-label">Auto-boost every event night</div>
+            <div class="toggle on" onclick="event.stopPropagation();this.classList.toggle('on')"><div class="toggle-dot"></div></div>
+          </div>
+        </div>
+
+        <div class="boost-card" onclick="activateBoost(this,'7-Day Event Spotlight',200)">
+          <div class="bc-top">
+            <div>
+              <div class="bc-name">👑 7-Day Event Spotlight</div>
+              <div class="bc-desc">Stay at the top of the feed for a full week. Best for events you're promoting in advance.</div>
+            </div>
+            <div class="bc-cost"><div class="bc-credits">200</div><div class="bc-credits-lbl">credits</div></div>
+          </div>
+          <div class="bc-meta">
+            <div class="bc-tag promoter">Promoter</div>
+            <div class="bc-tag duration">7 Days</div>
+          </div>
+          <div class="bc-boost-btn">
+            <div class="bc-boost-label">ACTIVATE SPOTLIGHT</div>
+            <div class="bc-boost-action">200✦ →</div>
+          </div>
+        </div>
+
+        <div class="boost-card" onclick="activateBoost(this,'City Blast Reach',100)">
+          <div class="bc-top">
+            <div>
+              <div class="bc-name">📣 City Blast Reach</div>
+              <div class="bc-desc">Send your event notification to 500 Hush members in your city — even if they're not on your list yet.</div>
+            </div>
+            <div class="bc-cost"><div class="bc-credits">100</div><div class="bc-credits-lbl">credits</div></div>
+          </div>
+          <div class="bc-meta">
+            <div class="bc-tag promoter">Promoter</div>
+            <div class="bc-tag duration">500 Guests</div>
+          </div>
+          <div class="bc-boost-btn">
+            <div class="bc-boost-label">BLAST THE CITY</div>
+            <div class="bc-boost-action">100✦ →</div>
+          </div>
+        </div>
+
+        <div class="boost-card" onclick="activateBoost(this,'City Expansion',150)">
+          <div class="bc-top">
+            <div>
+              <div class="bc-name">🗺️ City Expansion</div>
+              <div class="bc-desc">Make your events discoverable in a second city for 30 days. Go regional without going in person.</div>
+            </div>
+            <div class="bc-cost"><div class="bc-credits">150</div><div class="bc-credits-lbl">credits/mo</div></div>
+          </div>
+          <div class="bc-meta">
+            <div class="bc-tag promoter">Promoter</div>
+            <div class="bc-tag duration">30 Days</div>
+          </div>
+          <div class="bc-boost-btn">
+            <div class="bc-boost-label">EXPAND TO NEW CITY</div>
+            <div class="bc-boost-action">150✦ →</div>
+          </div>
+          <div class="auto-toggle">
+            <div class="at-label">Auto-renew monthly</div>
+            <div class="toggle" onclick="event.stopPropagation();this.classList.toggle('on')"><div class="toggle-dot"></div></div>
+          </div>
+        </div>
+
+        <div class="boost-card" onclick="activateBoost(this,'Model Spot Priority',75)">
+          <div class="bc-top">
+            <div>
+              <div class="bc-name">💃 Model Spot Priority</div>
+              <div class="bc-desc">Your open model call surfaces first to verified Elite and Featured models in your city tonight.</div>
+            </div>
+            <div class="bc-cost"><div class="bc-credits">75</div><div class="bc-credits-lbl">credits</div></div>
+          </div>
+          <div class="bc-meta">
+            <div class="bc-tag promoter">Promoter</div>
+            <div class="bc-tag duration">Tonight</div>
+          </div>
+          <div class="bc-boost-btn">
+            <div class="bc-boost-label">PRIORITY LISTING</div>
+            <div class="bc-boost-action">75✦ →</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- MODEL BOOSTS -->
+      <div class="boost-category">
+        <div class="bc-title"><div class="bc-icon">💃</div>For Event Models</div>
+
+        <div class="boost-card" onclick="activateBoost(this,'Profile Boost',50)">
+          <div class="bc-top">
+            <div>
+              <div class="bc-name">⭐ Profile Boost</div>
+              <div class="bc-desc">Appear at the top of the model marketplace for 24 hours. More promoters see you first.</div>
+            </div>
+            <div class="bc-cost"><div class="bc-credits">50</div><div class="bc-credits-lbl">credits</div></div>
+          </div>
+          <div class="bc-meta">
+            <div class="bc-tag model">Model</div>
+            <div class="bc-tag duration">24 Hours</div>
+          </div>
+          <div class="bc-boost-btn">
+            <div class="bc-boost-label">BOOST PROFILE</div>
+            <div class="bc-boost-action">50✦ →</div>
+          </div>
+          <div class="auto-toggle">
+            <div class="at-label">Auto-boost on event nights</div>
+            <div class="toggle" onclick="event.stopPropagation();this.classList.toggle('on')"><div class="toggle-dot"></div></div>
+          </div>
+        </div>
+
+        <div class="boost-card" onclick="activateBoost(this,'Video Intro Autoplay',30)">
+          <div class="bc-top">
+            <div>
+              <div class="bc-name">🎥 Video Intro Autoplay</div>
+              <div class="bc-desc">Your recorded intro video autoplays when a promoter views your profile instead of requiring a tap.</div>
+            </div>
+            <div class="bc-cost"><div class="bc-credits">30</div><div class="bc-credits-lbl">credits</div></div>
+          </div>
+          <div class="bc-meta">
+            <div class="bc-tag model">Model</div>
+            <div class="bc-tag duration">7 Days</div>
+          </div>
+          <div class="bc-boost-btn">
+            <div class="bc-boost-label">ACTIVATE AUTOPLAY</div>
+            <div class="bc-boost-action">30✦ →</div>
+          </div>
+        </div>
+
+        <div class="boost-card" onclick="activateBoost(this,'Application Priority',40)">
+          <div class="bc-top">
+            <div>
+              <div class="bc-name">🚀 Application Priority</div>
+              <div class="bc-desc">When you apply to an event model spot, your application surfaces at the top of the promoter's inbox.</div>
+            </div>
+            <div class="bc-cost"><div class="bc-credits">40</div><div class="bc-credits-lbl">per apply</div></div>
+          </div>
+          <div class="bc-meta">
+            <div class="bc-tag model">Model</div>
+            <div class="bc-tag duration">Per Application</div>
+          </div>
+          <div class="bc-boost-btn">
+            <div class="bc-boost-label">PRIORITY APPLY</div>
+            <div class="bc-boost-action">40✦ →</div>
+          </div>
+        </div>
+
+        <div class="boost-card" onclick="activateBoost(this,'Second City Visibility',150)">
+          <div class="bc-top">
+            <div>
+              <div class="bc-name">✈️ Second City Visibility</div>
+              <div class="bc-desc">Get discovered by promoters in a second city for 30 days. Take your career regional.</div>
+            </div>
+            <div class="bc-cost"><div class="bc-credits">150</div><div class="bc-credits-lbl">credits/mo</div></div>
+          </div>
+          <div class="bc-meta">
+            <div class="bc-tag model">Model</div>
+            <div class="bc-tag duration">30 Days</div>
+          </div>
+          <div class="bc-boost-btn">
+            <div class="bc-boost-label">GO REGIONAL</div>
+            <div class="bc-boost-action">150✦ →</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- GUEST BOOSTS -->
+      <div class="boost-category">
+        <div class="bc-title"><div class="bc-icon">🎟️</div>For Guests</div>
+
+        <div class="boost-card" onclick="activateBoost(this,'Who\'s Going Highlight',25)">
+          <div class="bc-top">
+            <div>
+              <div class="bc-name">✨ Who's Going Highlight</div>
+              <div class="bc-desc">Appear at the top of the Who's Going list for tonight's event. More connections, more visibility.</div>
+            </div>
+            <div class="bc-cost"><div class="bc-credits">25</div><div class="bc-credits-lbl">credits</div></div>
+          </div>
+          <div class="bc-meta">
+            <div class="bc-tag guest">Guest</div>
+            <div class="bc-tag duration">Tonight</div>
+          </div>
+          <div class="bc-boost-btn">
+            <div class="bc-boost-label">HIGHLIGHT ME</div>
+            <div class="bc-boost-action">25✦ →</div>
+          </div>
+        </div>
+
+        <div class="boost-card" onclick="activateBoost(this,'VIP Upgrade',75)">
+          <div class="bc-top">
+            <div>
+              <div class="bc-name">👑 VIP Upgrade</div>
+              <div class="bc-desc">Upgrade from General Admission to VIP if spots open up. Credits hold your place in the upgrade queue.</div>
+            </div>
+            <div class="bc-cost"><div class="bc-credits">75</div><div class="bc-credits-lbl">credits</div></div>
+          </div>
+          <div class="bc-meta">
+            <div class="bc-tag guest">Guest</div>
+            <div class="bc-tag duration">Tonight</div>
+          </div>
+          <div class="bc-boost-btn">
+            <div class="bc-boost-label">JOIN VIP QUEUE</div>
+            <div class="bc-boost-action">75✦ →</div>
+          </div>
+        </div>
+
+        <div class="boost-card" onclick="activateBoost(this,'Waitlist Priority',35)">
+          <div class="bc-top">
+            <div>
+              <div class="bc-name">⏳ Waitlist Priority</div>
+              <div class="bc-desc">Jump to the front of the waitlist for sold-out events. First to get notified when a spot opens.</div>
+            </div>
+            <div class="bc-cost"><div class="bc-credits">35</div><div class="bc-credits-lbl">credits</div></div>
+          </div>
+          <div class="bc-meta">
+            <div class="bc-tag guest">Guest</div>
+            <div class="bc-tag duration">Per Event</div>
+          </div>
+          <div class="bc-boost-btn">
+            <div class="bc-boost-label">JUMP THE LINE</div>
+            <div class="bc-boost-action">35✦ →</div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+    <div class="bot-nav">
+      <div class="bn" onclick="goTo('s1')"><div class="bn-ico">✦</div><div class="bn-pip"></div><div class="bn-lbl">Wallet</div></div>
+      <div class="bn" onclick="goTo('s2')"><div class="bn-ico">🛒</div><div class="bn-pip"></div><div class="bn-lbl">Buy</div></div>
+      <div class="bn active" onclick="goTo('s3')"><div class="bn-ico">⚡</div><div class="bn-pip"></div><div class="bn-lbl">Boosts</div></div>
+      <div class="bn" onclick="goTo('s4')"><div class="bn-ico">💃</div><div class="bn-pip"></div><div class="bn-lbl">Model</div></div>
+    </div>
+  </div>
+
+  <!-- ════ S4: MODEL UNLOCK ════ -->
+  <div class="screen" id="s4">
+    <div class="unlock-hero">
+      <div class="uh-glow"></div>
+      <div class="uh-diamonds"></div>
+      <div class="uh-ico">💃</div>
+      <div class="uh-title">BECOME AN<br>EVENT MODEL</div>
+      <div class="uh-sub">One-time credit unlock. Your profile goes live in the marketplace. Get booked. Get paid.</div>
+    </div>
+
+    <div class="unlock-body">
+
+      <!-- What you unlock -->
+      <div class="sec-lbl">What You Unlock</div>
+      <div class="unlock-perks">
+        <div class="up-row">
+          <div class="up-ico">🌟</div>
+          <div class="up-body">
+            <div class="up-title">Marketplace Listing</div>
+            <div class="up-desc">Your profile goes live to all promoters on the platform. They can find you, view your socials, and book you for events.</div>
+            <div class="up-badge">Visible to all promoters</div>
+          </div>
+        </div>
+        <div class="up-row">
+          <div class="up-ico">🎥</div>
+          <div class="up-body">
+            <div class="up-title">Video Interview Access</div>
+            <div class="up-desc">Promoters can request a live video call before booking. All communication stays in-app. No personal info exchanged.</div>
+            <div class="up-badge">Privacy protected</div>
+          </div>
+        </div>
+        <div class="up-row">
+          <div class="up-ico">💳</div>
+          <div class="up-body">
+            <div class="up-title">In-App Payments</div>
+            <div class="up-desc">Get paid automatically on check-in via Stripe. Stage name stays public. Legal name secured for payouts only.</div>
+            <div class="up-badge">No Venmo. No cash.</div>
+          </div>
+        </div>
+        <div class="up-row">
+          <div class="up-ico">⭐</div>
+          <div class="up-body">
+            <div class="up-title">Rating & Badge System</div>
+            <div class="up-desc">Build your reputation. Rising → Featured → Elite. Higher tier means higher visibility and better bookings.</div>
+            <div class="up-badge">Rising → Featured → Elite</div>
+          </div>
+        </div>
+        <div class="up-row">
+          <div class="up-ico">✦</div>
+          <div class="up-body">
+            <div class="up-title">Credits & Boosts</div>
+            <div class="up-desc">Use credits to boost your profile visibility, priority apply to events, and expand to new cities.</div>
+            <div class="up-badge">Full boost access</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Credit requirement -->
+      <div class="credit-req">
+        <div class="cr-eyebrow">One-Time Unlock Cost</div>
+        <div class="cr-amount">500✦</div>
+        <div class="cr-lbl">Hush Credits · One time only · Never charged again</div>
+        <div class="cr-balance-check">
+          <div class="cr-have">You have <strong>847✦</strong></div>
+          <div class="cr-status enough">✓ You're good</div>
+        </div>
+      </div>
+
+      <!-- Breakdown -->
+      <div class="unlock-breakdown">
+        <div class="ub-row"><div class="ub-label">Model Marketplace Listing</div><div class="ub-val">Included</div></div>
+        <div class="ub-row"><div class="ub-label">Video Interview System</div><div class="ub-val">Included</div></div>
+        <div class="ub-row"><div class="ub-label">Stripe Payout Setup</div><div class="ub-val">Included</div></div>
+        <div class="ub-row"><div class="ub-label">Stage Name + Privacy Vault</div><div class="ub-val">Included</div></div>
+        <div class="ub-row"><div class="ub-label">Hush Booking Fee</div><div class="ub-val">10% per booking</div></div>
+        <div class="ub-row"><div class="ub-label">Total One-Time Cost</div><div class="ub-val credit">500✦</div></div>
+        <div class="ub-row"><div class="ub-label">Remaining After Unlock</div><div class="ub-val credit">347✦</div></div>
+      </div>
+
+      <button class="unlock-btn" onclick="unlockModel()">💃 UNLOCK MODEL STATUS — 500✦</button>
+      <div class="buy-credits-link" onclick="goTo('s2')">Need more credits? <span>Buy a pack →</span></div>
+
+    </div>
+
+    <div class="bot-nav">
+      <div class="bn" onclick="goTo('s1')"><div class="bn-ico">✦</div><div class="bn-pip"></div><div class="bn-lbl">Wallet</div></div>
+      <div class="bn" onclick="goTo('s2')"><div class="bn-ico">🛒</div><div class="bn-pip"></div><div class="bn-lbl">Buy</div></div>
+      <div class="bn" onclick="goTo('s3')"><div class="bn-ico">⚡</div><div class="bn-pip"></div><div class="bn-lbl">Boosts</div></div>
+      <div class="bn active" onclick="goTo('s4')"><div class="bn-ico">💃</div><div class="bn-pip"></div><div class="bn-lbl">Model</div></div>
+    </div>
+  </div>
+
+  <!-- Boost success overlay -->
+  <div id="boostOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:300;align-items:center;justify-content:center">
+    <div style="background:var(--card);border:1px solid var(--credit-line);border-radius:16px;padding:32px 28px;width:calc(100% - 48px);max-width:340px;text-align:center">
+      <div style="font-size:52px;margin-bottom:14px" id="boostOvIco">⚡</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.08em;background:linear-gradient(135deg,var(--credit2),var(--credit));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px" id="boostOvTitle">BOOST ACTIVE</div>
+      <div style="font-size:13px;color:var(--muted2);margin-bottom:20px;line-height:1.6" id="boostOvDesc">Your event is now featured at the top of the St. Louis discovery feed.</div>
+      <div style="display:flex;justify-content:space-between;background:var(--deep);border:1px solid var(--credit-line);border-radius:8px;padding:12px 16px;margin-bottom:20px">
+        <div style="text-align:left"><div style="font-size:9px;letter-spacing:.15em;color:var(--credit);text-transform:uppercase;margin-bottom:2px">Credits Used</div><div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--credit)" id="boostOvCost">50✦</div></div>
+        <div style="text-align:right"><div style="font-size:9px;letter-spacing:.15em;color:var(--muted);text-transform:uppercase;margin-bottom:2px">Balance After</div><div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--white)" id="boostOvBalance">797✦</div></div>
+      </div>
+      <button onclick="closeBoost()" style="width:100%;padding:14px;background:linear-gradient(135deg,var(--credit2),var(--credit));border:none;border-radius:6px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.15em;color:var(--black);cursor:pointer">DONE ✓</button>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<script>
+let balance = 847;
+
+function goTo(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const t = document.getElementById(id);
+  if(t){ t.classList.add('active'); t.scrollTop = 0; }
+}
+
+// ── PACK SELECTION ──
+const packData = {
+  1:{credits:100,price:'$9.99',label:'BUY 100 CREDITS — $9.99'},
+  2:{credits:300,price:'$24.99',label:'BUY 300 CREDITS — $24.99'},
+  3:{credits:750,price:'$49.99',label:'BUY 750 CREDITS — $49.99'},
+  4:{credits:2000,price:'$99.99',label:'BUY 2,000 CREDITS — $99.99'}
+};
+let selectedPack = 2;
+
+function selectPack(n) {
+  selectedPack = n;
+  for(let i=1;i<=4;i++){
+    const c = document.getElementById('pack'+i);
+    if(c) c.classList.toggle('selected', i===n);
+  }
+  const btn = document.querySelector('#s2 .gold-btn');
+  if(btn) btn.textContent = packData[n].label;
+}
+
+function purchaseCredits() {
+  const btn = document.querySelector('#s2 .gold-btn');
+  if(!btn) return;
+  const pack = packData[selectedPack];
+  btn.textContent = '⚡ PROCESSING...';
+  btn.style.opacity = '.7';
+  btn.style.pointerEvents = 'none';
+  setTimeout(() => {
+    balance += pack.credits;
+    updateBalance();
+    btn.textContent = `✓ ${pack.credits} CREDITS ADDED!`;
+    btn.style.opacity = '1';
+    btn.style.background = 'var(--green)';
+    btn.style.color = 'var(--black)';
+    setTimeout(() => {
+      btn.textContent = packData[selectedPack].label;
+      btn.style.background = '';
+      btn.style.color = '';
+      btn.style.pointerEvents = 'all';
+    }, 2000);
+  }, 1500);
+}
+
+// ── BOOST ACTIVATION ──
+function activateBoost(card, name, cost) {
+  if(balance < cost) {
+    goTo('s2'); return;
+  }
+  balance -= cost;
+  updateBalance();
+
+  const overlay = document.getElementById('boostOverlay');
+  document.getElementById('boostOvTitle').textContent = name.toUpperCase() + ' · ACTIVE';
+  document.getElementById('boostOvCost').textContent = cost + '✦';
+  document.getElementById('boostOvBalance').textContent = balance + '✦';
+
+  const descs = {
+    'Event Boost':'Your event is now at the top of the St. Louis discovery feed for 24 hours.',
+    '7-Day Event Spotlight':'Featured at the top of the feed for 7 full days. Maximum visibility.',
+    'City Blast Reach':'Notification sent to 500 Hush members in St. Louis right now.',
+    'City Expansion':'Your events are now discoverable in your second city for 30 days.',
+    'Model Spot Priority':'Your model call is now top of the inbox for Elite and Featured models tonight.',
+    'Profile Boost':'Your model profile is at the top of the marketplace for 24 hours.',
+    'Video Intro Autoplay':'Your intro video now autoplays on your profile for 7 days.',
+    'Application Priority':'Priority flag added — your next application surfaces first.',
+    'Second City Visibility':'You\'re now discoverable by promoters in your second city for 30 days.',
+    'Who\'s Going Highlight':'You\'re at the top of the Who\'s Going list for tonight\'s event.',
+    'VIP Upgrade':'You\'re first in the VIP upgrade queue. We\'ll notify you when a spot opens.',
+    'Waitlist Priority':'You\'re at the front of the waitlist. First to get in when a spot drops.'
+  };
+  document.getElementById('boostOvDesc').textContent = descs[name] || 'Your boost is now active.';
+
+  card.classList.add('active-boost-card');
+  const boostLabel = card.querySelector('.bc-boost-label');
+  const boostAction = card.querySelector('.bc-boost-action');
+  if(boostLabel) boostLabel.textContent = '✓ ' + name.toUpperCase() + ' · ACTIVE';
+  if(boostAction) boostAction.textContent = 'Running ✓';
+
+  overlay.style.display = 'flex';
+}
+
+function closeBoost(){
+  document.getElementById('boostOverlay').style.display = 'none';
+}
+
+// ── MODEL UNLOCK ──
+function unlockModel() {
+  if(balance < 500){ goTo('s2'); return; }
+  const btn = document.querySelector('.unlock-btn');
+  if(!btn) return;
+  btn.textContent = '⚡ UNLOCKING YOUR MODEL PROFILE...';
+  btn.style.opacity = '.7';
+  btn.style.pointerEvents = 'none';
+  setTimeout(() => {
+    balance -= 500;
+    updateBalance();
+    btn.textContent = '✓ MODEL STATUS UNLOCKED — WELCOME TO THE MARKETPLACE';
+    btn.style.background = 'rgba(0,232,154,.3)';
+    btn.style.borderColor = 'rgba(0,232,154,.4)';
+    btn.style.opacity = '1';
+    const statusEl = document.querySelector('.cr-status');
+    if(statusEl){ statusEl.textContent = '✓ Unlocked!'; }
+    const balanceEl = document.querySelector('.ub-row:last-child .ub-val');
+    if(balanceEl) balanceEl.textContent = balance + '✦';
+  }, 2000);
+}
+
+// ── BALANCE SYNC ──
+function updateBalance() {
+  const els = document.querySelectorAll('#mainBalance, .ch-balance');
+  els.forEach(el => {
+    if(el) {
+      let start = performance.now();
+      const from = parseInt(el.textContent) || 0;
+      const to = balance;
+      function tick(now) {
+        const p = Math.min((now-start)/600, 1);
+        const ease = 1-Math.pow(1-p,3);
+        el.textContent = Math.floor(from + (to-from)*ease);
+        if(p<1) requestAnimationFrame(tick);
+        else el.textContent = to;
+      }
+      requestAnimationFrame(tick);
+    }
+  });
+}
+</script>
+</body>
+</html>

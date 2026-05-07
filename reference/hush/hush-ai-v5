@@ -1,0 +1,2503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Hush AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --black:#040405;
+  --deep:#08080b;
+  --card:#0e0e12;
+  --card2:#131318;
+  --gold:#C9A84C;
+  --gold2:#e8c96a;
+  --gold3:#a8862e;
+  --gold4:#f5d98a;
+  --gdim:rgba(201,168,76,0.12);
+  --gline:rgba(201,168,76,0.22);
+  --gglow:rgba(201,168,76,0.06);
+  --white:#f5f0e8;
+  --muted:rgba(245,240,232,0.38);
+  --muted2:rgba(245,240,232,0.6);
+  --green:#00e89a;
+  --red:#ff4757;
+  --cyan:#00d4ff;
+}
+html,body{height:100%;background:#000;overflow:hidden;font-family:'Outfit',sans-serif;color:var(--white)}
+
+/* ── SHELL ── */
+.shell{
+  width:100%;height:100vh;
+  display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(ellipse at 50% 60%,#1a1205 0%,#040405 65%);
+  position:relative;
+}
+.shell::after{
+  content:'';position:absolute;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events:none;opacity:.5;
+}
+
+.phone{
+  width:min(390px,100vw);
+  height:min(844px,100vh);
+  background:var(--black);
+  border-radius:min(44px,5vw);
+  overflow:hidden;position:relative;
+  box-shadow:0 0 0 1px rgba(201,168,76,.18),0 0 80px rgba(201,168,76,.07),0 60px 160px rgba(0,0,0,.9);
+}
+
+/* ── CANVAS for particles ── */
+#particleCanvas{position:absolute;inset:0;z-index:0;pointer-events:none}
+
+/* ── SCREENS ── */
+.screens{position:absolute;inset:0;z-index:1}
+.screen{
+  position:absolute;inset:0;
+  opacity:0;pointer-events:none;
+  transition:opacity .55s cubic-bezier(.4,0,.2,1);
+  overflow-y:auto;overflow-x:hidden;
+  scrollbar-width:none;
+}
+.screen::-webkit-scrollbar{display:none}
+.screen.active{opacity:1;pointer-events:all}
+
+/* ════════════════════════════════════════
+   SCREEN 0 — CINEMATIC INTRO
+════════════════════════════════════════ */
+#s0{
+  background:var(--black);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  position:relative;overflow:hidden;
+}
+.intro-ring{
+  position:absolute;
+  border-radius:50%;border:1px solid var(--gline);
+  animation:ringPulse 3s ease-in-out infinite;
+  opacity:0;
+}
+.intro-ring:nth-child(1){width:200px;height:200px;animation-delay:0s}
+.intro-ring:nth-child(2){width:320px;height:320px;animation-delay:.4s}
+.intro-ring:nth-child(3){width:440px;height:440px;animation-delay:.8s}
+.intro-ring:nth-child(4){width:560px;height:560px;animation-delay:1.2s}
+@keyframes ringPulse{
+  0%{opacity:0;transform:scale(.85)}
+  40%{opacity:.4}
+  100%{opacity:0;transform:scale(1.05)}
+}
+
+.intro-h{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:130px;
+  line-height:1;
+  background:linear-gradient(160deg,var(--gold3) 0%,var(--gold4) 35%,var(--gold) 55%,var(--gold3) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:drop-shadow(0 0 32px rgba(201,168,76,.5));
+  animation:introH 1.2s cubic-bezier(.16,1,.3,1) forwards;
+  opacity:0;position:relative;z-index:2;
+}
+@keyframes introH{
+  0%{opacity:0;transform:scale(.6) translateY(20px)}
+  60%{opacity:1;transform:scale(1.05) translateY(-4px)}
+  100%{opacity:1;transform:scale(1) translateY(0)}
+}
+
+.intro-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:38px;letter-spacing:.25em;
+  background:linear-gradient(90deg,var(--gold3),var(--gold2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  animation:fadeUp .8s 1s ease both;
+  position:relative;z-index:2;
+}
+
+.intro-tag{
+  font-family:'Cormorant Garamond',serif;
+  font-style:italic;font-size:18px;
+  color:var(--muted);letter-spacing:.04em;
+  margin-top:10px;
+  animation:fadeUp .8s 1.3s ease both;
+  position:relative;z-index:2;text-align:center;
+  padding:0 32px;
+}
+
+.intro-line{
+  width:80px;height:1px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  margin:28px 0;
+  animation:fadeUp .8s 1.6s ease both;
+  position:relative;z-index:2;
+}
+
+.intro-btn{
+  background:linear-gradient(135deg,var(--gold3) 0%,var(--gold) 50%,var(--gold2) 100%);
+  border:none;border-radius:3px;
+  font-family:'Bebas Neue',sans-serif;
+  font-size:17px;letter-spacing:.25em;
+  color:var(--black);
+  padding:18px 48px;cursor:pointer;
+  animation:fadeUp .8s 1.9s ease both;
+  position:relative;z-index:2;
+  box-shadow:0 8px 40px rgba(201,168,76,.3);
+  transition:all .2s;
+}
+.intro-btn:active{transform:scale(.97)}
+
+.intro-powered{
+  position:absolute;bottom:28px;
+  font-size:9px;letter-spacing:.22em;
+  color:rgba(245,240,232,.15);text-transform:uppercase;
+  animation:fadeUp .8s 2.2s ease both;z-index:2;
+}
+
+/* ════════════════════════════════════════
+   SHARED COMPONENTS
+════════════════════════════════════════ */
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(18px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+.top-bar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:52px 22px 18px;
+  background:var(--black);
+  border-bottom:1px solid var(--gline);
+  position:sticky;top:0;z-index:10;
+}
+.top-logo{
+  font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.15em;
+  background:linear-gradient(135deg,var(--gold3),var(--gold2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.top-right{display:flex;align-items:center;gap:10px}
+.notif-wrap{
+  width:36px;height:36px;border-radius:50%;
+  border:1px solid var(--gline);
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;position:relative;cursor:pointer;
+}
+.notif-wrap::after{
+  content:'3';position:absolute;top:-4px;right:-4px;
+  width:16px;height:16px;background:var(--gold);
+  border-radius:50%;font-size:9px;font-weight:700;
+  color:var(--black);display:flex;align-items:center;justify-content:center;
+  line-height:16px;text-align:center;
+}
+
+.scroll-area{padding:24px 20px 110px}
+
+.sec-label{
+  font-size:10px;letter-spacing:.22em;color:var(--gold);
+  text-transform:uppercase;margin-bottom:14px;
+  display:flex;align-items:center;gap:8px;
+}
+.live-dot{
+  width:6px;height:6px;border-radius:50%;background:var(--green);
+  animation:blink 1.5s ease-in-out infinite;flex-shrink:0;
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+
+/* ── NAV ── */
+.nav-bar{
+  position:absolute;bottom:0;left:0;right:0;
+  background:var(--black);
+  border-top:1px solid var(--gline);
+  display:flex;padding:10px 0 26px;z-index:100;
+}
+.nav-item{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;gap:3px;cursor:pointer;padding:4px 0;
+}
+.nav-ico{font-size:21px;opacity:.32;transition:opacity .2s}
+.nav-lbl{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);transition:color .2s}
+.nav-pip{width:4px;height:4px;border-radius:50%;background:var(--gold);opacity:0;transition:opacity .2s;margin:0 auto}
+.nav-item.active .nav-ico{opacity:1}
+.nav-item.active .nav-lbl{color:var(--gold)}
+.nav-item.active .nav-pip{opacity:1}
+
+/* ── CARDS ── */
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.stat-card{
+  background:var(--card);border:1px solid var(--gline);
+  border-radius:8px;padding:18px 14px;position:relative;overflow:hidden;
+}
+.stat-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--gold3),var(--gold2));
+}
+.stat-lbl{font-size:10px;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;margin-bottom:6px}
+.stat-val{
+  font-family:'Bebas Neue',sans-serif;font-size:34px;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  line-height:1;
+}
+.stat-sub{font-size:11px;color:var(--green);margin-top:3px}
+.stat-sub.gold{color:var(--gold)}
+
+/* ── FEED CARDS ── */
+.feed-card{
+  background:var(--card);border:1px solid rgba(201,168,76,.1);
+  border-radius:8px;padding:14px;margin-bottom:10px;
+  display:flex;gap:12px;align-items:flex-start;cursor:pointer;
+  transition:border-color .2s;
+}
+.feed-card:active{border-color:var(--gline)}
+.feed-av{
+  width:40px;height:40px;border-radius:50%;
+  background:linear-gradient(135deg,#1a1408,#2a2010);
+  border:1px solid var(--gline);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--gold2);flex-shrink:0;
+}
+.feed-body{flex:1;min-width:0}
+.feed-name{font-size:14px;font-weight:500;color:var(--white);margin-bottom:2px}
+.feed-msg{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.feed-time{font-size:10px;color:var(--muted);flex-shrink:0}
+.badge{
+  display:inline-block;font-size:9px;letter-spacing:.1em;
+  padding:2px 7px;border-radius:2px;text-transform:uppercase;margin-top:4px;
+}
+.badge.ai{background:var(--gdim);border:1px solid var(--gline);color:var(--gold)}
+.badge.booked{background:rgba(0,232,154,.1);border:1px solid rgba(0,232,154,.28);color:var(--green)}
+.badge.warm{background:rgba(255,71,87,.08);border:1px solid rgba(255,71,87,.25);color:var(--red)}
+
+/* ════════════════════════════════════════
+   SCREEN 1 — DASHBOARD
+════════════════════════════════════════ */
+#s1{background:var(--deep)}
+
+.welcome-bar{
+  background:linear-gradient(135deg,rgba(201,168,76,.1) 0%,transparent 60%);
+  border:1px solid var(--gline);border-radius:8px;
+  padding:20px;margin-bottom:20px;position:relative;overflow:hidden;
+}
+.welcome-bar::after{
+  content:'NIDDY';
+  position:absolute;right:-8px;top:50%;transform:translateY(-50%);
+  font-family:'Bebas Neue',sans-serif;font-size:72px;
+  color:rgba(201,168,76,.04);pointer-events:none;letter-spacing:.1em;
+}
+.welcome-eyebrow{font-size:10px;letter-spacing:.22em;color:var(--gold);text-transform:uppercase;margin-bottom:4px}
+.welcome-name{
+  font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:300;
+  color:var(--white);
+}
+.welcome-sub{font-size:12px;color:var(--muted);margin-top:2px}
+
+/* Revenue counter banner */
+.rev-banner{
+  background:linear-gradient(135deg,rgba(201,168,76,.1),rgba(201,168,76,.04));
+  border:1px solid var(--gline);border-radius:8px;
+  padding:22px 20px;margin-bottom:20px;text-align:center;
+  cursor:pointer;
+}
+.rev-eyebrow{font-size:9px;letter-spacing:.25em;color:var(--gold);text-transform:uppercase;margin-bottom:6px}
+.rev-amount{
+  font-family:'Bebas Neue',sans-serif;font-size:52px;line-height:1;
+  background:linear-gradient(135deg,var(--gold3),var(--gold4));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:drop-shadow(0 0 20px rgba(201,168,76,.35));
+}
+.rev-sub{font-size:11px;color:var(--muted);margin-top:6px}
+
+/* ════════════════════════════════════════
+   SCREEN 2 — MESSAGES / AI SMS
+════════════════════════════════════════ */
+#s2{background:var(--deep);display:flex;flex-direction:column}
+.chat-hdr{
+  padding:52px 20px 16px;background:var(--black);
+  border-bottom:1px solid var(--gline);
+  display:flex;align-items:center;gap:12px;
+}
+.chat-back{
+  width:32px;height:32px;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:var(--gold);font-size:24px;line-height:1;
+}
+.chat-ai-name{
+  font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.1em;
+  background:linear-gradient(135deg,var(--gold3),var(--gold2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.chat-status{font-size:11px;color:var(--green);display:flex;align-items:center;gap:5px}
+
+.chat-scroll{
+  flex:1;overflow-y:auto;padding:20px 16px;
+  display:flex;flex-direction:column;gap:12px;
+  scrollbar-width:none;padding-bottom:80px;
+}
+.chat-scroll::-webkit-scrollbar{display:none}
+
+.msg{max-width:80%;padding:12px 16px;font-size:14px;line-height:1.55;position:relative}
+.msg.in{
+  background:var(--card2);border:1px solid rgba(201,168,76,.1);
+  border-radius:4px 16px 16px 16px;align-self:flex-start;color:var(--white);
+}
+.msg.out{
+  background:linear-gradient(135deg,rgba(201,168,76,.16),rgba(201,168,76,.08));
+  border:1px solid var(--gline);
+  border-radius:16px 4px 16px 16px;align-self:flex-end;color:var(--white);
+}
+.msg-lbl{font-size:9px;letter-spacing:.15em;color:var(--gold);text-transform:uppercase;margin-bottom:4px}
+.msg-lbl.right{text-align:right}
+.msg-time{font-size:10px;color:var(--muted);margin-top:4px;text-align:right}
+
+.ai-pill{
+  align-self:center;
+  background:var(--gdim);border:1px solid var(--gline);
+  border-radius:20px;padding:5px 14px;
+  font-size:10px;color:var(--gold);letter-spacing:.1em;
+}
+.ai-pill.green{
+  background:rgba(0,232,154,.08);border-color:rgba(0,232,154,.28);color:var(--green);
+}
+
+.typing-row{display:flex;justify-content:flex-end;padding:2px 0}
+.typing-bubble{
+  background:var(--card2);border:1px solid var(--gline);
+  border-radius:16px 4px 16px 16px;
+  padding:12px 18px;display:flex;gap:4px;align-items:center;
+}
+.t-dot{
+  width:5px;height:5px;border-radius:50%;background:var(--gold);
+  animation:tdot 1.4s infinite;
+}
+.t-dot:nth-child(2){animation-delay:.2s}
+.t-dot:nth-child(3){animation-delay:.4s}
+@keyframes tdot{0%,60%,100%{opacity:.2;transform:scale(.8)}30%{opacity:1;transform:scale(1)}}
+
+.chat-input-bar{
+  padding:12px 16px 32px;background:var(--black);
+  border-top:1px solid var(--gline);
+  display:flex;gap:10px;align-items:center;
+}
+.chat-inp{
+  flex:1;background:var(--card);border:1px solid var(--gline);
+  border-radius:24px;padding:12px 18px;font-size:14px;
+  color:var(--white);outline:none;font-family:'Outfit',sans-serif;
+}
+.chat-inp::placeholder{color:var(--muted)}
+.send-btn{
+  width:42px;height:42px;border-radius:50%;
+  background:linear-gradient(135deg,var(--gold3),var(--gold));
+  border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  color:var(--black);font-size:16px;flex-shrink:0;
+}
+
+/* ════════════════════════════════════════
+   SCREEN 3 — LEADS
+════════════════════════════════════════ */
+#s3{background:var(--deep)}
+
+.lead-card{
+  background:var(--card);border:1px solid rgba(201,168,76,.1);
+  border-radius:8px;padding:16px;margin-bottom:10px;cursor:pointer;
+  transition:border-color .2s;
+}
+.lead-card.hot{border-color:rgba(201,168,76,.28)}
+.lead-card:active{border-color:var(--gold)}
+.lead-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px}
+.lead-name{font-size:15px;font-weight:500;color:var(--white)}
+.status-pill{
+  font-size:9px;letter-spacing:.1em;text-transform:uppercase;
+  padding:3px 9px;border-radius:2px;font-weight:600;flex-shrink:0;
+}
+.status-pill.booked{background:rgba(0,232,154,.12);color:var(--green);border:1px solid rgba(0,232,154,.3)}
+.status-pill.warm{background:var(--gdim);color:var(--gold);border:1px solid var(--gline)}
+.status-pill.new{background:rgba(0,212,255,.08);color:var(--cyan);border:1px solid rgba(0,212,255,.25)}
+.lead-event{font-size:12px;color:var(--muted);margin-bottom:7px}
+.lead-meta{display:flex;gap:14px}
+.lead-meta span{font-size:11px;color:var(--muted2)}
+
+.zero-missed{
+  text-align:center;padding:20px;
+  border:1px dashed var(--gline);border-radius:8px;margin-top:4px;
+}
+.zero-missed-val{
+  font-family:'Bebas Neue',sans-serif;font-size:42px;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.zero-missed-lbl{font-size:10px;letter-spacing:.2em;color:var(--gold);text-transform:uppercase;margin-top:2px}
+
+/* ════════════════════════════════════════
+   SCREEN 4 — POSH vs HUSH COMPARISON
+════════════════════════════════════════ */
+#s4{background:var(--deep)}
+
+.compare-hero{
+  background:var(--black);padding:52px 20px 24px;
+  border-bottom:1px solid var(--gline);
+  text-align:center;
+}
+.compare-eyebrow{font-size:10px;letter-spacing:.25em;color:var(--gold);text-transform:uppercase;margin-bottom:10px}
+.compare-title{
+  font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:.08em;
+  color:var(--white);line-height:1.1;
+}
+.compare-sub{
+  font-family:'Cormorant Garamond',serif;font-style:italic;
+  font-size:15px;color:var(--muted);margin-top:8px;
+}
+
+.vs-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--gline);margin:20px 20px 0}
+.vs-col{background:var(--black);padding:18px 14px}
+.vs-header{
+  font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.08em;
+  margin-bottom:14px;text-align:center;padding-bottom:12px;
+  border-bottom:1px solid;
+}
+.vs-header.posh{color:rgba(245,240,232,.35);border-color:rgba(245,240,232,.1)}
+.vs-header.hush{
+  background:linear-gradient(135deg,var(--gold3),var(--gold2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  border-color:var(--gline);
+}
+
+.vs-row{
+  display:flex;flex-direction:column;gap:10px;
+}
+.vs-item{padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.vs-item:last-child{border-bottom:none}
+.vs-item-label{font-size:9px;letter-spacing:.15em;text-transform:uppercase;margin-bottom:4px}
+.vs-item-label.posh{color:rgba(245,240,232,.25)}
+.vs-item-label.hush{color:var(--gold)}
+.vs-item-val{font-size:13px;line-height:1.4}
+.vs-item-val.posh{color:rgba(245,240,232,.4)}
+.vs-item-val.hush{color:var(--white)}
+
+.vs-icon{font-size:14px;margin-right:4px}
+
+.killer-line{
+  margin:20px;
+  background:linear-gradient(135deg,rgba(201,168,76,.12),rgba(201,168,76,.05));
+  border:1px solid var(--gline);border-left:3px solid var(--gold);
+  border-radius:4px;padding:18px 20px;
+}
+.killer-line p{
+  font-family:'Cormorant Garamond',serif;font-style:italic;
+  font-size:18px;line-height:1.55;color:var(--white);
+}
+.killer-line strong{color:var(--gold);font-style:normal}
+
+/* ════════════════════════════════════════
+   SCREEN 5 — NETWORK / MOGUL
+════════════════════════════════════════ */
+#s5{background:var(--deep)}
+
+.mogul-hero{
+  background:linear-gradient(160deg,rgba(201,168,76,.12) 0%,transparent 60%);
+  border:1px solid var(--gline);border-radius:8px;
+  padding:24px 20px;margin-bottom:20px;position:relative;overflow:hidden;
+}
+.mogul-hero::after{
+  content:'NIDDY';
+  position:absolute;right:-12px;top:50%;transform:translateY(-50%);
+  font-family:'Bebas Neue',sans-serif;font-size:88px;
+  color:rgba(201,168,76,.04);pointer-events:none;letter-spacing:.1em;
+}
+.mogul-tier{font-size:9px;letter-spacing:.25em;color:var(--gold);text-transform:uppercase;margin-bottom:6px}
+.mogul-name{
+  font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;
+  color:var(--white);margin-bottom:3px;
+}
+.mogul-role{font-size:12px;color:var(--muted)}
+.mogul-stats{
+  display:flex;gap:0;margin-top:18px;padding-top:16px;
+  border-top:1px solid var(--gline);
+}
+.m-stat{flex:1;text-align:center;border-right:1px solid var(--gline)}
+.m-stat:last-child{border-right:none}
+.m-stat-val{
+  font-family:'Bebas Neue',sans-serif;font-size:26px;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.m-stat-lbl{font-size:9px;color:var(--muted);letter-spacing:.1em;margin-top:2px}
+
+.promoter-row{
+  display:flex;align-items:center;gap:12px;
+  background:var(--card);border:1px solid rgba(201,168,76,.1);
+  border-radius:8px;padding:13px 14px;margin-bottom:9px;
+}
+.p-rank{
+  font-family:'Bebas Neue',sans-serif;font-size:20px;
+  color:rgba(201,168,76,.3);width:24px;text-align:center;
+}
+.p-av{
+  width:38px;height:38px;border-radius:50%;
+  border:1px solid var(--gline);background:linear-gradient(135deg,#1a1408,#2a2010);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--gold);flex-shrink:0;
+}
+.p-info{flex:1}
+.p-name{font-size:14px;font-weight:500;color:var(--white)}
+.p-city{font-size:11px;color:var(--muted)}
+.p-rev{
+  font-family:'Bebas Neue',sans-serif;font-size:17px;
+  background:linear-gradient(135deg,var(--gold3),var(--gold2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+
+.total-bar{
+  background:linear-gradient(135deg,rgba(201,168,76,.1),rgba(201,168,76,.04));
+  border:1px solid var(--gline);border-radius:8px;
+  padding:18px 16px;display:flex;justify-content:space-between;align-items:center;
+  margin-top:4px;
+}
+.total-lbl{font-size:12px;color:var(--muted)}
+.total-val{
+  font-family:'Bebas Neue',sans-serif;font-size:38px;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+
+/* ════════════════════════════════════════
+   SCREEN 6 — MOGUL CLOSER
+════════════════════════════════════════ */
+#s6{
+  background:var(--black);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:40px 32px;position:relative;overflow:hidden;
+  text-align:center;
+}
+.closer-rings{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.c-ring{
+  position:absolute;border-radius:50%;border:1px solid var(--gline);
+  animation:cRingPulse 4s ease-in-out infinite;
+}
+.c-ring:nth-child(1){width:180px;height:180px;animation-delay:0s}
+.c-ring:nth-child(2){width:300px;height:300px;animation-delay:.5s;border-color:rgba(201,168,76,.1)}
+.c-ring:nth-child(3){width:440px;height:440px;animation-delay:1s;border-color:rgba(201,168,76,.06)}
+.c-ring:nth-child(4){width:600px;height:600px;animation-delay:1.5s;border-color:rgba(201,168,76,.03)}
+@keyframes cRingPulse{
+  0%,100%{transform:scale(1);opacity:.5}
+  50%{transform:scale(1.04);opacity:1}
+}
+
+.closer-crown{
+  font-size:56px;margin-bottom:20px;position:relative;z-index:2;
+  animation:crownFloat 3s ease-in-out infinite;
+}
+@keyframes crownFloat{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-8px)}
+}
+
+.closer-name{
+  font-family:'Bebas Neue',sans-serif;font-size:68px;letter-spacing:.1em;
+  background:linear-gradient(160deg,var(--gold3) 0%,var(--gold4) 40%,var(--gold) 70%,var(--gold3) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:drop-shadow(0 0 30px rgba(201,168,76,.4));
+  line-height:1;position:relative;z-index:2;
+}
+
+.closer-title{
+  font-family:'Cormorant Garamond',serif;font-style:italic;
+  font-size:20px;color:var(--muted);margin-top:8px;
+  position:relative;z-index:2;
+}
+
+.closer-line{
+  width:60px;height:1px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  margin:24px auto;position:relative;z-index:2;
+}
+
+.closer-rev{
+  position:relative;z-index:2;margin-bottom:8px;
+}
+.closer-rev-lbl{font-size:10px;letter-spacing:.22em;color:var(--gold);text-transform:uppercase;margin-bottom:4px}
+.closer-rev-val{
+  font-family:'Bebas Neue',sans-serif;font-size:58px;line-height:1;
+  background:linear-gradient(135deg,var(--gold3),var(--gold4));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:drop-shadow(0 0 24px rgba(201,168,76,.4));
+}
+.closer-rev-sub{font-size:12px;color:var(--muted);margin-top:4px}
+
+.closer-statement{
+  font-family:'Cormorant Garamond',serif;font-style:italic;
+  font-size:17px;line-height:1.65;color:var(--muted2);
+  max-width:300px;margin:20px auto 0;
+  position:relative;z-index:2;
+}
+.closer-statement span{color:var(--gold);font-style:normal;font-weight:600}
+
+.closer-powered{
+  position:absolute;bottom:24px;
+  font-size:9px;letter-spacing:.2em;
+  color:rgba(245,240,232,.12);text-transform:uppercase;
+}
+@keyframes shimmer{
+  0%,100%{opacity:.7}50%{opacity:1}
+}
+@keyframes hypeBar{
+  from{height:88%;opacity:.9}to{height:100%;opacity:1}
+}
+@keyframes barGrow{
+  from{width:0}to{width:23%}
+}
+/* ── EVENT MODELS ── */
+.model-card{background:var(--card);border:1px solid rgba(201,168,76,.1);border-radius:10px;padding:14px;margin-bottom:10px;display:flex;gap:12px;align-items:flex-start;cursor:pointer;transition:border-color .2s}
+.model-card:active{border-color:var(--gline)}
+.mc-left{display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0}
+.mc-photo{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:18px;border:2px solid}
+.mc-photo.elite{background:linear-gradient(135deg,var(--gold3),var(--gold));color:var(--black);border-color:var(--gold2)}
+.mc-photo.featured{background:linear-gradient(135deg,rgba(162,155,254,.3),rgba(162,155,254,.1));color:#a29bfe;border-color:rgba(162,155,254,.4)}
+.mc-photo.rising{background:rgba(0,232,154,.1);color:var(--green);border-color:rgba(0,232,154,.3)}
+.mc-elite-badge{font-size:9px;letter-spacing:.1em;background:linear-gradient(135deg,var(--gold3),var(--gold));color:var(--black);padding:2px 7px;border-radius:20px;font-weight:700;white-space:nowrap}
+.mc-featured-badge{font-size:9px;letter-spacing:.1em;background:rgba(162,155,254,.2);border:1px solid rgba(162,155,254,.3);color:#a29bfe;padding:2px 7px;border-radius:20px;white-space:nowrap}
+.mc-rising-badge{font-size:9px;letter-spacing:.1em;background:rgba(0,232,154,.1);border:1px solid rgba(0,232,154,.25);color:var(--green);padding:2px 7px;border-radius:20px;white-space:nowrap}
+.mc-mid{flex:1;min-width:0}
+.mc-name{font-size:14px;font-weight:500;color:var(--white);margin-bottom:2px}
+.mc-stars{font-size:12px;color:var(--gold)}
+.mc-actions{display:flex;flex-direction:column;gap:8px;flex-shrink:0}
+.mc-accept{width:34px;height:34px;border-radius:50%;background:rgba(0,232,154,.15);border:1px solid rgba(0,232,154,.3);display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--green);cursor:pointer;transition:all .2s}
+.mc-accept:active,.mc-accept.done{background:var(--green);color:var(--black)}
+.mc-decline{width:34px;height:34px;border-radius:50%;background:rgba(255,71,87,.08);border:1px solid rgba(255,71,87,.2);display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--red);cursor:pointer;transition:all .2s}
+.mc-decline:active{background:var(--red);color:var(--white)}
+
+/* ── STUDIO ── */
+.step-dot{width:28px;height:28px;border-radius:50%;background:var(--card);border:1px solid var(--gline);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .3s;flex-shrink:0}
+.step-dot.active{background:linear-gradient(135deg,var(--gold3),var(--gold));color:var(--black);border-color:transparent}
+.step-dot.done{background:rgba(0,232,154,.15);border-color:rgba(0,232,154,.3);color:var(--green)}
+.step-line{flex:1;height:1px;background:var(--gline);transition:background .3s}
+.step-line.done{background:var(--gold)}
+.mode-card{background:var(--card);border:1px solid rgba(201,168,76,.1);border-radius:10px;padding:18px;margin-bottom:12px;cursor:pointer;transition:all .2s}
+.mode-card.active-mode{border-color:var(--gline);background:linear-gradient(135deg,rgba(201,168,76,.1),rgba(201,168,76,.04))}
+.mode-card:active{transform:scale(.98)}
+</style>
+</head>
+<body>
+
+<div class="shell">
+<div class="phone">
+  <canvas id="particleCanvas"></canvas>
+
+  <div class="screens">
+
+    <!-- ══ S0: CINEMATIC INTRO ══ -->
+    <div class="screen active" id="s0">
+      <div class="intro-ring"></div>
+      <div class="intro-ring"></div>
+      <div class="intro-ring"></div>
+      <div class="intro-ring"></div>
+      <div class="intro-h">H</div>
+      <div class="intro-title">HUSH AI</div>
+      <div class="intro-tag">Your AI runs the night.<br>You just show up.</div>
+      <div class="intro-line"></div>
+      <button class="intro-btn" onclick="goTo('s1',0)">ENTER THE PLATFORM</button>
+      <div class="intro-powered">Powered by GoElev8.AI · Infinite Possibilities</div>
+    </div>
+
+    <!-- ══ S1: DASHBOARD ══ -->
+    <div class="screen" id="s1">
+      <div class="top-bar">
+        <div class="top-logo">HUSH AI</div>
+        <div class="top-right">
+          <div class="notif-wrap">🔔</div>
+        </div>
+      </div>
+      <div class="scroll-area">
+
+        <div class="welcome-bar">
+          <div class="welcome-eyebrow">👑 Founding Partner</div>
+          <div class="welcome-name">Good Evening, Niddy</div>
+          <div class="welcome-sub">Hush STL · St. Louis & Region</div>
+        </div>
+
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="stat-lbl">Tonight's Leads</div>
+            <div class="stat-val">47</div>
+            <div class="stat-sub">↑ 12 new this hour</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-lbl">AI Response Rate</div>
+            <div class="stat-val">100%</div>
+            <div class="stat-sub gold">Zero missed</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-lbl">Confirmed Bookings</div>
+            <div class="stat-val">31</div>
+            <div class="stat-sub">↑ from 18 last week</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-lbl">Your Network</div>
+            <div class="stat-val">12</div>
+            <div class="stat-sub gold">Promoters live</div>
+          </div>
+        </div>
+
+        <div class="rev-banner" onclick="startCounter()">
+          <div class="rev-eyebrow">Your Monthly Revenue Share</div>
+          <div class="rev-amount" id="revcounter">$3,588</div>
+          <div class="rev-sub">From 12 promoters · Tap to watch it grow</div>
+        </div>
+
+        <div class="sec-label">
+          <div class="live-dot"></div>
+          Live AI Activity Tonight
+        </div>
+
+        <div class="feed-card" onclick="goTo('s2',1)">
+          <div class="feed-av">JB</div>
+          <div class="feed-body">
+            <div class="feed-name">Jordan B.</div>
+            <div class="feed-msg">Hush AI: "You're on the list! Show this at the door…"</div>
+            <span class="badge booked">Booked · 2m ago</span>
+          </div>
+          <div class="feed-time">11:42p</div>
+        </div>
+
+        <div class="feed-card" onclick="goTo('s2',1)">
+          <div class="feed-av">KM</div>
+          <div class="feed-body">
+            <div class="feed-name">Keisha M.</div>
+            <div class="feed-msg">Hush AI: "Hey! Limited spots for Sat night…"</div>
+            <span class="badge ai">AI Responding · 5m ago</span>
+          </div>
+          <div class="feed-time">11:39p</div>
+        </div>
+
+        <div class="feed-card" onclick="goTo('s2',1)">
+          <div class="feed-av">DW</div>
+          <div class="feed-body">
+            <div class="feed-name">Dre W.</div>
+            <div class="feed-msg">What time do doors open for Hush tonight?</div>
+            <span class="badge warm">Handling now</span>
+          </div>
+          <div class="feed-time">11:36p</div>
+        </div>
+
+        <!-- Flyer Studio shortcut -->
+        <div onclick="goTo('s8',5)" style="background:linear-gradient(135deg,rgba(201,168,76,.1),rgba(201,168,76,.04));border:1px solid var(--gline);border-radius:8px;padding:16px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;cursor:pointer">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div style="width:40px;height:40px;border-radius:8px;background:linear-gradient(135deg,var(--gold3),var(--gold));display:flex;align-items:center;justify-content:center;font-size:18px">✦</div>
+            <div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.1em;color:var(--gold)">FLYER STUDIO</div>
+              <div style="font-size:11px;color:var(--muted)">Create · customize · blast to your list</div>
+            </div>
+          </div>
+          <div style="color:var(--gold);font-size:22px">›</div>
+        </div>
+
+        <!-- Recent flyer card -->
+        <div class="sec-label" style="margin-top:4px">Recent Flyers</div>
+        <div style="background:var(--card);border:1px solid rgba(201,168,76,.1);border-radius:8px;padding:14px;display:flex;gap:12px;align-items:center;cursor:pointer" onclick="goTo('s8',5)">
+          <div style="width:44px;height:56px;background:linear-gradient(160deg,#0a0805,#050510);border:1px solid var(--gline);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;background:linear-gradient(135deg,var(--gold3),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">H</div>
+          </div>
+          <div style="flex:1">
+            <div style="font-size:14px;font-weight:500;color:var(--white)">Hush STL — Saturday Night</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px">Sat May 10 · Venue 9</div>
+            <div style="font-size:10px;color:var(--green);margin-top:4px">✓ Sent to 247 guests · 31 bookings so far</div>
+          </div>
+          <div style="font-size:10px;color:var(--muted)">2h ago</div>
+        </div>
+
+      </div>
+      <div class="nav-bar">
+        <div class="nav-item active" onclick="goTo('s1',0)"><div class="nav-ico">⚡</div><div class="nav-pip"></div><div class="nav-lbl">Home</div></div>
+        <div class="nav-item" onclick="goTo('s2',1)"><div class="nav-ico">💬</div><div class="nav-pip"></div><div class="nav-lbl">Messages</div></div>
+        <div class="nav-item" onclick="goTo('s3',2)"><div class="nav-ico">🎟️</div><div class="nav-pip"></div><div class="nav-lbl">Guest List</div></div>
+        <div class="nav-item" onclick="goTo('s4',3)"><div class="nav-ico">🔴</div><div class="nav-pip"></div><div class="nav-lbl">Tonight</div></div>
+        <div class="nav-item" onclick="goTo('s8',5)"><div class="nav-ico">✦</div><div class="nav-pip"></div><div class="nav-lbl">Studio</div></div>
+      </div>
+    </div>
+
+    <!-- ══ S2: MESSAGES (Live + Keywords) ══ -->
+    <div class="screen" id="s2">
+
+      <!-- Header -->
+      <div class="chat-hdr" style="flex-direction:column;gap:12px;padding-bottom:0">
+        <div style="display:flex;align-items:center;gap:12px;width:100%">
+          <div class="chat-back" onclick="goTo('s1',0)">‹</div>
+          <div style="flex:1">
+            <div class="chat-ai-name">HUSH AI NUMBER</div>
+            <div class="chat-status"><div class="live-dot"></div>Active · 47 live conversations</div>
+          </div>
+        </div>
+        <!-- Sub tabs -->
+        <div style="display:flex;width:100%;border-top:1px solid var(--gline)">
+          <div id="tabLive" onclick="msgTab('live')" style="flex:1;text-align:center;padding:12px 0;font-size:11px;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;color:var(--gold);border-bottom:2px solid var(--gold);transition:all .2s">Live</div>
+          <div id="tabKeys" onclick="msgTab('keys')" style="flex:1;text-align:center;padding:12px 0;font-size:11px;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;transition:all .2s">Keywords</div>
+        </div>
+      </div>
+
+      <!-- LIVE CONVERSATIONS -->
+      <div id="msgLive" style="display:flex;flex-direction:column;flex:1;overflow:hidden">
+        <div class="chat-scroll" id="chatScroll">
+
+          <div class="ai-pill" style="align-self:center">Tonight · Hush STL Event</div>
+
+          <!-- Keyword trigger demo -->
+          <div class="msg in">
+            <div class="msg-lbl">Dre W. · Guest</div>
+            HUSHVIP
+            <div class="msg-time">11:22 PM</div>
+          </div>
+          <div class="msg out">
+            <div class="msg-lbl right">Hush AI · Instant</div>
+            🖤 VIP Access unlocked, Dre! Here's your exclusive booking link — grab your spot before it's gone:<br><br>
+            <div style="background:rgba(201,168,76,.15);border:1px solid var(--gline);border-radius:6px;padding:10px 12px;margin-top:6px">
+              <div style="font-size:10px;color:var(--gold);letter-spacing:.1em;margin-bottom:3px">👑 VIP TICKET · $75</div>
+              <div style="font-size:12px;color:var(--cyan);text-decoration:underline">hush.ai/vip/sat0426</div>
+              <div style="font-size:10px;color:var(--muted);margin-top:3px">Includes priority entry + complimentary drink</div>
+            </div>
+            <div class="msg-time">11:22 PM</div>
+          </div>
+          <div class="ai-pill green">✓ VIP Keyword Triggered · Booking Link Sent · Auto</div>
+
+          <div class="msg in">
+            <div class="msg-lbl">Jordan B. · Guest</div>
+            Yo what's the move tonight? Is Hush still going down?
+            <div class="msg-time">11:38 PM</div>
+          </div>
+          <div class="msg out">
+            <div class="msg-lbl right">Hush AI · Instant</div>
+            Hey Jordan 🖤 Tonight is live — Venue 9, doors at 10PM. Spots going fast. Want me to lock you in?
+            <div class="msg-time">11:38 PM</div>
+          </div>
+          <div class="msg in">
+            HUSHGA
+            <div class="msg-time">11:39 PM</div>
+          </div>
+          <div class="msg out">
+            <div class="msg-lbl right">Hush AI · Instant</div>
+            You're in Jordan 🎉 General admission link below — see you tonight:<br><br>
+            <div style="background:rgba(245,240,232,.06);border:1px solid rgba(245,240,232,.12);border-radius:6px;padding:10px 12px;margin-top:6px">
+              <div style="font-size:10px;color:var(--muted2);letter-spacing:.1em;margin-bottom:3px">🎟 GENERAL ADMISSION · $35</div>
+              <div style="font-size:12px;color:var(--cyan);text-decoration:underline">hush.ai/ga/sat0426</div>
+              <div style="font-size:10px;color:var(--muted);margin-top:3px">Doors open 10PM · Venue 9</div>
+            </div>
+            <div class="msg-time">11:39 PM</div>
+          </div>
+          <div class="ai-pill green">✓ GA Keyword Triggered · Booking Link Sent · Auto</div>
+
+          <div class="typing-row">
+            <div class="typing-bubble">
+              <span style="font-size:11px;color:var(--muted);margin-right:6px">Hush AI</span>
+              <div class="t-dot"></div><div class="t-dot"></div><div class="t-dot"></div>
+            </div>
+          </div>
+
+        </div>
+        <div class="chat-input-bar">
+          <input class="chat-inp" placeholder="Hush AI is handling this…" readonly>
+          <button class="send-btn">➤</button>
+        </div>
+      </div>
+
+      <!-- KEYWORDS MANAGER -->
+      <div id="msgKeys" style="display:none;overflow-y:auto;padding:20px 20px 110px;flex:1;scrollbar-width:none">
+
+        <div style="font-size:10px;letter-spacing:.15em;color:var(--muted);text-transform:uppercase;margin-bottom:16px;line-height:1.6">Guests text a keyword to your Hush AI number — AI instantly fires back the matching booking link and price.</div>
+
+        <!-- Existing keywords -->
+        <div class="sec-label">Active Keywords · Tonight</div>
+
+        <!-- VIP keyword card -->
+        <div style="background:linear-gradient(135deg,rgba(201,168,76,.1),rgba(201,168,76,.04));border:1px solid var(--gline);border-left:3px solid var(--gold);border-radius:8px;padding:16px;margin-bottom:12px">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+            <div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:.1em;background:linear-gradient(135deg,var(--gold3),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">HUSHVIP</div>
+              <div style="font-size:10px;color:var(--gold);letter-spacing:.1em;margin-top:2px">👑 VIP ACCESS</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--gold)">$75</div>
+              <div style="font-size:10px;color:var(--green)">▲ Used 8x tonight</div>
+            </div>
+          </div>
+          <div style="background:rgba(0,0,0,.3);border-radius:6px;padding:10px 12px;margin-bottom:10px">
+            <div style="font-size:9px;letter-spacing:.15em;color:var(--gold);text-transform:uppercase;margin-bottom:3px">Booking Link Fired</div>
+            <div style="font-size:12px;color:var(--cyan)">hush.ai/vip/sat0426</div>
+          </div>
+          <div style="background:rgba(201,168,76,.06);border-radius:6px;padding:9px 12px;margin-bottom:10px">
+            <div style="font-size:9px;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;margin-bottom:3px">AI Auto-Reply</div>
+            <div style="font-size:12px;color:var(--muted2);line-height:1.5">🖤 VIP Access unlocked! Here's your exclusive booking link — grab your spot before it's gone:</div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <div onclick="editKeyword('vip')" style="flex:1;border:1px solid var(--gline);border-radius:4px;padding:9px;text-align:center;font-size:12px;color:var(--gold);cursor:pointer;letter-spacing:.08em">Edit</div>
+            <div style="flex:1;border:1px solid rgba(255,71,87,.2);border-radius:4px;padding:9px;text-align:center;font-size:12px;color:var(--red);cursor:pointer;letter-spacing:.08em">Pause</div>
+          </div>
+        </div>
+
+        <!-- Regular keyword card -->
+        <div style="background:var(--card);border:1px solid rgba(245,240,232,.1);border-left:3px solid rgba(245,240,232,.3);border-radius:8px;padding:16px;margin-bottom:12px">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+            <div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:.1em;color:var(--muted2)">HUSHGA</div>
+              <div style="font-size:10px;color:var(--muted2);letter-spacing:.1em;margin-top:2px">🎟 GENERAL ADMISSION</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--muted2)">$35</div>
+              <div style="font-size:10px;color:var(--green)">▲ Used 24x tonight</div>
+            </div>
+          </div>
+          <div style="background:rgba(0,0,0,.3);border-radius:6px;padding:10px 12px;margin-bottom:10px">
+            <div style="font-size:9px;letter-spacing:.15em;color:var(--muted);text-transform:uppercase;margin-bottom:3px">Booking Link Fired</div>
+            <div style="font-size:12px;color:var(--cyan)">hush.ai/ga/sat0426</div>
+          </div>
+          <div style="background:rgba(245,240,232,.04);border-radius:6px;padding:9px 12px;margin-bottom:10px">
+            <div style="font-size:9px;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;margin-bottom:3px">AI Auto-Reply</div>
+            <div style="font-size:12px;color:var(--muted2);line-height:1.5">You're in! Here's your general admission link — doors open 10PM, see you tonight:</div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <div onclick="editKeyword('ga')" style="flex:1;border:1px solid rgba(245,240,232,.12);border-radius:4px;padding:9px;text-align:center;font-size:12px;color:var(--muted2);cursor:pointer;letter-spacing:.08em">Edit</div>
+            <div style="flex:1;border:1px solid rgba(255,71,87,.2);border-radius:4px;padding:9px;text-align:center;font-size:12px;color:var(--red);cursor:pointer;letter-spacing:.08em">Pause</div>
+          </div>
+        </div>
+
+        <!-- New keyword -->
+        <div style="background:rgba(0,212,255,.04);border:1px dashed rgba(0,212,255,.2);border-radius:8px;padding:16px;margin-bottom:20px">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+            <div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:.1em;color:var(--cyan)">HUSHNEW</div>
+              <div style="font-size:10px;color:var(--cyan);letter-spacing:.1em;margin-top:2px">✨ FIRST TIMERS</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--cyan)">$20</div>
+              <div style="font-size:10px;color:var(--green)">▲ Used 15x tonight</div>
+            </div>
+          </div>
+          <div style="background:rgba(0,0,0,.3);border-radius:6px;padding:10px 12px;margin-bottom:10px">
+            <div style="font-size:9px;letter-spacing:.15em;color:var(--cyan);text-transform:uppercase;margin-bottom:3px">Booking Link Fired</div>
+            <div style="font-size:12px;color:var(--cyan)">hush.ai/new/sat0426</div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <div style="flex:1;border:1px solid rgba(0,212,255,.2);border-radius:4px;padding:9px;text-align:center;font-size:12px;color:var(--cyan);cursor:pointer;letter-spacing:.08em">Edit</div>
+            <div style="flex:1;border:1px solid rgba(255,71,87,.2);border-radius:4px;padding:9px;text-align:center;font-size:12px;color:var(--red);cursor:pointer;letter-spacing:.08em">Pause</div>
+          </div>
+        </div>
+
+        <!-- Add new keyword button -->
+        <div onclick="showAddKeyword()" style="background:transparent;border:1px dashed var(--gline);border-radius:8px;padding:18px;text-align:center;cursor:pointer;margin-bottom:20px">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.15em;color:var(--gold)">+ CREATE NEW KEYWORD</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px">Set a keyword, price, and booking link</div>
+        </div>
+
+        <!-- Add keyword modal -->
+        <div id="addKeyModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:999;align-items:flex-end;justify-content:center;padding-bottom:20px">
+          <div style="background:var(--card);border:1px solid var(--gline);border-radius:16px 16px 8px 8px;padding:28px 24px;width:100%;max-width:390px">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.1em;color:var(--gold);margin-bottom:4px">NEW KEYWORD</div>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:20px">Guests text this word to get their booking link automatically</div>
+
+            <div style="margin-bottom:14px">
+              <div style="font-size:10px;letter-spacing:.15em;color:var(--muted);text-transform:uppercase;margin-bottom:6px">Keyword</div>
+              <input id="newKwInput" style="width:100%;background:var(--deep);border:1px solid var(--gline);border-radius:6px;padding:12px;color:var(--white);font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.1em;outline:none;text-transform:uppercase" placeholder="e.g. HUSHVIP2">
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+              <div>
+                <div style="font-size:10px;letter-spacing:.15em;color:var(--muted);text-transform:uppercase;margin-bottom:6px">Tier</div>
+                <select id="newKwTier" style="width:100%;background:var(--deep);border:1px solid var(--gline);border-radius:6px;padding:12px;color:var(--white);font-family:'Outfit',sans-serif;font-size:13px;outline:none">
+                  <option value="vip">👑 VIP</option>
+                  <option value="ga">🎟 General</option>
+                  <option value="new">✨ First Timer</option>
+                </select>
+              </div>
+              <div>
+                <div style="font-size:10px;letter-spacing:.15em;color:var(--muted);text-transform:uppercase;margin-bottom:6px">Price</div>
+                <input id="newKwPrice" style="width:100%;background:var(--deep);border:1px solid var(--gline);border-radius:6px;padding:12px;color:var(--white);font-family:'Bebas Neue',sans-serif;font-size:20px;outline:none" placeholder="$75" type="text">
+              </div>
+            </div>
+
+            <div style="margin-bottom:14px">
+              <div style="font-size:10px;letter-spacing:.15em;color:var(--muted);text-transform:uppercase;margin-bottom:6px">Booking Link</div>
+              <input id="newKwLink" style="width:100%;background:var(--deep);border:1px solid var(--gline);border-radius:6px;padding:12px;color:var(--cyan);font-family:'Outfit',sans-serif;font-size:13px;outline:none" placeholder="hush.ai/vip/yourevent">
+            </div>
+
+            <div style="margin-bottom:18px">
+              <div style="font-size:10px;letter-spacing:.15em;color:var(--muted);text-transform:uppercase;margin-bottom:6px">AI Reply Message</div>
+              <textarea id="newKwReply" style="width:100%;background:var(--deep);border:1px solid var(--gline);border-radius:6px;padding:12px;color:var(--white);font-family:'Outfit',sans-serif;font-size:13px;resize:none;height:70px;outline:none" placeholder="🖤 VIP Access unlocked! Here's your exclusive link..."></textarea>
+            </div>
+
+            <div style="display:flex;gap:10px">
+              <div onclick="saveKeyword()" style="flex:1;background:linear-gradient(135deg,var(--gold3),var(--gold));border-radius:4px;padding:14px;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.15em;color:var(--black);cursor:pointer">SAVE KEYWORD</div>
+              <div onclick="hideAddKeyword()" style="padding:14px 18px;border:1px solid var(--gline);border-radius:4px;color:var(--muted);cursor:pointer;font-size:13px">Cancel</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="nav-bar">
+        <div class="nav-item" onclick="goTo('s1',0)"><div class="nav-ico">⚡</div><div class="nav-pip"></div><div class="nav-lbl">Home</div></div>
+        <div class="nav-item active" onclick="goTo('s2',1)"><div class="nav-ico">💬</div><div class="nav-pip"></div><div class="nav-lbl">Messages</div></div>
+        <div class="nav-item" onclick="goTo('s3',2)"><div class="nav-ico">🎟️</div><div class="nav-pip"></div><div class="nav-lbl">Guest List</div></div>
+        <div class="nav-item" onclick="goTo('s4',3)"><div class="nav-ico">⚖️</div><div class="nav-pip"></div><div class="nav-lbl">vs Posh</div></div>
+        <div class="nav-item" onclick="goTo('s5',4)"><div class="nav-ico">👑</div><div class="nav-pip"></div><div class="nav-lbl">Network</div></div>
+      </div>
+    </div>
+
+    <!-- ══ S3: GUEST LIST ══ -->
+    <div class="screen" id="s3">
+      <div class="top-bar">
+        <div class="top-logo">GUEST LIST</div>
+        <div style="font-size:10px;letter-spacing:.15em;color:var(--green)">47 Tonight</div>
+      </div>
+      <div class="scroll-area">
+
+        <!-- VIP Tier Summary -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:18px">
+          <div style="background:linear-gradient(135deg,rgba(201,168,76,.18),rgba(201,168,76,.06));border:1px solid var(--gline);border-radius:8px;padding:12px 10px;text-align:center">
+            <div style="font-size:9px;letter-spacing:.15em;color:var(--gold);text-transform:uppercase;margin-bottom:4px">VIP</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;background:linear-gradient(135deg,var(--gold3),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">8</div>
+            <div style="font-size:9px;color:var(--muted)">5+ parties</div>
+          </div>
+          <div style="background:var(--card);border:1px solid rgba(245,240,232,.08);border-radius:8px;padding:12px 10px;text-align:center">
+            <div style="font-size:9px;letter-spacing:.15em;color:var(--muted2);text-transform:uppercase;margin-bottom:4px">Regular</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--muted2)">24</div>
+            <div style="font-size:9px;color:var(--muted)">2–4 parties</div>
+          </div>
+          <div style="background:var(--card);border:1px solid rgba(0,212,255,.1);border-radius:8px;padding:12px 10px;text-align:center">
+            <div style="font-size:9px;letter-spacing:.15em;color:var(--cyan);text-transform:uppercase;margin-bottom:4px">New</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--cyan)">15</div>
+            <div style="font-size:9px;color:var(--muted)">First time</div>
+          </div>
+        </div>
+
+        <!-- Filter tabs -->
+        <div style="display:flex;gap:8px;margin-bottom:16px">
+          <div id="filterAll" onclick="filterGuests('all')" style="padding:6px 14px;border-radius:20px;font-size:11px;letter-spacing:.1em;cursor:pointer;background:var(--gold);color:var(--black);font-weight:600">All</div>
+          <div id="filterVip" onclick="filterGuests('vip')" style="padding:6px 14px;border-radius:20px;font-size:11px;letter-spacing:.1em;cursor:pointer;background:var(--gdim);border:1px solid var(--gline);color:var(--gold)">VIP</div>
+          <div id="filterReg" onclick="filterGuests('reg')" style="padding:6px 14px;border-radius:20px;font-size:11px;letter-spacing:.1em;cursor:pointer;background:rgba(245,240,232,.05);border:1px solid rgba(245,240,232,.1);color:var(--muted2)">Regular</div>
+          <div id="filterNew" onclick="filterGuests('new')" style="padding:6px 14px;border-radius:20px;font-size:11px;letter-spacing:.1em;cursor:pointer;background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.2);color:var(--cyan)">New</div>
+        </div>
+
+        <div class="sec-label"><div class="live-dot"></div>Tonight's Guest List</div>
+
+        <!-- VIP guests -->
+        <div class="guest-group" id="gAll">
+
+          <div class="lead-card hot" data-tier="vip">
+            <div class="lead-top">
+              <div style="display:flex;align-items:center;gap:8px">
+                <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--gold3),var(--gold));display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--black);flex-shrink:0">JB</div>
+                <div><div class="lead-name">Jordan B.</div><div style="font-size:10px;color:var(--muted)">📱 (314) 555-0182</div></div>
+              </div>
+              <div class="status-pill booked">VIP</div>
+            </div>
+            <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+              <div style="font-size:10px;background:var(--gdim);border:1px solid var(--gline);color:var(--gold);padding:3px 8px;border-radius:4px">🎉 8 parties attended</div>
+              <div style="font-size:10px;background:rgba(0,232,154,.08);border:1px solid rgba(0,232,154,.25);color:var(--green);padding:3px 8px;border-radius:4px">✓ Confirmed · Party of 2</div>
+            </div>
+          </div>
+
+          <div class="lead-card hot" data-tier="vip">
+            <div class="lead-top">
+              <div style="display:flex;align-items:center;gap:8px">
+                <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--gold3),var(--gold));display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--black);flex-shrink:0">MT</div>
+                <div><div class="lead-name">Marcus T.</div><div style="font-size:10px;color:var(--muted)">📱 (314) 555-0511</div></div>
+              </div>
+              <div class="status-pill booked">VIP</div>
+            </div>
+            <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+              <div style="font-size:10px;background:var(--gdim);border:1px solid var(--gline);color:var(--gold);padding:3px 8px;border-radius:4px">🎉 6 parties attended</div>
+              <div style="font-size:10px;background:rgba(0,232,154,.08);border:1px solid rgba(0,232,154,.25);color:var(--green);padding:3px 8px;border-radius:4px">✓ Confirmed · Party of 4</div>
+            </div>
+          </div>
+
+          <div class="lead-card" data-tier="reg">
+            <div class="lead-top">
+              <div style="display:flex;align-items:center;gap:8px">
+                <div style="width:36px;height:36px;border-radius:50%;background:var(--card2);border:1px solid rgba(245,240,232,.1);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--muted2);flex-shrink:0">KM</div>
+                <div><div class="lead-name">Keisha M.</div><div style="font-size:10px;color:var(--muted)">📱 (314) 555-0241</div></div>
+              </div>
+              <div class="status-pill warm" style="background:rgba(245,240,232,.08);color:var(--muted2);border-color:rgba(245,240,232,.15)">Regular</div>
+            </div>
+            <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+              <div style="font-size:10px;background:rgba(245,240,232,.05);border:1px solid rgba(245,240,232,.1);color:var(--muted2);padding:3px 8px;border-radius:4px">🎉 3 parties attended</div>
+              <div style="font-size:10px;background:rgba(0,232,154,.08);border:1px solid rgba(0,232,154,.25);color:var(--green);padding:3px 8px;border-radius:4px">✓ Confirmed · Party of 1</div>
+            </div>
+          </div>
+
+          <div class="lead-card" data-tier="reg">
+            <div class="lead-top">
+              <div style="display:flex;align-items:center;gap:8px">
+                <div style="width:36px;height:36px;border-radius:50%;background:var(--card2);border:1px solid rgba(245,240,232,.1);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--muted2);flex-shrink:0">DW</div>
+                <div><div class="lead-name">Dre W.</div><div style="font-size:10px;color:var(--muted)">📱 (314) 555-0399</div></div>
+              </div>
+              <div class="status-pill warm" style="background:rgba(245,240,232,.08);color:var(--muted2);border-color:rgba(245,240,232,.15)">Regular</div>
+            </div>
+            <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+              <div style="font-size:10px;background:rgba(245,240,232,.05);border:1px solid rgba(245,240,232,.1);color:var(--muted2);padding:3px 8px;border-radius:4px">🎉 2 parties attended</div>
+              <div style="font-size:10px;background:var(--gdim);border:1px solid var(--gline);color:var(--gold);padding:3px 8px;border-radius:4px">⏳ AI handling now</div>
+            </div>
+          </div>
+
+          <div class="lead-card" data-tier="new">
+            <div class="lead-top">
+              <div style="display:flex;align-items:center;gap:8px">
+                <div style="width:36px;height:36px;border-radius:50%;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.2);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--cyan);flex-shrink:0">TR</div>
+                <div><div class="lead-name">Tasha R.</div><div style="font-size:10px;color:var(--muted)">📱 (314) 555-0187</div></div>
+              </div>
+              <div class="status-pill new">New</div>
+            </div>
+            <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+              <div style="font-size:10px;background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.2);color:var(--cyan);padding:3px 8px;border-radius:4px">✨ First Hush event</div>
+              <div style="font-size:10px;background:var(--gdim);border:1px solid var(--gline);color:var(--gold);padding:3px 8px;border-radius:4px">⏳ Asking about VIP</div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="zero-missed">
+          <div class="zero-missed-val">0</div>
+          <div class="zero-missed-lbl">Guests Missed Tonight</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:6px;letter-spacing:.05em">Hush AI handled all 47 · While you were on the floor</div>
+        </div>
+
+      </div>
+      <div class="nav-bar">
+        <div class="nav-item" onclick="goTo('s1',0)"><div class="nav-ico">⚡</div><div class="nav-pip"></div><div class="nav-lbl">Home</div></div>
+        <div class="nav-item" onclick="goTo('s2',1)"><div class="nav-ico">💬</div><div class="nav-pip"></div><div class="nav-lbl">Messages</div></div>
+        <div class="nav-item active" onclick="goTo('s3',2)"><div class="nav-ico">🎟️</div><div class="nav-pip"></div><div class="nav-lbl">Guest List</div></div>
+        <div class="nav-item" onclick="goTo('s4',3)"><div class="nav-ico">⚖️</div><div class="nav-pip"></div><div class="nav-lbl">vs Posh</div></div>
+        <div class="nav-item" onclick="goTo('s5',4)"><div class="nav-ico">👑</div><div class="nav-pip"></div><div class="nav-lbl">Network</div></div>
+      </div>
+    </div>
+
+    <!-- ══ S4: TONIGHT ══ -->
+    <div class="screen" id="s4">
+      <div class="top-bar">
+        <div class="top-logo">TONIGHT</div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <div class="live-dot"></div>
+          <div style="font-size:10px;letter-spacing:.12em;color:var(--green)">LIVE</div>
+        </div>
+      </div>
+      <div class="scroll-area">
+
+        <!-- Event Header -->
+        <div style="background:linear-gradient(135deg,rgba(201,168,76,.14),rgba(201,168,76,.04));border:1px solid var(--gline);border-radius:8px;padding:20px;margin-bottom:16px;position:relative;overflow:hidden">
+          <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold3),var(--gold2),var(--gold3));animation:shimmer 2s ease-in-out infinite"></div>
+          <div style="font-size:9px;letter-spacing:.25em;color:var(--gold);text-transform:uppercase;margin-bottom:6px">🎉 Tonight's Event</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.08em;color:var(--white);margin-bottom:2px">HUSH STL — SATURDAY NIGHT</div>
+          <div style="font-size:12px;color:var(--muted)">Venue 9 · Doors 10PM · 21+</div>
+          <div style="display:flex;gap:12px;margin-top:14px;padding-top:14px;border-top:1px solid var(--gline)">
+            <div style="text-align:center;flex:1">
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:30px;background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text" id="doorCount">0</div>
+              <div style="font-size:9px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase">At Door</div>
+            </div>
+            <div style="width:1px;background:var(--gline)"></div>
+            <div style="text-align:center;flex:1">
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:30px;color:var(--green)">47</div>
+              <div style="font-size:9px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase">Confirmed</div>
+            </div>
+            <div style="width:1px;background:var(--gline)"></div>
+            <div style="text-align:center;flex:1">
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:30px;color:var(--cyan)">203</div>
+              <div style="font-size:9px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase">Capacity</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Capacity bar -->
+        <div style="margin-bottom:16px">
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+            <div style="font-size:10px;letter-spacing:.15em;color:var(--muted);text-transform:uppercase">Venue Capacity</div>
+            <div style="font-size:10px;color:var(--gold)">47 / 203 · 23%</div>
+          </div>
+          <div style="height:6px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden">
+            <div style="height:100%;width:23%;background:linear-gradient(90deg,var(--gold3),var(--gold2));border-radius:3px;animation:barGrow 1.5s ease forwards"></div>
+          </div>
+        </div>
+
+        <!-- Hype meter -->
+        <div style="background:var(--card);border:1px solid var(--gline);border-radius:8px;padding:16px;margin-bottom:16px">
+          <div style="font-size:10px;letter-spacing:.2em;color:var(--gold);text-transform:uppercase;margin-bottom:12px">🔥 Hype Meter</div>
+          <div style="display:flex;gap:4px;align-items:flex-end;height:48px">
+            <div style="flex:1;background:var(--gold3);border-radius:2px;height:30%;opacity:.5"></div>
+            <div style="flex:1;background:var(--gold3);border-radius:2px;height:45%;opacity:.6"></div>
+            <div style="flex:1;background:var(--gold);border-radius:2px;height:60%;opacity:.7"></div>
+            <div style="flex:1;background:var(--gold);border-radius:2px;height:50%;opacity:.7"></div>
+            <div style="flex:1;background:var(--gold2);border-radius:2px;height:80%;opacity:.8"></div>
+            <div style="flex:1;background:var(--gold2);border-radius:2px;height:70%;opacity:.8"></div>
+            <div style="flex:1;background:var(--gold4);border-radius:2px;height:95%;animation:hypeBar 1s ease infinite alternate"></div>
+            <div style="flex:1;background:var(--gold4);border-radius:2px;height:100%;animation:hypeBar 1s .2s ease infinite alternate"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:8px">
+            <div style="font-size:10px;color:var(--muted)">10PM</div>
+            <div style="font-size:10px;color:var(--gold);font-weight:600">NOW 🔥</div>
+            <div style="font-size:10px;color:var(--muted)">3AM</div>
+          </div>
+        </div>
+
+        <!-- Live SMS blast button -->
+        <div onclick="showBlastConfirm()" style="background:linear-gradient(135deg,var(--gold3),var(--gold));border-radius:6px;padding:18px;text-align:center;cursor:pointer;margin-bottom:12px;box-shadow:0 4px 24px rgba(201,168,76,.25);transition:all .2s">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.2em;color:var(--black)">📣 BLAST THE CROWD</div>
+          <div style="font-size:11px;color:rgba(0,0,0,.6);margin-top:3px">Fire an SMS to your whole list right now</div>
+        </div>
+
+        <!-- Recent arrivals -->
+        <div class="sec-label"><div class="live-dot"></div>Just Walked In</div>
+
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="background:var(--card);border:1px solid rgba(0,232,154,.15);border-radius:8px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--gold3),var(--gold));display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:12px;color:var(--black)">JB</div>
+              <div><div style="font-size:13px;color:var(--white);font-weight:500">Jordan B.</div><div style="font-size:10px;color:var(--gold)">👑 VIP · Party of 2</div></div>
+            </div>
+            <div style="font-size:10px;color:var(--green)">Just now</div>
+          </div>
+          <div style="background:var(--card);border:1px solid rgba(0,232,154,.1);border-radius:8px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--gold3),var(--gold));display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:12px;color:var(--black)">MT</div>
+              <div><div style="font-size:13px;color:var(--white);font-weight:500">Marcus T.</div><div style="font-size:10px;color:var(--gold)">👑 VIP · Party of 4</div></div>
+            </div>
+            <div style="font-size:10px;color:var(--green)">4 min ago</div>
+          </div>
+          <div style="background:var(--card);border:1px solid rgba(245,240,232,.06);border-radius:8px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="width:32px;height:32px;border-radius:50%;background:var(--card2);border:1px solid rgba(245,240,232,.1);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:12px;color:var(--muted2)">KM</div>
+              <div><div style="font-size:13px;color:var(--white);font-weight:500">Keisha M.</div><div style="font-size:10px;color:var(--muted2)">Regular · Party of 1</div></div>
+            </div>
+            <div style="font-size:10px;color:var(--muted)">9 min ago</div>
+          </div>
+        </div>
+
+        <!-- EVENT MODELS SECTION -->
+        <div style="margin-top:20px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+            <div class="sec-label" style="margin-bottom:0">💃 Event Models</div>
+            <div onclick="showPostModel()" style="background:linear-gradient(135deg,var(--gold3),var(--gold));border-radius:20px;padding:6px 14px;font-size:11px;font-family:'Bebas Neue',sans-serif;letter-spacing:.12em;color:var(--black);cursor:pointer">+ POST A SPOT</div>
+          </div>
+
+          <!-- Model tabs -->
+          <div style="display:flex;gap:0;border:1px solid var(--gline);border-radius:8px;overflow:hidden;margin-bottom:14px">
+            <div id="mtab1" onclick="modelTab(1)" style="flex:1;text-align:center;padding:10px 0;font-size:10px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;background:var(--gold);color:var(--black);font-weight:600">Applications (3)</div>
+            <div id="mtab2" onclick="modelTab(2)" style="flex:1;text-align:center;padding:10px 0;font-size:10px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;color:var(--muted);border-left:1px solid var(--gline)">Verified (12)</div>
+            <div id="mtab3" onclick="modelTab(3)" style="flex:1;text-align:center;padding:10px 0;font-size:10px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;color:var(--muted);border-left:1px solid var(--gline)">Invited (2)</div>
+          </div>
+
+          <!-- Applications tab -->
+          <div id="modelTab1">
+
+            <!-- Model card 1 -->
+            <div class="model-card" onclick="openModelProfile('Jasmine R.','JR','Elite','4.9',24,'@jasminer_stl','@jasmine.r','$150 cash','Rising star in STL nightlife scene. Always on time, always professional.')">
+              <div class="mc-left">
+                <div class="mc-photo elite">JR</div>
+                <div class="mc-badge-wrap">
+                  <div class="mc-elite-badge">⭐ Elite</div>
+                </div>
+              </div>
+              <div class="mc-mid">
+                <div class="mc-name">Jasmine R.</div>
+                <div class="mc-stars">★★★★★ <span style="color:var(--muted);font-size:10px">4.9 · 24 events</span></div>
+                <div style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap">
+                  <div style="font-size:10px;background:rgba(225,48,108,.1);border:1px solid rgba(225,48,108,.2);color:#e1306c;padding:2px 7px;border-radius:20px">@jasminer_stl</div>
+                  <div style="font-size:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--muted2);padding:2px 7px;border-radius:20px">12.4K followers</div>
+                </div>
+                <div style="margin-top:6px;font-size:11px;color:var(--gold)">Asking: $150 cash + entry</div>
+              </div>
+              <div class="mc-actions">
+                <div onclick="event.stopPropagation();acceptModel(this)" class="mc-accept">✓</div>
+                <div onclick="event.stopPropagation();declineModel(this)" class="mc-decline">✕</div>
+              </div>
+            </div>
+
+            <!-- Model card 2 -->
+            <div class="model-card" onclick="openModelProfile('Tiana M.','TM','Featured','4.7',11,'@tiana.stl','@tianaM','Hush Credits + entry','Known for bringing her own crowd. Great energy.')">
+              <div class="mc-left">
+                <div class="mc-photo featured">TM</div>
+                <div class="mc-badge-wrap">
+                  <div class="mc-featured-badge">✦ Featured</div>
+                </div>
+              </div>
+              <div class="mc-mid">
+                <div class="mc-name">Tiana M.</div>
+                <div class="mc-stars">★★★★☆ <span style="color:var(--muted);font-size:10px">4.7 · 11 events</span></div>
+                <div style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap">
+                  <div style="font-size:10px;background:rgba(225,48,108,.1);border:1px solid rgba(225,48,108,.2);color:#e1306c;padding:2px 7px;border-radius:20px">@tiana.stl</div>
+                  <div style="font-size:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--muted2);padding:2px 7px;border-radius:20px">8.1K followers</div>
+                </div>
+                <div style="margin-top:6px;font-size:11px;color:var(--cyan)">Asking: Hush Credits + entry</div>
+              </div>
+              <div class="mc-actions">
+                <div onclick="event.stopPropagation();acceptModel(this)" class="mc-accept">✓</div>
+                <div onclick="event.stopPropagation();declineModel(this)" class="mc-decline">✕</div>
+              </div>
+            </div>
+
+            <!-- Model card 3 — Rising -->
+            <div class="model-card" onclick="openModelProfile('Destiny W.','DW','Rising','4.5',3,'@destiny.w','@destinyW','Free entry + $50','New to the scene but brings good energy and aesthetic.')">
+              <div class="mc-left">
+                <div class="mc-photo rising">DW</div>
+                <div class="mc-badge-wrap">
+                  <div class="mc-rising-badge">↑ Rising</div>
+                </div>
+              </div>
+              <div class="mc-mid">
+                <div class="mc-name">Destiny W.</div>
+                <div class="mc-stars">★★★★☆ <span style="color:var(--muted);font-size:10px">4.5 · 3 events</span></div>
+                <div style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap">
+                  <div style="font-size:10px;background:rgba(225,48,108,.1);border:1px solid rgba(225,48,108,.2);color:#e1306c;padding:2px 7px;border-radius:20px">@destiny.w</div>
+                  <div style="font-size:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--muted2);padding:2px 7px;border-radius:20px">2.3K followers</div>
+                </div>
+                <div style="margin-top:6px;font-size:11px;color:var(--muted2)">Asking: Entry + $50 cash</div>
+              </div>
+              <div class="mc-actions">
+                <div onclick="event.stopPropagation();acceptModel(this)" class="mc-accept">✓</div>
+                <div onclick="event.stopPropagation();declineModel(this)" class="mc-decline">✕</div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Verified tab -->
+          <div id="modelTab2" style="display:none">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:12px">Verified Event Models in St. Louis — tap to invite directly</div>
+            <div class="model-card" onclick="inviteModel('Alexis B.')">
+              <div class="mc-left">
+                <div class="mc-photo elite">AB</div>
+                <div class="mc-badge-wrap"><div class="mc-elite-badge">⭐ Elite</div></div>
+              </div>
+              <div class="mc-mid">
+                <div class="mc-name">Alexis B.</div>
+                <div class="mc-stars">★★★★★ <span style="color:var(--muted);font-size:10px">5.0 · 38 events</span></div>
+                <div style="display:flex;gap:6px;margin-top:4px">
+                  <div style="font-size:10px;background:rgba(225,48,108,.1);border:1px solid rgba(225,48,108,.2);color:#e1306c;padding:2px 7px;border-radius:20px">@alexisb_stl</div>
+                  <div style="font-size:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--muted2);padding:2px 7px;border-radius:20px">31.2K</div>
+                </div>
+                <div style="margin-top:6px;font-size:11px;color:var(--muted)">Rate: $200/event · Available tonight</div>
+              </div>
+              <div style="padding:6px 14px;border-radius:20px;border:1px solid var(--gline);color:var(--gold);font-size:11px;cursor:pointer;align-self:center;white-space:nowrap">Invite</div>
+            </div>
+            <div class="model-card" onclick="inviteModel('Monique T.')">
+              <div class="mc-left">
+                <div class="mc-photo featured">MT</div>
+                <div class="mc-badge-wrap"><div class="mc-featured-badge">✦ Featured</div></div>
+              </div>
+              <div class="mc-mid">
+                <div class="mc-name">Monique T.</div>
+                <div class="mc-stars">★★★★★ <span style="color:var(--muted);font-size:10px">4.8 · 19 events</span></div>
+                <div style="display:flex;gap:6px;margin-top:4px">
+                  <div style="font-size:10px;background:rgba(225,48,108,.1);border:1px solid rgba(225,48,108,.2);color:#e1306c;padding:2px 7px;border-radius:20px">@monique.t</div>
+                  <div style="font-size:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--muted2);padding:2px 7px;border-radius:20px">18.7K</div>
+                </div>
+                <div style="margin-top:6px;font-size:11px;color:var(--muted)">Rate: $125/event · Available tonight</div>
+              </div>
+              <div style="padding:6px 14px;border-radius:20px;border:1px solid var(--gline);color:var(--gold);font-size:11px;cursor:pointer;align-self:center;white-space:nowrap">Invite</div>
+            </div>
+          </div>
+
+          <!-- Invited tab -->
+          <div id="modelTab3" style="display:none">
+            <div class="model-card" style="border-color:rgba(0,232,154,.2)">
+              <div class="mc-left">
+                <div class="mc-photo elite">AB</div>
+                <div class="mc-badge-wrap"><div class="mc-elite-badge">⭐ Elite</div></div>
+              </div>
+              <div class="mc-mid">
+                <div class="mc-name">Alexis B.</div>
+                <div class="mc-stars">★★★★★ <span style="color:var(--muted);font-size:10px">5.0 · 38 events</span></div>
+                <div style="margin-top:6px;font-size:11px;color:var(--green)">✓ Accepted · $200 cash · Arriving 10PM</div>
+                <div style="font-size:10px;color:var(--muted);margin-top:2px">Payment releases on check-in · Auto via Stripe</div>
+              </div>
+              <div style="font-size:18px;align-self:center">✅</div>
+            </div>
+            <div class="model-card" style="border-color:rgba(201,168,76,.2)">
+              <div class="mc-left">
+                <div class="mc-photo featured">KJ</div>
+                <div class="mc-badge-wrap"><div class="mc-featured-badge">✦ Featured</div></div>
+              </div>
+              <div class="mc-mid">
+                <div class="mc-name">Kayla J.</div>
+                <div class="mc-stars">★★★★☆ <span style="color:var(--muted);font-size:10px">4.6 · 14 events</span></div>
+                <div style="margin-top:6px;font-size:11px;color:var(--gold)">⏳ Pending · Hush Credits + $75</div>
+                <div style="font-size:10px;color:var(--muted);margin-top:2px">Sent invite 2 hours ago</div>
+              </div>
+              <div style="font-size:18px;align-self:center">⏳</div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Post a Model Spot overlay -->
+        <div id="postModelOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:998;align-items:flex-end;justify-content:center;padding-bottom:20px">
+          <div style="background:var(--card);border:1px solid var(--gline);border-radius:16px 16px 8px 8px;padding:28px 24px;width:100%;max-width:390px;max-height:80vh;overflow-y:auto">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.1em;color:var(--gold);margin-bottom:4px">💃 POST AN EVENT MODEL SPOT</div>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:20px">Set your offer — models apply, you pick</div>
+
+            <div style="margin-bottom:14px">
+              <div style="font-size:10px;letter-spacing:.15em;color:var(--muted);text-transform:uppercase;margin-bottom:6px">How Many Models</div>
+              <div style="display:flex;gap:8px">
+                <div onclick="selectModelCount(this,1)" style="flex:1;text-align:center;padding:10px;background:var(--gold);color:var(--black);border-radius:6px;font-family:'Bebas Neue',sans-serif;font-size:18px;cursor:pointer">1</div>
+                <div onclick="selectModelCount(this,2)" style="flex:1;text-align:center;padding:10px;background:var(--deep);border:1px solid var(--gline);border-radius:6px;font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--muted2);cursor:pointer">2</div>
+                <div onclick="selectModelCount(this,3)" style="flex:1;text-align:center;padding:10px;background:var(--deep);border:1px solid var(--gline);border-radius:6px;font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--muted2);cursor:pointer">3</div>
+                <div onclick="selectModelCount(this,5)" style="flex:1;text-align:center;padding:10px;background:var(--deep);border:1px solid var(--gline);border-radius:6px;font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--muted2);cursor:pointer">5+</div>
+              </div>
+            </div>
+
+            <div style="margin-bottom:14px">
+              <div style="font-size:10px;letter-spacing:.15em;color:var(--muted);text-transform:uppercase;margin-bottom:6px">Compensation</div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <div id="compCash" onclick="toggleComp('cash')" style="padding:8px 14px;border-radius:20px;font-size:11px;cursor:pointer;background:var(--gold);color:var(--black);font-weight:600">💵 Cash</div>
+                <div id="compCredits" onclick="toggleComp('credits')" style="padding:8px 14px;border-radius:20px;font-size:11px;cursor:pointer;background:var(--gdim);border:1px solid var(--gline);color:var(--gold)">✦ Hush Credits</div>
+                <div id="compEntry" onclick="toggleComp('entry')" style="padding:8px 14px;border-radius:20px;font-size:11px;cursor:pointer;background:rgba(245,240,232,.05);border:1px solid rgba(245,240,232,.1);color:var(--muted2)">🎟 Free Entry</div>
+              </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+              <div>
+                <div style="font-size:10px;letter-spacing:.15em;color:var(--muted);text-transform:uppercase;margin-bottom:6px">Cash Amount</div>
+                <input style="width:100%;background:var(--deep);border:1px solid var(--gline);border-radius:6px;padding:12px;color:var(--white);font-family:'Bebas Neue',sans-serif;font-size:20px;outline:none" placeholder="$100" value="$150">
+              </div>
+              <div>
+                <div style="font-size:10px;letter-spacing:.15em;color:var(--muted);text-transform:uppercase;margin-bottom:6px">Arrive By</div>
+                <input style="width:100%;background:var(--deep);border:1px solid var(--gline);border-radius:6px;padding:12px;color:var(--white);font-family:'Outfit',sans-serif;font-size:14px;outline:none" placeholder="10:00 PM" value="10:00 PM">
+              </div>
+            </div>
+
+            <div style="margin-bottom:14px">
+              <div style="font-size:10px;letter-spacing:.15em;color:var(--muted);text-transform:uppercase;margin-bottom:6px">Dress Code / Vibe Notes</div>
+              <textarea style="width:100%;background:var(--deep);border:1px solid var(--gline);border-radius:6px;padding:12px;color:var(--white);font-family:'Outfit',sans-serif;font-size:13px;resize:none;height:60px;outline:none" placeholder="e.g. Upscale, all black, high energy preferred...">Upscale luxury — all black or gold. High energy. Must be comfortable mingling with VIP guests.</textarea>
+            </div>
+
+            <div style="margin-bottom:14px">
+              <div style="font-size:10px;letter-spacing:.15em;color:var(--muted);text-transform:uppercase;margin-bottom:6px">Who Can Apply</div>
+              <div style="display:flex;gap:8px">
+                <div onclick="selectApply(this,'open')" style="flex:1;text-align:center;padding:9px;background:var(--gold);color:var(--black);font-weight:600;border-radius:6px;font-size:11px;cursor:pointer;letter-spacing:.08em">Open Call</div>
+                <div onclick="selectApply(this,'verified')" style="flex:1;text-align:center;padding:9px;background:var(--deep);border:1px solid var(--gline);color:var(--muted2);border-radius:6px;font-size:11px;cursor:pointer;letter-spacing:.08em">Verified Only</div>
+              </div>
+            </div>
+
+            <div style="background:rgba(201,168,76,.06);border:1px solid var(--gline);border-radius:6px;padding:12px;margin-bottom:16px">
+              <div style="font-size:10px;color:var(--gold);letter-spacing:.12em;margin-bottom:4px">💳 PAYMENT HANDLED AUTOMATICALLY</div>
+              <div style="font-size:12px;color:var(--muted2);line-height:1.5">When the model checks in at the door, Stripe releases payment instantly. Hush AI takes 10% booking fee. No cash. No Venmo. No awkward conversations.</div>
+            </div>
+
+            <div style="display:flex;gap:10px">
+              <div onclick="submitModelSpot()" style="flex:1;background:linear-gradient(135deg,var(--gold3),var(--gold));border-radius:4px;padding:16px;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.15em;color:var(--black);cursor:pointer">POST SPOT 💃</div>
+              <div onclick="hidePostModel()" style="padding:16px 18px;border:1px solid var(--gline);border-radius:4px;color:var(--muted);cursor:pointer;font-size:13px">Cancel</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Model Profile overlay -->
+        <div id="modelProfileOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:999;align-items:flex-end;justify-content:center;padding-bottom:20px">
+          <div style="background:var(--card);border:1px solid var(--gline);border-radius:16px 16px 8px 8px;padding:0 0 28px;width:100%;max-width:390px;max-height:85vh;overflow-y:auto">
+            <!-- Profile header -->
+            <div style="background:linear-gradient(135deg,#0e0a04,#05050f);padding:28px 24px 20px;text-align:center;border-bottom:1px solid var(--gline);position:relative">
+              <div style="width:80px;height:80px;border-radius:50%;border:3px solid var(--gold);background:linear-gradient(135deg,var(--gold3),var(--gdim));display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--gold);margin:0 auto 12px" id="mpPhoto">JR</div>
+              <div style="font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--white)" id="mpName">Jasmine R.</div>
+              <div id="mpBadge" style="display:inline-block;margin-top:4px;padding:3px 12px;border-radius:20px;font-size:10px;background:linear-gradient(135deg,var(--gold3),var(--gold));color:var(--black);font-weight:700">⭐ Elite</div>
+            </div>
+            <div style="padding:20px 24px">
+              <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;border:1px solid var(--gline);border-radius:8px;overflow:hidden;margin-bottom:16px">
+                <div style="padding:12px 0;text-align:center;border-right:1px solid var(--gline)">
+                  <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text" id="mpRating">4.9</div>
+                  <div style="font-size:9px;color:var(--muted);letter-spacing:.1em">Rating</div>
+                </div>
+                <div style="padding:12px 0;text-align:center;border-right:1px solid var(--gline)">
+                  <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--gold2)" id="mpEvents">24</div>
+                  <div style="font-size:9px;color:var(--muted);letter-spacing:.1em">Events</div>
+                </div>
+                <div style="padding:12px 0;text-align:center">
+                  <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--green)">100%</div>
+                  <div style="font-size:9px;color:var(--muted);letter-spacing:.1em">Show Rate</div>
+                </div>
+              </div>
+              <div style="margin-bottom:14px">
+                <div style="font-size:10px;letter-spacing:.18em;color:var(--gold);text-transform:uppercase;margin-bottom:8px">Socials</div>
+                <div style="display:flex;gap:8px">
+                  <div style="flex:1;background:rgba(225,48,108,.1);border:1px solid rgba(225,48,108,.2);border-radius:6px;padding:8px;text-align:center;font-size:12px;color:#e1306c" id="mpIg">@jasminer_stl</div>
+                  <div style="flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:8px;text-align:center;font-size:12px;color:var(--muted2)" id="mpTt">@jasmine.r</div>
+                </div>
+              </div>
+              <div style="background:var(--deep);border:1px solid var(--gline);border-radius:6px;padding:12px;margin-bottom:16px">
+                <div style="font-size:10px;color:var(--gold);letter-spacing:.12em;margin-bottom:4px">ASKING FOR</div>
+                <div style="font-size:14px;color:var(--white);font-weight:500" id="mpAsk">$150 cash + entry</div>
+              </div>
+              <div style="background:var(--deep);border:1px solid var(--gline);border-radius:6px;padding:12px;margin-bottom:20px">
+                <div style="font-size:10px;color:var(--muted);letter-spacing:.12em;margin-bottom:4px">ABOUT</div>
+                <div style="font-size:13px;color:var(--muted2);line-height:1.6" id="mpAbout">Rising star in STL nightlife scene.</div>
+              </div>
+              <div style="display:flex;gap:10px">
+                <div onclick="acceptFromProfile()" style="flex:1;background:linear-gradient(135deg,var(--gold3),var(--gold));border-radius:6px;padding:14px;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.15em;color:var(--black);cursor:pointer">✓ BOOK HER</div>
+                <div onclick="closeModelProfile()" style="padding:14px 18px;border:1px solid var(--gline);border-radius:6px;color:var(--muted);cursor:pointer;font-size:13px">Close</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Blast confirm overlay -->
+        <div id="blastOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:999;display:none;align-items:flex-end;justify-content:center;padding-bottom:40px">
+          <div style="background:var(--card);border:1px solid var(--gline);border-radius:16px 16px 8px 8px;padding:28px 24px;width:100%;max-width:390px">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.1em;color:var(--gold);margin-bottom:4px">BLAST YOUR LIST</div>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:20px">Choose who gets this message</div>
+            <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+              <div id="bAll" onclick="selectBlast('all')" style="padding:8px 14px;border-radius:20px;font-size:11px;cursor:pointer;background:var(--gold);color:var(--black);font-weight:600">Everyone (47)</div>
+              <div id="bVip" onclick="selectBlast('vip')" style="padding:8px 14px;border-radius:20px;font-size:11px;cursor:pointer;background:var(--gdim);border:1px solid var(--gline);color:var(--gold)">VIP Only (8)</div>
+              <div id="bReg" onclick="selectBlast('reg')" style="padding:8px 14px;border-radius:20px;font-size:11px;cursor:pointer;background:rgba(245,240,232,.05);border:1px solid rgba(245,240,232,.1);color:var(--muted2)">Regular (24)</div>
+              <div id="bNew" onclick="selectBlast('new')" style="padding:8px 14px;border-radius:20px;font-size:11px;cursor:pointer;background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.2);color:var(--cyan)">New (15)</div>
+            </div>
+            <textarea id="blastMsg" style="width:100%;background:var(--deep);border:1px solid var(--gline);border-radius:6px;padding:12px;color:var(--white);font-family:'Outfit',sans-serif;font-size:13px;resize:none;height:80px;outline:none;margin-bottom:14px" placeholder="Type your message... (e.g. 🔥 The vibe is CRAZY right now — doors still open, come through!)"></textarea>
+            <div style="display:flex;gap:10px">
+              <div onclick="sendBlast()" style="flex:1;background:linear-gradient(135deg,var(--gold3),var(--gold));border-radius:4px;padding:14px;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.15em;color:var(--black);cursor:pointer">SEND BLAST 🚀</div>
+              <div onclick="hideBlast()" style="padding:14px 18px;border:1px solid var(--gline);border-radius:4px;color:var(--muted);cursor:pointer;font-size:13px">Cancel</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="nav-bar">
+        <div class="nav-item" onclick="goTo('s1',0)"><div class="nav-ico">⚡</div><div class="nav-pip"></div><div class="nav-lbl">Home</div></div>
+        <div class="nav-item" onclick="goTo('s2',1)"><div class="nav-ico">💬</div><div class="nav-pip"></div><div class="nav-lbl">Messages</div></div>
+        <div class="nav-item" onclick="goTo('s3',2)"><div class="nav-ico">🎟️</div><div class="nav-pip"></div><div class="nav-lbl">Guest List</div></div>
+        <div class="nav-item active" onclick="goTo('s4',3)"><div class="nav-ico">🔴</div><div class="nav-pip"></div><div class="nav-lbl">Tonight</div></div>
+        <div class="nav-item" onclick="goTo('s5',4)"><div class="nav-ico">👑</div><div class="nav-pip"></div><div class="nav-lbl">Network</div></div>
+      </div>
+    </div>
+
+    <!-- ══ S5: NETWORK ══ -->
+    <div class="screen" id="s5">
+      <div class="top-bar">
+        <div class="top-logo">MY NETWORK</div>
+        <div style="font-size:10px;letter-spacing:.12em;color:var(--gold)">MAY 2026</div>
+      </div>
+      <div class="scroll-area">
+
+        <div class="mogul-hero">
+          <div class="mogul-tier">👑 Founding Partner · Hush AI</div>
+          <div class="mogul-name">Niddy</div>
+          <div class="mogul-role">Head of Network · St. Louis & Region</div>
+          <div class="mogul-stats">
+            <div class="m-stat"><div class="m-stat-val">12</div><div class="m-stat-lbl">Promoters</div></div>
+            <div class="m-stat"><div class="m-stat-val" id="netCounter">$3,588</div><div class="m-stat-lbl">This Month</div></div>
+            <div class="m-stat"><div class="m-stat-val">20%</div><div class="m-stat-lbl">Equity</div></div>
+          </div>
+        </div>
+
+        <!-- Blast from Network -->
+        <div onclick="goTo('s4',3);setTimeout(showBlastConfirm,400)" style="background:var(--gdim);border:1px solid var(--gline);border-radius:8px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer">
+          <div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.1em;color:var(--gold)">📣 BLAST ALL PROMOTERS</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px">Send one SMS to your entire network</div>
+          </div>
+          <div style="color:var(--gold);font-size:20px">›</div>
+        </div>
+
+        <div class="sec-label">Promoters Under Your Brand</div>
+
+        <div class="promoter-row">
+          <div class="p-rank">1</div><div class="p-av">TK</div>
+          <div class="p-info"><div class="p-name">TK Promotions</div><div class="p-city">St. Louis, MO</div></div>
+          <div class="p-rev">$299/mo</div>
+        </div>
+        <div class="promoter-row">
+          <div class="p-rank">2</div><div class="p-av">JR</div>
+          <div class="p-info"><div class="p-name">Jay Renee Events</div><div class="p-city">St. Louis, MO</div></div>
+          <div class="p-rev">$299/mo</div>
+        </div>
+        <div class="promoter-row">
+          <div class="p-rank">3</div><div class="p-av">MD</div>
+          <div class="p-info"><div class="p-name">Meech Digital</div><div class="p-city">Kansas City, MO</div></div>
+          <div class="p-rev">$299/mo</div>
+        </div>
+        <div class="promoter-row">
+          <div class="p-rank">4</div><div class="p-av">SB</div>
+          <div class="p-info"><div class="p-name">Savvy B Events</div><div class="p-city">St. Louis, MO</div></div>
+          <div class="p-rev">$299/mo</div>
+        </div>
+        <div class="promoter-row" style="opacity:.45;border-style:dashed;border-color:var(--gline)">
+          <div class="p-rank" style="color:var(--gold)">+</div><div class="p-av" style="border-style:dashed">?</div>
+          <div class="p-info"><div class="p-name" style="color:var(--gold)">Invite a Promoter</div><div class="p-city">Grow your empire</div></div>
+          <div class="p-rev" style="font-size:14px">+$120</div>
+        </div>
+
+        <div class="total-bar">
+          <div><div class="total-lbl">Monthly Revenue Share</div><div style="font-size:10px;color:var(--muted);margin-top:2px">Auto-deposited · Every month</div></div>
+          <div class="total-val">$3,588</div>
+        </div>
+
+        <div style="text-align:center;margin-top:16px;cursor:pointer" onclick="goTo('s6',5)">
+          <div style="font-size:10px;letter-spacing:.2em;color:var(--gold);text-transform:uppercase">See Last Weekend's Replay →</div>
+        </div>
+
+      </div>
+      <div class="nav-bar">
+        <div class="nav-item" onclick="goTo('s1',0)"><div class="nav-ico">⚡</div><div class="nav-pip"></div><div class="nav-lbl">Home</div></div>
+        <div class="nav-item" onclick="goTo('s2',1)"><div class="nav-ico">💬</div><div class="nav-pip"></div><div class="nav-lbl">Messages</div></div>
+        <div class="nav-item" onclick="goTo('s3',2)"><div class="nav-ico">🎟️</div><div class="nav-pip"></div><div class="nav-lbl">Guest List</div></div>
+        <div class="nav-item" onclick="goTo('s4',3)"><div class="nav-ico">🔴</div><div class="nav-pip"></div><div class="nav-lbl">Tonight</div></div>
+        <div class="nav-item active" onclick="goTo('s5',4)"><div class="nav-ico">👑</div><div class="nav-pip"></div><div class="nav-lbl">Network</div></div>
+      </div>
+    </div>
+
+    <!-- ══ S6: REPLAY ══ -->
+    <div class="screen" id="s6">
+      <div class="top-bar">
+        <div class="top-logo">REPLAY</div>
+        <div style="font-size:10px;letter-spacing:.12em;color:var(--muted)">Last Saturday</div>
+      </div>
+      <div class="scroll-area">
+
+        <div style="background:linear-gradient(135deg,rgba(201,168,76,.1),rgba(201,168,76,.03));border:1px solid var(--gline);border-radius:8px;padding:20px;margin-bottom:16px;text-align:center">
+          <div style="font-size:9px;letter-spacing:.25em;color:var(--gold);text-transform:uppercase;margin-bottom:6px">Hush STL · April 26</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:22px;color:var(--white);margin-bottom:14px">Here's what last Saturday did for you.</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--gline);border:1px solid var(--gline);border-radius:4px;overflow:hidden">
+            <div style="background:var(--black);padding:14px 8px;text-align:center">
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text" id="r1">0</div>
+              <div style="font-size:9px;color:var(--muted);letter-spacing:.08em;margin-top:2px">Guests</div>
+            </div>
+            <div style="background:var(--black);padding:14px 8px;text-align:center">
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--green)" id="r2">0</div>
+              <div style="font-size:9px;color:var(--muted);letter-spacing:.08em;margin-top:2px">Confirmed</div>
+            </div>
+            <div style="background:var(--black);padding:14px 8px;text-align:center">
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--cyan)" id="r3">0%</div>
+              <div style="font-size:9px;color:var(--muted);letter-spacing:.08em;margin-top:2px">Show Rate</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- What AI did that night -->
+        <div class="sec-label">What Hush AI Did While You Were On The Floor</div>
+
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px">
+          <div style="background:var(--card);border:1px solid var(--gline);border-radius:8px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center">
+            <div style="font-size:13px;color:var(--white)">💬 Texts handled by AI</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--gold)">183</div>
+          </div>
+          <div style="background:var(--card);border:1px solid var(--gline);border-radius:8px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center">
+            <div style="font-size:13px;color:var(--white)">⏱ Avg response time</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--green)">4 SEC</div>
+          </div>
+          <div style="background:var(--card);border:1px solid var(--gline);border-radius:8px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center">
+            <div style="font-size:13px;color:var(--white)">🚫 Leads missed</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--green)">ZERO</div>
+          </div>
+          <div style="background:var(--card);border:1px solid var(--gline);border-radius:8px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center">
+            <div style="font-size:13px;color:var(--white)">📈 New VIPs earned</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--gold)">3</div>
+          </div>
+        </div>
+
+        <!-- Missed without AI -->
+        <div style="background:rgba(255,71,87,.06);border:1px solid rgba(255,71,87,.2);border-left:3px solid var(--red);border-radius:4px;padding:16px 18px;margin-bottom:16px">
+          <div style="font-size:10px;letter-spacing:.15em;color:var(--red);text-transform:uppercase;margin-bottom:6px">Without Hush AI That Night</div>
+          <div style="font-size:13px;color:var(--muted2);line-height:1.6">183 texts. No one to answer them at midnight. Guests left on read. <span style="color:var(--red);font-weight:500">Estimated 60+ people went somewhere else.</span></div>
+        </div>
+
+        <div style="text-align:center;cursor:pointer" onclick="goTo('s7',5)">
+          <div style="font-size:10px;letter-spacing:.2em;color:var(--gold);text-transform:uppercase;padding:12px">See What You're Building →</div>
+        </div>
+
+      </div>
+      <div class="nav-bar">
+        <div class="nav-item" onclick="goTo('s1',0)"><div class="nav-ico">⚡</div><div class="nav-pip"></div><div class="nav-lbl">Home</div></div>
+        <div class="nav-item" onclick="goTo('s2',1)"><div class="nav-ico">💬</div><div class="nav-pip"></div><div class="nav-lbl">Messages</div></div>
+        <div class="nav-item" onclick="goTo('s3',2)"><div class="nav-ico">🎟️</div><div class="nav-pip"></div><div class="nav-lbl">Guest List</div></div>
+        <div class="nav-item" onclick="goTo('s4',3)"><div class="nav-ico">🔴</div><div class="nav-pip"></div><div class="nav-lbl">Tonight</div></div>
+        <div class="nav-item active" onclick="goTo('s5',4)"><div class="nav-ico">👑</div><div class="nav-pip"></div><div class="nav-lbl">Network</div></div>
+      </div>
+    </div>
+
+    <!-- ══ S7: MOGUL CLOSER ══ -->
+    <div class="screen" id="s7">
+      <div class="closer-rings">
+        <div class="c-ring"></div><div class="c-ring"></div>
+        <div class="c-ring"></div><div class="c-ring"></div>
+      </div>
+      <div class="closer-crown">👑</div>
+      <div class="closer-name">NIDDY</div>
+      <div class="closer-title">Founding Partner · Hush AI</div>
+      <div class="closer-line"></div>
+      <div class="closer-rev">
+        <div class="closer-rev-lbl">Your Network Generates</div>
+        <div class="closer-rev-val" id="closerCounter">$3,588</div>
+        <div class="closer-rev-sub">Every single month · Without you lifting a finger</div>
+      </div>
+      <div class="closer-statement">
+        "We're not building an app.<br>
+        We're building something<br>
+        <span>our kids inherit.</span>"
+      </div>
+      <div class="closer-powered">GoElev8.AI · Infinite Possibilities</div>
+    </div>
+
+    <!-- ══ S8: FLYER STUDIO ══ -->
+    <div class="screen" id="s8">
+      <div class="top-bar">
+        <div class="top-logo">FLYER STUDIO</div>
+        <div style="font-size:10px;letter-spacing:.12em;color:var(--gold)">✦ AI POWERED</div>
+      </div>
+      <div class="scroll-area" id="studioScroll">
+
+        <!-- Step indicator -->
+        <div style="display:flex;align-items:center;gap:0;margin-bottom:20px" id="stepBar">
+          <div class="step-dot active" id="step1dot" onclick="studioStep(1)">1</div>
+          <div class="step-line" id="line12"></div>
+          <div class="step-dot" id="step2dot" onclick="studioStep(2)">2</div>
+          <div class="step-line" id="line23"></div>
+          <div class="step-dot" id="step3dot" onclick="studioStep(3)">3</div>
+          <div class="step-line" id="line34"></div>
+          <div class="step-dot" id="step4dot" onclick="studioStep(4)">4</div>
+        </div>
+
+        <!-- STEP 1: CREATE MODE -->
+        <div id="studioStep1">
+          <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:18px;color:var(--muted2);margin-bottom:6px">How do you want to build it?</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:20px;letter-spacing:.05em">Choose your creation method</div>
+
+          <div class="mode-card active-mode" id="modeAI" onclick="selectMode('ai')">
+            <div style="font-size:28px;margin-bottom:8px">🤖</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.1em;color:var(--gold);margin-bottom:4px">AI GENERATE</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.5">Describe your event vibe — AI writes the copy and builds your flyer instantly</div>
+          </div>
+
+          <div class="mode-card" id="modeUpload" onclick="selectMode('upload')">
+            <div style="font-size:28px;margin-bottom:8px">📸</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.1em;color:var(--muted2);margin-bottom:4px">UPLOAD BACKGROUND</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.5">Upload your own photo — Hush AI overlays your branding and event details</div>
+          </div>
+
+          <div class="mode-card" id="modeTemplate" onclick="selectMode('template')">
+            <div style="font-size:28px;margin-bottom:8px">🎨</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.1em;color:var(--muted2);margin-bottom:4px">PICK A TEMPLATE</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.5">Choose from luxury dark templates and customize every detail</div>
+          </div>
+
+          <button onclick="studioStep(2)" style="width:100%;margin-top:8px;padding:18px;background:linear-gradient(135deg,var(--gold3),var(--gold));border:none;border-radius:6px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.2em;color:var(--black);cursor:pointer">NEXT — ADD EVENT DETAILS</button>
+        </div>
+
+        <!-- STEP 2: EVENT DETAILS -->
+        <div id="studioStep2" style="display:none">
+          <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:18px;color:var(--muted2);margin-bottom:6px">Tell Hush AI about your event</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:20px">Fill in the details — AI does the rest</div>
+
+          <!-- AI vibe prompt (shown for AI mode) -->
+          <div id="aiPromptWrap" style="margin-bottom:16px">
+            <div style="font-size:10px;letter-spacing:.18em;color:var(--gold);text-transform:uppercase;margin-bottom:6px">Describe the vibe</div>
+            <textarea id="aiVibe" style="width:100%;background:var(--card);border:1px solid var(--gline);border-radius:6px;padding:12px;color:var(--white);font-family:'Outfit',sans-serif;font-size:13px;resize:none;height:72px;outline:none" placeholder="e.g. Upscale nightlife, mysterious, black and gold, exclusive Saturday night party in St. Louis..."></textarea>
+          </div>
+
+          <div style="margin-bottom:14px">
+            <div style="font-size:10px;letter-spacing:.18em;color:var(--muted);text-transform:uppercase;margin-bottom:6px">Event Name</div>
+            <input style="width:100%;background:var(--card);border:1px solid var(--gline);border-radius:6px;padding:13px;color:var(--white);font-family:'Outfit',sans-serif;font-size:14px;outline:none" value="Hush STL — Saturday Night" id="evtName">
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+            <div>
+              <div style="font-size:10px;letter-spacing:.18em;color:var(--muted);text-transform:uppercase;margin-bottom:6px">Date</div>
+              <input style="width:100%;background:var(--card);border:1px solid var(--gline);border-radius:6px;padding:13px;color:var(--white);font-family:'Outfit',sans-serif;font-size:13px;outline:none" value="Sat, May 10" id="evtDate">
+            </div>
+            <div>
+              <div style="font-size:10px;letter-spacing:.18em;color:var(--muted);text-transform:uppercase;margin-bottom:6px">Doors</div>
+              <input style="width:100%;background:var(--card);border:1px solid var(--gline);border-radius:6px;padding:13px;color:var(--white);font-family:'Outfit',sans-serif;font-size:13px;outline:none" value="10:00 PM" id="evtTime">
+            </div>
+          </div>
+
+          <div style="margin-bottom:14px">
+            <div style="font-size:10px;letter-spacing:.18em;color:var(--muted);text-transform:uppercase;margin-bottom:6px">Venue</div>
+            <input style="width:100%;background:var(--card);border:1px solid var(--gline);border-radius:6px;padding:13px;color:var(--white);font-family:'Outfit',sans-serif;font-size:14px;outline:none" value="Venue 9 · St. Louis, MO" id="evtVenue">
+          </div>
+
+          <!-- Keywords/tiers on flyer -->
+          <div style="margin-bottom:14px">
+            <div style="font-size:10px;letter-spacing:.18em;color:var(--gold);text-transform:uppercase;margin-bottom:10px">Keywords to show on flyer</div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--gline);border-radius:6px;padding:10px 14px">
+                <span style="font-size:14px">👑</span>
+                <div style="flex:1">
+                  <div style="font-size:11px;color:var(--gold)">VIP · Text <strong>HUSHVIP</strong></div>
+                  <div style="font-size:10px;color:var(--muted)">$75 · Priority entry + drink</div>
+                </div>
+                <div style="width:20px;height:20px;border-radius:4px;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--black)">✓</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid rgba(245,240,232,.1);border-radius:6px;padding:10px 14px">
+                <span style="font-size:14px">🎟️</span>
+                <div style="flex:1">
+                  <div style="font-size:11px;color:var(--muted2)">General · Text <strong>HUSHGA</strong></div>
+                  <div style="font-size:10px;color:var(--muted)">$35 · General admission</div>
+                </div>
+                <div style="width:20px;height:20px;border-radius:4px;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--black)">✓</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid rgba(0,212,255,.1);border-radius:6px;padding:10px 14px">
+                <span style="font-size:14px">✨</span>
+                <div style="flex:1">
+                  <div style="font-size:11px;color:var(--cyan)">First Timer · Text <strong>HUSHNEW</strong></div>
+                  <div style="font-size:10px;color:var(--muted)">$20 · Intro price</div>
+                </div>
+                <div style="width:20px;height:20px;border-radius:4px;background:var(--gdim);border:1px solid var(--gline);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted)">+</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:10px">
+            <button onclick="studioStep(1)" style="padding:16px 20px;background:transparent;border:1px solid var(--gline);border-radius:6px;color:var(--muted);cursor:pointer;font-size:13px">← Back</button>
+            <button onclick="generateFlyer()" style="flex:1;padding:16px;background:linear-gradient(135deg,var(--gold3),var(--gold));border:none;border-radius:6px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.18em;color:var(--black);cursor:pointer" id="generateBtn">✦ GENERATE FLYER</button>
+          </div>
+        </div>
+
+        <!-- STEP 3: PREVIEW FLYER -->
+        <div id="studioStep3" style="display:none">
+          <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:18px;color:var(--muted2);margin-bottom:6px">Your flyer is ready.</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:16px">Tap to edit any detail before sharing</div>
+
+          <!-- THE GENERATED FLYER -->
+          <div id="flyerPreview" style="width:100%;border-radius:12px;overflow:hidden;border:1px solid var(--gline);box-shadow:0 20px 60px rgba(0,0,0,.6),0 0 0 1px rgba(201,168,76,.15);margin-bottom:16px;position:relative">
+
+            <!-- Flyer background -->
+            <div style="background:linear-gradient(160deg,#0a0805 0%,#080608 40%,#050510 100%);padding:0;position:relative;overflow:hidden">
+
+              <!-- Diamond texture -->
+              <div style="position:absolute;inset:0;background-image:repeating-linear-gradient(45deg,rgba(201,168,76,.04) 0px,rgba(201,168,76,.04) 1px,transparent 1px,transparent 24px),repeating-linear-gradient(-45deg,rgba(201,168,76,.04) 0px,rgba(201,168,76,.04) 1px,transparent 1px,transparent 24px)"></div>
+
+              <!-- Glow orb -->
+              <div style="position:absolute;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(201,168,76,.12) 0%,transparent 70%);top:-50px;left:50%;transform:translateX(-50%)"></div>
+
+              <!-- Top branding -->
+              <div style="padding:28px 24px 16px;text-align:center;position:relative;z-index:2">
+                <div style="font-family:'Bebas Neue',sans-serif;font-size:64px;line-height:1;background:linear-gradient(160deg,var(--gold3) 0%,var(--gold4) 40%,var(--gold) 70%,var(--gold3) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 24px rgba(201,168,76,.5))">H</div>
+                <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:.4em;color:rgba(201,168,76,.6);margin-top:-4px">HUSH STL</div>
+              </div>
+
+              <!-- Event title -->
+              <div style="padding:0 24px 16px;text-align:center;position:relative;z-index:2">
+                <div style="font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:.06em;color:var(--white);line-height:1.1" id="flyerTitle">SATURDAY NIGHT</div>
+                <div style="width:60px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:10px auto"></div>
+                <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:13px;color:rgba(201,168,76,.7);letter-spacing:.06em">An exclusive experience. By invitation only.</div>
+              </div>
+
+              <!-- Details band -->
+              <div style="margin:0 20px;background:rgba(201,168,76,.08);border:1px solid var(--gline);border-radius:8px;padding:14px 16px;position:relative;z-index:2;margin-bottom:16px">
+                <div style="display:grid;grid-template-columns:1fr 1px 1fr 1px 1fr;gap:0;text-align:center">
+                  <div>
+                    <div style="font-size:9px;letter-spacing:.15em;color:var(--gold);text-transform:uppercase;margin-bottom:3px">Date</div>
+                    <div style="font-size:12px;color:var(--white);font-weight:500" id="flyerDate">SAT MAY 10</div>
+                  </div>
+                  <div style="background:var(--gline)"></div>
+                  <div>
+                    <div style="font-size:9px;letter-spacing:.15em;color:var(--gold);text-transform:uppercase;margin-bottom:3px">Doors</div>
+                    <div style="font-size:12px;color:var(--white);font-weight:500" id="flyerTime">10:00 PM</div>
+                  </div>
+                  <div style="background:var(--gline)"></div>
+                  <div>
+                    <div style="font-size:9px;letter-spacing:.15em;color:var(--gold);text-transform:uppercase;margin-bottom:3px">Age</div>
+                    <div style="font-size:12px;color:var(--white);font-weight:500">21+</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Venue -->
+              <div style="text-align:center;margin-bottom:16px;position:relative;z-index:2">
+                <div style="font-size:11px;color:var(--muted);letter-spacing:.12em" id="flyerVenue">VENUE 9 · ST. LOUIS, MO</div>
+              </div>
+
+              <!-- Keywords section -->
+              <div style="margin:0 20px 20px;position:relative;z-index:2">
+                <div style="font-size:9px;letter-spacing:.25em;color:var(--gold);text-transform:uppercase;text-align:center;margin-bottom:10px">HOW TO GET IN</div>
+                <div style="display:flex;flex-direction:column;gap:6px">
+                  <div style="background:linear-gradient(135deg,rgba(201,168,76,.15),rgba(201,168,76,.05));border:1px solid var(--gline);border-radius:6px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center">
+                    <div>
+                      <div style="font-size:9px;color:var(--gold);letter-spacing:.12em">👑 VIP ACCESS</div>
+                      <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.1em;color:var(--white)">TEXT HUSHVIP</div>
+                    </div>
+                    <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--gold)">$75</div>
+                  </div>
+                  <div style="background:rgba(245,240,232,.04);border:1px solid rgba(245,240,232,.08);border-radius:6px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center">
+                    <div>
+                      <div style="font-size:9px;color:var(--muted2);letter-spacing:.12em">🎟 GENERAL ADMISSION</div>
+                      <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.1em;color:var(--muted2)">TEXT HUSHGA</div>
+                    </div>
+                    <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--muted2)">$35</div>
+                  </div>
+                </div>
+
+                <!-- Number to text -->
+                <div style="text-align:center;margin-top:12px;padding:10px;background:rgba(0,0,0,.3);border-radius:6px;border:1px dashed var(--gline)">
+                  <div style="font-size:9px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;margin-bottom:3px">Text your keyword to</div>
+                  <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.1em;background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">(888) 302-0649</div>
+                  <div style="font-size:9px;color:var(--muted);margin-top:2px">AI responds instantly with your booking link</div>
+                </div>
+              </div>
+
+              <!-- QR Code on flyer -->
+              <div style="margin:0 20px 24px;display:flex;align-items:center;gap:14px;background:rgba(0,0,0,.4);border-radius:8px;padding:14px;position:relative;z-index:2">
+                <div style="width:64px;height:64px;background:white;border-radius:6px;padding:6px;flex-shrink:0">
+                  <svg viewBox="0 0 70 70" style="width:100%;height:100%">
+                    <rect x="2" y="2" width="18" height="18" fill="#040405" rx="2"/><rect x="4" y="4" width="14" height="14" fill="white" rx="1"/><rect x="6" y="6" width="10" height="10" fill="#040405" rx="1"/>
+                    <rect x="50" y="2" width="18" height="18" fill="#040405" rx="2"/><rect x="52" y="4" width="14" height="14" fill="white" rx="1"/><rect x="54" y="6" width="10" height="10" fill="#040405" rx="1"/>
+                    <rect x="2" y="50" width="18" height="18" fill="#040405" rx="2"/><rect x="4" y="52" width="14" height="14" fill="white" rx="1"/><rect x="6" y="54" width="10" height="10" fill="#040405" rx="1"/>
+                    <rect x="24" y="4" width="4" height="4" fill="#040405"/><rect x="32" y="4" width="4" height="4" fill="#040405"/><rect x="40" y="4" width="4" height="4" fill="#040405"/>
+                    <rect x="26" y="12" width="4" height="4" fill="#040405"/><rect x="34" y="10" width="4" height="4" fill="#040405"/><rect x="44" y="14" width="4" height="4" fill="#040405"/>
+                    <rect x="24" y="24" width="4" height="4" fill="#040405"/><rect x="32" y="22" width="4" height="4" fill="#040405"/><rect x="44" y="26" width="4" height="4" fill="#040405"/>
+                    <rect x="26" y="34" width="4" height="4" fill="#040405"/><rect x="38" y="32" width="4" height="4" fill="#040405"/><rect x="50" y="36" width="4" height="4" fill="#040405"/>
+                    <rect x="24" y="44" width="4" height="4" fill="#040405"/><rect x="36" y="46" width="4" height="4" fill="#040405"/><rect x="48" y="44" width="4" height="4" fill="#040405"/>
+                    <rect x="26" y="56" width="4" height="4" fill="#040405"/><rect x="40" y="58" width="4" height="4" fill="#040405"/><rect x="52" y="54" width="4" height="4" fill="#040405"/>
+                    <rect x="60" y="24" width="4" height="4" fill="#040405"/><rect x="56" y="34" width="4" height="4" fill="#040405"/><rect x="64" y="44" width="4" height="4" fill="#040405"/>
+                    <rect x="58" y="56" width="4" height="4" fill="#040405"/><rect x="66" y="60" width="4" height="4" fill="#040405"/>
+                  </svg>
+                </div>
+                <div>
+                  <div style="font-size:10px;color:var(--gold);letter-spacing:.12em;margin-bottom:3px">SCAN TO BOOK INSTANTLY</div>
+                  <div style="font-size:12px;color:var(--muted2);line-height:1.5">Opens your Hush AI booking page — no app needed</div>
+                  <div style="font-size:9px;color:var(--muted);margin-top:3px;letter-spacing:.08em">Powered by GoElev8.AI</div>
+                </div>
+              </div>
+
+              <!-- Bottom gold bar -->
+              <div style="background:linear-gradient(135deg,var(--gold3),var(--gold4),var(--gold),var(--gold3));padding:10px;text-align:center">
+                <div style="font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:.3em;color:var(--black)">HUSH AI · INFINITE POSSIBILITIES</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:10px;margin-bottom:10px">
+            <button onclick="studioStep(2)" style="padding:14px 16px;background:transparent;border:1px solid var(--gline);border-radius:6px;color:var(--muted);cursor:pointer;font-size:13px">← Edit</button>
+            <button onclick="studioStep(4)" style="flex:1;padding:14px;background:linear-gradient(135deg,var(--gold3),var(--gold));border:none;border-radius:6px;font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:.18em;color:var(--black);cursor:pointer">SHARE THIS FLYER →</button>
+          </div>
+        </div>
+
+        <!-- STEP 4: SHARE -->
+        <div id="studioStep4" style="display:none">
+          <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:18px;color:var(--muted2);margin-bottom:6px">Send it out.</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:20px">Your flyer + booking link fires automatically</div>
+
+          <!-- Flyer thumbnail -->
+          <div style="background:linear-gradient(135deg,rgba(201,168,76,.1),rgba(201,168,76,.03));border:1px solid var(--gline);border-radius:8px;padding:14px;display:flex;gap:14px;align-items:center;margin-bottom:20px">
+            <div style="width:52px;height:64px;background:linear-gradient(160deg,#0a0805,#050510);border:1px solid var(--gline);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;background:linear-gradient(135deg,var(--gold3),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">H</div>
+            </div>
+            <div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.06em;color:var(--white)">HUSH STL — SATURDAY NIGHT</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:2px">Sat, May 10 · Venue 9 · 10PM</div>
+              <div style="font-size:10px;color:var(--gold);margin-top:4px">Keywords: HUSHVIP · HUSHGA</div>
+            </div>
+          </div>
+
+          <!-- SMS BLAST -->
+          <div style="font-size:10px;letter-spacing:.2em;color:var(--gold);text-transform:uppercase;margin-bottom:12px">📣 SMS Blast</div>
+
+          <div style="background:var(--card);border:1px solid var(--gline);border-radius:8px;padding:16px;margin-bottom:16px">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:12px">Who gets this blast?</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+              <div id="bAll2" onclick="selectBlast2('all')" style="padding:7px 14px;border-radius:20px;font-size:11px;cursor:pointer;background:var(--gold);color:var(--black);font-weight:600">Everyone (247)</div>
+              <div id="bVip2" onclick="selectBlast2('vip')" style="padding:7px 14px;border-radius:20px;font-size:11px;cursor:pointer;background:var(--gdim);border:1px solid var(--gline);color:var(--gold)">VIP (48)</div>
+              <div id="bReg2" onclick="selectBlast2('reg')" style="padding:7px 14px;border-radius:20px;font-size:11px;cursor:pointer;background:rgba(245,240,232,.05);border:1px solid rgba(245,240,232,.1);color:var(--muted2)">Regular (142)</div>
+              <div id="bNew2" onclick="selectBlast2('new')" style="padding:7px 14px;border-radius:20px;font-size:11px;cursor:pointer;background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.2);color:var(--cyan)">New (57)</div>
+            </div>
+            <div style="background:var(--deep);border:1px solid var(--gline);border-radius:6px;padding:12px;margin-bottom:12px">
+              <div style="font-size:9px;letter-spacing:.15em;color:var(--muted);text-transform:uppercase;margin-bottom:6px">Message preview</div>
+              <div style="font-size:13px;color:var(--muted2);line-height:1.6">🖤 Hush STL is back this Saturday. VIP spots going fast — text <span style="color:var(--gold);font-weight:600">HUSHVIP</span> to lock in. See you on the floor.</div>
+              <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--gline);font-size:11px;color:var(--cyan)">+ Flyer attached · + Booking link: hush.ai/sat0510</div>
+            </div>
+            <button onclick="sendFlyer('sms')" id="smsSendBtn" style="width:100%;padding:16px;background:linear-gradient(135deg,var(--gold3),var(--gold));border:none;border-radius:6px;font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:.18em;color:var(--black);cursor:pointer">📤 SEND SMS BLAST</button>
+          </div>
+
+          <!-- SOCIAL SHARE -->
+          <div style="font-size:10px;letter-spacing:.2em;color:var(--gold);text-transform:uppercase;margin-bottom:12px">📱 Social Share</div>
+
+          <div style="background:var(--card);border:1px solid var(--gline);border-radius:8px;padding:16px;margin-bottom:20px">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:14px">Export and post to your socials</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+              <button onclick="sendFlyer('ig')" style="padding:14px 10px;background:linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045);border:none;border-radius:6px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:.1em;color:white;cursor:pointer">📸 IG STORY</button>
+              <button onclick="sendFlyer('igpost')" style="padding:14px 10px;background:linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045);border:none;border-radius:6px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:.1em;color:white;cursor:pointer">🖼 IG POST</button>
+              <button onclick="sendFlyer('download')" style="padding:14px 10px;background:var(--deep);border:1px solid var(--gline);border-radius:6px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:.1em;color:var(--gold);cursor:pointer">💾 SAVE FLYER</button>
+              <button onclick="sendFlyer('copy')" style="padding:14px 10px;background:var(--deep);border:1px solid var(--gline);border-radius:6px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:.1em;color:var(--muted2);cursor:pointer">🔗 COPY LINK</button>
+            </div>
+          </div>
+
+          <!-- Success message (hidden) -->
+          <div id="shareSuccess" style="display:none;background:rgba(0,232,154,.08);border:1px solid rgba(0,232,154,.3);border-radius:8px;padding:16px;text-align:center;margin-bottom:16px">
+            <div style="font-size:24px;margin-bottom:6px">🎉</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.1em;color:var(--green)">FLYER SENT!</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:4px">Your flyer + booking links are out. Watch the bookings roll in.</div>
+          </div>
+
+          <button onclick="studioStep(3)" style="width:100%;padding:14px;background:transparent;border:1px solid var(--gline);border-radius:6px;color:var(--muted);cursor:pointer;font-size:13px">← Back to Preview</button>
+        </div>
+
+      </div>
+
+      <div class="nav-bar">
+        <div class="nav-item" onclick="goTo('s1',0)"><div class="nav-ico">⚡</div><div class="nav-pip"></div><div class="nav-lbl">Home</div></div>
+        <div class="nav-item" onclick="goTo('s2',1)"><div class="nav-ico">💬</div><div class="nav-pip"></div><div class="nav-lbl">Messages</div></div>
+        <div class="nav-item" onclick="goTo('s3',2)"><div class="nav-ico">🎟️</div><div class="nav-pip"></div><div class="nav-lbl">Guest List</div></div>
+        <div class="nav-item" onclick="goTo('s4',3)"><div class="nav-ico">🔴</div><div class="nav-pip"></div><div class="nav-lbl">Tonight</div></div>
+        <div class="nav-item active" onclick="goTo('s8',5)"><div class="nav-ico">✦</div><div class="nav-pip"></div><div class="nav-lbl">Studio</div></div>
+      </div>
+    </div>
+
+  </div><!-- end screens -->
+</div><!-- end phone -->
+</div><!-- end shell -->
+
+<script>
+// ── EVENT MODELS ──
+function modelTab(n) {
+  for(let i=1;i<=3;i++){
+    const tab=document.getElementById('modelTab'+i);
+    const btn=document.getElementById('mtab'+i);
+    if(tab) tab.style.display=i===n?'block':'none';
+    if(btn){
+      if(i===n){btn.style.background='var(--gold)';btn.style.color='var(--black)';btn.style.fontWeight='600'}
+      else{btn.style.background='transparent';btn.style.color='var(--muted)';btn.style.fontWeight='400'}
+    }
+  }
+}
+
+function acceptModel(btn) {
+  const card=btn.closest('.model-card');
+  if(!card) return;
+  btn.classList.add('done');
+  btn.textContent='✓';
+  btn.style.background='var(--green)';btn.style.color='var(--black)';
+  setTimeout(()=>{
+    card.style.borderColor='rgba(0,232,154,.3)';
+    const nameEl=card.querySelector('.mc-name');
+    const name=nameEl?nameEl.textContent:'Model';
+    const info=card.querySelector('[style*="margin-top:6px"]');
+    if(info){info.style.color='var(--green)';info.textContent='✓ Booked · Payment releases on check-in'}
+  },300);
+}
+
+function declineModel(btn) {
+  const card=btn.closest('.model-card');
+  if(card){card.style.opacity='.3';card.style.pointerEvents='none'}
+}
+
+function showPostModel(){
+  const o=document.getElementById('postModelOverlay');
+  if(o){o.style.display='flex'}
+}
+function hidePostModel(){
+  const o=document.getElementById('postModelOverlay');
+  if(o){o.style.display='none'}
+}
+function submitModelSpot(){
+  const btn=document.querySelector('#postModelOverlay [onclick="submitModelSpot()"]');
+  if(btn){
+    btn.textContent='✓ SPOT POSTED · ACCEPTING APPLICATIONS';
+    btn.style.background='var(--green)';
+    btn.style.color='var(--black)';
+    setTimeout(hidePostModel,1400);
+  }
+}
+function selectModelCount(el,n){
+  el.parentElement.querySelectorAll('div').forEach(d=>{d.style.background='var(--deep)';d.style.color='var(--muted2)';d.style.border='1px solid var(--gline)'});
+  el.style.background='var(--gold)';el.style.color='var(--black)';el.style.border='none';
+}
+function toggleComp(type){
+  const el=document.getElementById('comp'+type.charAt(0).toUpperCase()+type.slice(1));
+  if(!el) return;
+  const isActive=el.style.fontWeight==='600';
+  if(isActive){el.style.fontWeight='400';el.style.background='rgba(245,240,232,.05)';el.style.border='1px solid rgba(245,240,232,.1)';el.style.color='var(--muted2)'}
+  else{el.style.fontWeight='600';el.style.background='var(--gold)';el.style.color='var(--black)';el.style.border='none'}
+}
+function selectApply(el,type){
+  el.parentElement.querySelectorAll('div').forEach(d=>{d.style.background='var(--deep)';d.style.color='var(--muted2)';d.style.border='1px solid var(--gline)';d.style.fontWeight='400'});
+  el.style.background='var(--gold)';el.style.color='var(--black)';el.style.border='none';el.style.fontWeight='600';
+}
+
+function openModelProfile(name,initials,badge,rating,events,ig,tt,ask,about){
+  document.getElementById('mpPhoto').textContent=initials;
+  document.getElementById('mpName').textContent=name;
+  document.getElementById('mpRating').textContent=rating;
+  document.getElementById('mpEvents').textContent=events;
+  document.getElementById('mpIg').textContent=ig;
+  document.getElementById('mpTt').textContent=tt;
+  document.getElementById('mpAsk').textContent=ask;
+  document.getElementById('mpAbout').textContent=about;
+  const badgeEl=document.getElementById('mpBadge');
+  if(badgeEl){
+    if(badge==='Elite'){badgeEl.textContent='⭐ Elite';badgeEl.style.background='linear-gradient(135deg,var(--gold3),var(--gold))';badgeEl.style.color='var(--black)'}
+    else if(badge==='Featured'){badgeEl.textContent='✦ Featured';badgeEl.style.background='rgba(162,155,254,.2)';badgeEl.style.color='#a29bfe'}
+    else{badgeEl.textContent='↑ Rising';badgeEl.style.background='rgba(0,232,154,.1)';badgeEl.style.color='var(--green)'}
+  }
+  document.getElementById('modelProfileOverlay').style.display='flex';
+}
+function closeModelProfile(){document.getElementById('modelProfileOverlay').style.display='none'}
+function acceptFromProfile(){
+  const btn=document.querySelector('#modelProfileOverlay [onclick="acceptFromProfile()"]');
+  if(btn){btn.textContent='✓ BOOKED · PAYMENT SET';btn.style.background='var(--green)';btn.style.color='var(--black)';btn.style.pointerEvents='none'}
+  setTimeout(closeModelProfile,1200);
+}
+function inviteModel(name){
+  const btn=event.currentTarget.querySelector('[style*="Invite"]');
+  if(btn){btn.textContent='✓ Invited';btn.style.color='var(--green)';btn.style.borderColor='rgba(0,232,154,.3)'}
+}
+
+// ── FLYER STUDIO ──
+let selectedMode = 'ai';
+let currentStep = 1;
+
+function studioStep(n) {
+  currentStep = n;
+  for(let i=1;i<=4;i++){
+    const s=document.getElementById('studioStep'+i);
+    if(s) s.style.display = i===n ? 'block' : 'none';
+    const d=document.getElementById('step'+i+'dot');
+    if(d){
+      d.className='step-dot';
+      if(i<n) d.classList.add('done');
+      else if(i===n) d.classList.add('active');
+    }
+    const l=document.getElementById('line'+i+(i+1));
+    if(l) l.className='step-line'+(i<n?' done':'');
+  }
+  const scroll=document.getElementById('studioScroll');
+  if(scroll) scroll.scrollTop=0;
+}
+
+function selectMode(mode) {
+  selectedMode=mode;
+  ['ai','upload','template'].forEach(m=>{
+    const c=document.getElementById('mode'+m.charAt(0).toUpperCase()+m.slice(1));
+    if(c){
+      c.className='mode-card'+(m===mode?' active-mode':'');
+      const title=c.querySelector('[style*="Bebas Neue"]');
+      if(title) title.style.color=m===mode?'var(--gold)':'var(--muted2)';
+    }
+  });
+  const prompt=document.getElementById('aiPromptWrap');
+  if(prompt) prompt.style.display=mode==='ai'?'block':'none';
+}
+
+function generateFlyer() {
+  const btn=document.getElementById('generateBtn');
+  if(!btn) return;
+  btn.textContent='✦ GENERATING...';
+  btn.style.opacity='.7';
+  btn.style.pointerEvents='none';
+  setTimeout(()=>{
+    const name=document.getElementById('evtName');
+    const date=document.getElementById('evtDate');
+    const time=document.getElementById('evtTime');
+    const venue=document.getElementById('evtVenue');
+    const ft=document.getElementById('flyerTitle');
+    const fd=document.getElementById('flyerDate');
+    const ftm=document.getElementById('flyerTime');
+    const fv=document.getElementById('flyerVenue');
+    if(ft&&name) ft.textContent=name.value.toUpperCase().replace('HUSH STL — ','');
+    if(fd&&date) fd.textContent=date.value.toUpperCase();
+    if(ftm&&time) ftm.textContent=time.value;
+    if(fv&&venue) fv.textContent=venue.value.toUpperCase();
+    btn.textContent='✦ GENERATE FLYER';
+    btn.style.opacity='1';
+    btn.style.pointerEvents='all';
+    studioStep(3);
+  },1800);
+}
+
+function selectBlast2(tier){
+  const btns={all:'bAll2',vip:'bVip2',reg:'bReg2',new:'bNew2'};
+  Object.keys(btns).forEach(k=>{
+    const el=document.getElementById(btns[k]);
+    if(el){
+      if(k==='all') el.style.cssText='padding:7px 14px;border-radius:20px;font-size:11px;cursor:pointer;background:rgba(245,240,232,.08);border:1px solid rgba(245,240,232,.15);color:var(--muted2)';
+      else if(k==='vip') el.style.cssText='padding:7px 14px;border-radius:20px;font-size:11px;cursor:pointer;background:var(--gdim);border:1px solid var(--gline);color:var(--gold)';
+      else if(k==='reg') el.style.cssText='padding:7px 14px;border-radius:20px;font-size:11px;cursor:pointer;background:rgba(245,240,232,.05);border:1px solid rgba(245,240,232,.1);color:var(--muted2)';
+      else el.style.cssText='padding:7px 14px;border-radius:20px;font-size:11px;cursor:pointer;background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.2);color:var(--cyan)';
+    }
+  });
+  const active=document.getElementById(btns[tier]);
+  if(active){
+    if(tier==='all') active.style.cssText='padding:7px 14px;border-radius:20px;font-size:11px;cursor:pointer;background:var(--gold);color:var(--black);font-weight:600';
+    else if(tier==='vip') active.style.cssText='padding:7px 14px;border-radius:20px;font-size:11px;cursor:pointer;background:linear-gradient(135deg,var(--gold3),var(--gold));color:var(--black);font-weight:600';
+    else if(tier==='reg') active.style.cssText='padding:7px 14px;border-radius:20px;font-size:11px;cursor:pointer;background:rgba(245,240,232,.2);color:var(--white);font-weight:600';
+    else active.style.cssText='padding:7px 14px;border-radius:20px;font-size:11px;cursor:pointer;background:var(--cyan);color:var(--black);font-weight:600';
+  }
+}
+
+function sendFlyer(type){
+  const success=document.getElementById('shareSuccess');
+  if(type==='sms'){
+    const btn=document.getElementById('smsSendBtn');
+    if(btn){
+      btn.textContent='✓ BLAST SENT TO 247 GUESTS';
+      btn.style.background='var(--green)';
+      btn.style.pointerEvents='none';
+    }
+  }
+  if(success) success.style.display='block';
+  const scroll=document.getElementById('studioScroll');
+  if(scroll) setTimeout(()=>scroll.scrollTop=scroll.scrollHeight,100);
+}
+
+// ── MESSAGES TAB SWITCHING ──
+function msgTab(tab) {
+  const live = document.getElementById('msgLive');
+  const keys = document.getElementById('msgKeys');
+  const tLive = document.getElementById('tabLive');
+  const tKeys = document.getElementById('tabKeys');
+  if(tab === 'live') {
+    live.style.display = 'flex';
+    keys.style.display = 'none';
+    tLive.style.cssText = 'flex:1;text-align:center;padding:12px 0;font-size:11px;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;color:var(--gold);border-bottom:2px solid var(--gold);transition:all .2s';
+    tKeys.style.cssText = 'flex:1;text-align:center;padding:12px 0;font-size:11px;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;transition:all .2s';
+    setTimeout(() => {
+      const cs = document.getElementById('chatScroll');
+      if(cs) cs.scrollTop = cs.scrollHeight;
+    }, 100);
+  } else {
+    live.style.display = 'none';
+    keys.style.display = 'block';
+    tLive.style.cssText = 'flex:1;text-align:center;padding:12px 0;font-size:11px;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;transition:all .2s';
+    tKeys.style.cssText = 'flex:1;text-align:center;padding:12px 0;font-size:11px;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;color:var(--gold);border-bottom:2px solid var(--gold);transition:all .2s';
+  }
+}
+
+// ── KEYWORD MODALS ──
+function showAddKeyword() {
+  const m = document.getElementById('addKeyModal');
+  if(m){ m.style.display = 'flex'; }
+}
+function hideAddKeyword() {
+  const m = document.getElementById('addKeyModal');
+  if(m){ m.style.display = 'none'; }
+}
+function saveKeyword() {
+  const btn = document.querySelector('#addKeyModal [onclick="saveKeyword()"]');
+  if(btn){
+    btn.textContent = '✓ KEYWORD SAVED';
+    btn.style.background = 'var(--green)';
+    setTimeout(hideAddKeyword, 1200);
+  }
+}
+function editKeyword(type) {
+  showAddKeyword();
+  setTimeout(() => {
+    if(type==='vip') {
+      const ki=document.getElementById('newKwInput');
+      const kp=document.getElementById('newKwPrice');
+      const kl=document.getElementById('newKwLink');
+      const kr=document.getElementById('newKwReply');
+      if(ki) ki.value='HUSHVIP';
+      if(kp) kp.value='$75';
+      if(kl) kl.value='hush.ai/vip/sat0426';
+      if(kr) kr.value='🖤 VIP Access unlocked! Here\'s your exclusive booking link — grab your spot before it\'s gone:';
+    } else {
+      const ki=document.getElementById('newKwInput');
+      const kp=document.getElementById('newKwPrice');
+      const kl=document.getElementById('newKwLink');
+      const kr=document.getElementById('newKwReply');
+      if(ki) ki.value='HUSHGA';
+      if(kp) kp.value='$35';
+      if(kl) kl.value='hush.ai/ga/sat0426';
+      if(kr) kr.value='You\'re in! Here\'s your general admission link — doors open 10PM, see you tonight:';
+    }
+  }, 100);
+}
+
+// ── GUEST LIST FILTER ──
+function filterGuests(tier) {
+  const cards = document.querySelectorAll('[data-tier]');
+  const filters = {all:'filterAll',vip:'filterVip',reg:'filterReg',new:'filterNew'};
+  const activeStyles = {
+    all:'background:var(--gold);color:var(--black);font-weight:600;border:none',
+    vip:'background:var(--gdim);border:1px solid var(--gline);color:var(--gold)',
+    reg:'background:rgba(245,240,232,.05);border:1px solid rgba(245,240,232,.1);color:var(--muted2)',
+    new:'background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.2);color:var(--cyan)'
+  };
+  // Reset all filter tabs
+  Object.keys(filters).forEach(k => {
+    document.getElementById(filters[k]).style.cssText = `padding:6px 14px;border-radius:20px;font-size:11px;letter-spacing:.1em;cursor:pointer;${activeStyles[k]}`;
+  });
+  // Highlight active
+  const activeEl = document.getElementById(filters[tier]);
+  if(tier==='all') activeEl.style.cssText='padding:6px 14px;border-radius:20px;font-size:11px;letter-spacing:.1em;cursor:pointer;background:var(--gold);color:var(--black);font-weight:600';
+  else if(tier==='vip') activeEl.style.cssText='padding:6px 14px;border-radius:20px;font-size:11px;letter-spacing:.1em;cursor:pointer;background:linear-gradient(135deg,var(--gold3),var(--gold));color:var(--black);font-weight:600';
+  else if(tier==='reg') activeEl.style.cssText='padding:6px 14px;border-radius:20px;font-size:11px;letter-spacing:.1em;cursor:pointer;background:rgba(245,240,232,.2);color:var(--white);font-weight:600';
+  else if(tier==='new') activeEl.style.cssText='padding:6px 14px;border-radius:20px;font-size:11px;letter-spacing:.1em;cursor:pointer;background:var(--cyan);color:var(--black);font-weight:600';
+  // Show/hide cards
+  cards.forEach(card => {
+    card.style.display = (tier==='all' || card.dataset.tier===tier) ? 'block' : 'none';
+  });
+}
+
+// ── NAVIGATION ──
+const allScreens = ['s0','s1','s2','s3','s4','s5','s6','s7'];
+
+function goTo(id, navIdx) {
+  allScreens.forEach(s => {
+    const el = document.getElementById(s);
+    if(el) el.classList.remove('active');
+  });
+  const target = document.getElementById(id);
+  if(!target) return;
+  target.classList.add('active');
+  target.scrollTop = 0;
+
+  if (id === 's2') {
+    setTimeout(() => {
+      const cs = document.getElementById('chatScroll');
+      if (cs) cs.scrollTop = cs.scrollHeight;
+    }, 150);
+  }
+  if (id === 's4') {
+    setTimeout(() => animateCounter('doorCount', 0, 31, 1800), 400);
+  }
+  if (id === 's6') {
+    setTimeout(() => {
+      animateCounter('r1', 0, 89, 1600);
+      animateCounter('r2', 0, 74, 1800);
+    }, 400);
+    setTimeout(() => {
+      const r3 = document.getElementById('r3');
+      if(r3) {
+        let start = performance.now();
+        function tick(now) {
+          const p = Math.min((now-start)/1800,1);
+          const e = 1-Math.pow(1-p,3);
+          r3.textContent = Math.floor(e*83)+'%';
+          if(p<1) requestAnimationFrame(tick);
+          else r3.textContent='83%';
+        }
+        requestAnimationFrame(tick);
+      }
+    }, 400);
+  }
+  if (id === 's7') {
+    setTimeout(() => animateCounter('closerCounter', 0, 3588, 2200), 400);
+  }
+}
+
+// ── BLAST OVERLAY ──
+function showBlastConfirm() {
+  const overlay = document.getElementById('blastOverlay');
+  if(overlay){ overlay.style.display='flex'; }
+}
+function hideBlast() {
+  const overlay = document.getElementById('blastOverlay');
+  if(overlay){ overlay.style.display='none'; }
+}
+function selectBlast(tier) {
+  const btns = {all:'bAll',vip:'bVip',reg:'bReg',new:'bNew'};
+  const styles = {
+    all:'padding:8px 14px;border-radius:20px;font-size:11px;cursor:pointer;',
+    vip:'padding:8px 14px;border-radius:20px;font-size:11px;cursor:pointer;background:var(--gdim);border:1px solid var(--gline);color:var(--gold)',
+    reg:'padding:8px 14px;border-radius:20px;font-size:11px;cursor:pointer;background:rgba(245,240,232,.05);border:1px solid rgba(245,240,232,.1);color:var(--muted2)',
+    new:'padding:8px 14px;border-radius:20px;font-size:11px;cursor:pointer;background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.2);color:var(--cyan)'
+  };
+  Object.keys(btns).forEach(k=>{
+    const el=document.getElementById(btns[k]);
+    if(el) el.style.cssText=styles[k]+(k==='all'?'background:rgba(245,240,232,.08);border:1px solid rgba(245,240,232,.15);color:var(--muted2)':'');
+  });
+  const active=document.getElementById(btns[tier]);
+  if(active){
+    if(tier==='all') active.style.cssText='padding:8px 14px;border-radius:20px;font-size:11px;cursor:pointer;background:var(--gold);color:var(--black);font-weight:600';
+    else if(tier==='vip') active.style.cssText='padding:8px 14px;border-radius:20px;font-size:11px;cursor:pointer;background:linear-gradient(135deg,var(--gold3),var(--gold));color:var(--black);font-weight:600';
+    else if(tier==='reg') active.style.cssText='padding:8px 14px;border-radius:20px;font-size:11px;cursor:pointer;background:rgba(245,240,232,.2);color:var(--white);font-weight:600';
+    else if(tier==='new') active.style.cssText='padding:8px 14px;border-radius:20px;font-size:11px;cursor:pointer;background:var(--cyan);color:var(--black);font-weight:600';
+  }
+}
+function sendBlast() {
+  const btn = document.querySelector('#blastOverlay [onclick="sendBlast()"]');
+  if(btn){
+    btn.textContent='✓ BLAST SENT 🚀';
+    btn.style.background='var(--green)';
+    setTimeout(hideBlast, 1400);
+  }
+}
+
+// ── PARTICLE SYSTEM ──
+const canvas = document.getElementById('particleCanvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+let animFrame;
+
+function resizeCanvas() {
+  const phone = canvas.parentElement;
+  canvas.width = phone.offsetWidth;
+  canvas.height = phone.offsetHeight;
+}
+
+class Particle {
+  constructor() { this.reset(); }
+  reset() {
+    this.x = Math.random() * canvas.width;
+    this.y = Math.random() * canvas.height;
+    this.size = Math.random() * 1.5 + 0.3;
+    this.speedY = -(Math.random() * 0.4 + 0.1);
+    this.speedX = (Math.random() - 0.5) * 0.2;
+    this.opacity = Math.random() * 0.5 + 0.1;
+    this.life = 0;
+    this.maxLife = Math.random() * 200 + 100;
+  }
+  update() {
+    this.y += this.speedY;
+    this.x += this.speedX;
+    this.life++;
+    if (this.life > this.maxLife || this.y < 0) this.reset();
+  }
+  draw() {
+    const progress = this.life / this.maxLife;
+    const alpha = this.opacity * Math.sin(progress * Math.PI);
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(201,168,76,${alpha})`;
+    ctx.fill();
+  }
+}
+
+function initParticles() {
+  resizeCanvas();
+  particles = [];
+  for (let i = 0; i < 60; i++) {
+    const p = new Particle();
+    p.life = Math.random() * p.maxLife;
+    particles.push(p);
+  }
+  animateParticles();
+}
+
+function animateParticles() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  particles.forEach(p => { p.update(); p.draw(); });
+  animFrame = requestAnimationFrame(animateParticles);
+}
+
+// ── MONEY COUNTER ──
+function animateCounter(id, from, to, duration) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const start = performance.now();
+  function update(now) {
+    const elapsed = now - start;
+    const progress = Math.min(elapsed / duration, 1);
+    const ease = 1 - Math.pow(1 - progress, 3);
+    const val = Math.floor(from + (to - from) * ease);
+    el.textContent = '$' + val.toLocaleString();
+    if (progress < 1) requestAnimationFrame(update);
+    else el.textContent = '$' + to.toLocaleString();
+  }
+  requestAnimationFrame(update);
+}
+
+function startCounter() {
+  animateCounter('revcounter', 0, 3588, 2000);
+}
+
+// ── INIT ──
+window.addEventListener('load', () => {
+  initParticles();
+  // Auto-start counter on dashboard
+  setTimeout(() => {
+    if (document.getElementById('s1').classList.contains('active')) {
+      animateCounter('revcounter', 0, 3588, 2200);
+    }
+  }, 600);
+});
+
+// Auto-counter when s1 becomes active
+const s1Observer = new MutationObserver(() => {
+  if (document.getElementById('s1').classList.contains('active')) {
+    setTimeout(() => animateCounter('revcounter', 0, 3588, 2000), 300);
+  }
+});
+s1Observer.observe(document.getElementById('s1'), { attributes: true, attributeFilter: ['class'] });
+</script>
+</body>
+</html>

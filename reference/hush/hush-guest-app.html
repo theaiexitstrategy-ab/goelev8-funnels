@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Hush — Member</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --black:#040405;
+  --deep:#07070a;
+  --card:#0d0d11;
+  --card2:#121216;
+  --gold:#C9A84C;
+  --gold2:#e8c96a;
+  --gold3:#a8862e;
+  --gold4:#f5d98a;
+  --gdim:rgba(201,168,76,0.12);
+  --gline:rgba(201,168,76,0.2);
+  --white:#f5f0e8;
+  --muted:rgba(245,240,232,0.35);
+  --muted2:rgba(245,240,232,0.6);
+  --green:#00e89a;
+  --red:#ff4757;
+  --cyan:#00d4ff;
+  --ig:#e1306c;
+  --tt:#010101;
+  --snap:#FFFC00;
+  --x:#fff;
+}
+html,body{height:100%;background:#000;overflow:hidden;font-family:'Outfit',sans-serif;color:var(--white)}
+
+.shell{
+  width:100%;height:100vh;
+  display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(ellipse at 50% 40%,#120d04 0%,#040405 65%);
+}
+.phone{
+  width:min(390px,100vw);height:min(844px,100vh);
+  background:var(--black);border-radius:min(44px,5vw);
+  overflow:hidden;position:relative;
+  box-shadow:0 0 0 1px rgba(201,168,76,.18),0 0 80px rgba(201,168,76,.07),0 60px 140px rgba(0,0,0,.9);
+}
+
+/* SCREENS */
+.screen{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity .45s ease;overflow-y:auto;overflow-x:hidden;scrollbar-width:none}
+.screen::-webkit-scrollbar{display:none}
+.screen.active{opacity:1;pointer-events:all}
+
+/* NAV */
+.nav{
+  position:absolute;bottom:0;left:0;right:0;
+  background:rgba(4,4,5,.95);
+  backdrop-filter:blur(20px);
+  border-top:1px solid var(--gline);
+  display:flex;padding:10px 0 26px;z-index:100;
+}
+.ni{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px 0}
+.ni-ico{font-size:21px;opacity:.3;transition:opacity .2s}
+.ni-lbl{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);transition:color .2s}
+.ni-pip{width:4px;height:4px;border-radius:50%;background:var(--gold);opacity:0;transition:opacity .2s;margin:0 auto}
+.ni.active .ni-ico{opacity:1}
+.ni.active .ni-lbl{color:var(--gold)}
+.ni.active .ni-pip{opacity:1}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes scaleIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+
+/* ════════════════════════════
+   G0 — ONBOARDING / SIGNUP
+════════════════════════════ */
+#g0{
+  background:var(--black);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:40px 28px;position:relative;overflow:hidden;
+}
+#g0::before{
+  content:'';position:absolute;inset:0;
+  background-image:repeating-linear-gradient(45deg,rgba(201,168,76,.03) 0,rgba(201,168,76,.03) 1px,transparent 1px,transparent 26px),repeating-linear-gradient(-45deg,rgba(201,168,76,.03) 0,rgba(201,168,76,.03) 1px,transparent 1px,transparent 26px);
+}
+.ob-glow{position:absolute;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(201,168,76,.06) 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);animation:glowPulse 4s ease-in-out infinite}
+@keyframes glowPulse{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.5}50%{transform:translate(-50%,-50%) scale(1.2);opacity:1}}
+
+.ob-logo{font-family:'Bebas Neue',sans-serif;font-size:88px;background:linear-gradient(160deg,var(--gold3) 0%,var(--gold4) 40%,var(--gold) 70%,var(--gold3) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 32px rgba(201,168,76,.45));position:relative;z-index:2;animation:fadeUp .8s ease both}
+.ob-brand{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:.35em;color:rgba(201,168,76,.5);margin-top:-8px;position:relative;z-index:2;animation:fadeUp .8s .15s ease both}
+.ob-tag{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:16px;color:var(--muted);margin:12px 0 32px;text-align:center;position:relative;z-index:2;animation:fadeUp .8s .3s ease both}
+
+/* Photo upload */
+.photo-upload{
+  width:96px;height:96px;border-radius:50%;
+  border:2px dashed var(--gline);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  cursor:pointer;margin-bottom:20px;position:relative;z-index:2;
+  transition:all .2s;background:var(--card);
+  animation:fadeUp .8s .4s ease both;
+}
+.photo-upload.has-photo{border-style:solid;border-color:var(--gold)}
+.photo-upload-ico{font-size:28px;margin-bottom:4px}
+.photo-upload-lbl{font-size:9px;letter-spacing:.15em;color:var(--muted);text-transform:uppercase}
+.photo-preview{width:100%;height:100%;border-radius:50%;object-fit:cover;display:none}
+
+/* Form */
+.ob-form{width:100%;position:relative;z-index:2;animation:fadeUp .8s .5s ease both}
+.ob-field{margin-bottom:12px}
+.ob-label{font-size:9px;letter-spacing:.18em;color:var(--muted);text-transform:uppercase;margin-bottom:5px;display:block}
+.ob-input{width:100%;background:var(--card);border:1px solid var(--gline);border-radius:6px;padding:13px 14px;font-size:14px;color:var(--white);font-family:'Outfit',sans-serif;outline:none;transition:border-color .2s}
+.ob-input:focus{border-color:var(--gold)}
+.ob-input::placeholder{color:var(--muted)}
+
+/* Social links */
+.social-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.social-btn{
+  display:flex;align-items:center;gap:8px;
+  background:var(--card);border:1px solid rgba(255,255,255,.08);
+  border-radius:6px;padding:10px 12px;cursor:pointer;
+  transition:all .2s;
+}
+.social-btn.linked{border-color:var(--gold);background:var(--gdim)}
+.social-ico{font-size:18px;flex-shrink:0}
+.social-name{font-size:12px;color:var(--muted2)}
+.social-handle{font-size:11px;color:var(--gold);display:none}
+.social-btn.linked .social-name{display:none}
+.social-btn.linked .social-handle{display:block}
+
+.ob-cta{width:100%;padding:18px;background:linear-gradient(135deg,var(--gold3),var(--gold));border:none;border-radius:6px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.2em;color:var(--black);cursor:pointer;box-shadow:0 8px 32px rgba(201,168,76,.25);transition:all .2s}
+.ob-cta:active{transform:scale(.98)}
+
+/* ════════════════════════════
+   G1 — HOME FEED
+════════════════════════════ */
+#g1{background:var(--deep)}
+
+.feed-header{
+  padding:52px 20px 16px;background:var(--black);
+  border-bottom:1px solid var(--gline);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.feed-hush{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.15em;background:linear-gradient(135deg,var(--gold3),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.feed-avatar{width:34px;height:34px;border-radius:50%;border:2px solid var(--gold);background:linear-gradient(135deg,#2a1a06,#1a0e04);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--gold);cursor:pointer;overflow:hidden}
+.feed-avatar img{width:100%;height:100%;object-fit:cover;display:none}
+
+.feed-scroll{padding:16px 16px 110px}
+
+/* Member greeting */
+.member-greeting{
+  display:flex;align-items:center;gap:12px;
+  background:linear-gradient(135deg,rgba(201,168,76,.1),rgba(201,168,76,.03));
+  border:1px solid var(--gline);border-radius:10px;
+  padding:14px 16px;margin-bottom:16px;
+}
+.mg-avatar{width:44px;height:44px;border-radius:50%;border:2px solid var(--gold);background:linear-gradient(135deg,#2a1a06,#1a0e04);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gold);flex-shrink:0}
+.mg-name{font-size:16px;font-weight:500;color:var(--white)}
+.mg-tier{display:inline-flex;align-items:center;gap:4px;font-size:10px;letter-spacing:.12em;color:var(--gold);background:var(--gdim);border:1px solid var(--gline);border-radius:20px;padding:3px 10px;margin-top:4px}
+
+/* Event cards */
+.event-card{
+  background:var(--card);border:1px solid rgba(201,168,76,.12);
+  border-radius:12px;margin-bottom:14px;overflow:hidden;cursor:pointer;
+  transition:border-color .2s;
+}
+.event-card:active{border-color:var(--gline)}
+
+.event-card-top{
+  height:140px;position:relative;
+  background:linear-gradient(160deg,#0e0a04 0%,#080510 100%);
+  display:flex;align-items:center;justify-content:center;overflow:hidden;
+}
+.event-card-top::before{content:'';position:absolute;inset:0;background-image:repeating-linear-gradient(45deg,rgba(201,168,76,.04) 0,rgba(201,168,76,.04) 1px,transparent 1px,transparent 22px),repeating-linear-gradient(-45deg,rgba(201,168,76,.04) 0,rgba(201,168,76,.04) 1px,transparent 1px,transparent 22px)}
+.event-card-h{font-family:'Bebas Neue',sans-serif;font-size:72px;background:linear-gradient(135deg,var(--gold3),var(--gold4));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 20px rgba(201,168,76,.4));position:relative;z-index:1}
+.event-card-glow{position:absolute;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(201,168,76,.1) 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%)}
+
+.event-card-body{padding:14px 16px}
+.ec-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.ec-name{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.06em;color:var(--white)}
+.ec-date{font-size:10px;color:var(--gold);letter-spacing:.1em;background:var(--gdim);border:1px solid var(--gline);border-radius:4px;padding:3px 8px}
+
+.ec-details{display:flex;gap:16px;margin-bottom:10px}
+.ec-detail{font-size:11px;color:var(--muted)}
+
+/* Who's going preview */
+.wg-preview{display:flex;align-items:center;gap:0;margin-bottom:12px}
+.wg-av{width:28px;height:28px;border-radius:50%;border:2px solid var(--black);background:linear-gradient(135deg,#1a1408,#2a2010);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:10px;color:var(--gold);margin-left:-6px;flex-shrink:0}
+.wg-av:first-child{margin-left:0}
+.wg-count{font-size:11px;color:var(--muted);margin-left:8px}
+.wg-count span{color:var(--gold);font-weight:500}
+
+.ec-btns{display:flex;gap:8px}
+.ec-btn-primary{flex:1;padding:11px;background:linear-gradient(135deg,var(--gold3),var(--gold));border:none;border-radius:6px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:.12em;color:var(--black);cursor:pointer;transition:all .2s}
+.ec-btn-secondary{padding:11px 16px;border:1px solid var(--gline);border-radius:6px;font-size:12px;color:var(--gold);cursor:pointer;background:transparent;white-space:nowrap}
+
+/* ════════════════════════════
+   G2 — WHO'S GOING
+════════════════════════════ */
+#g2{background:var(--deep)}
+
+.wg-header{padding:52px 20px 16px;background:var(--black);border-bottom:1px solid var(--gline)}
+.wg-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.1em;background:linear-gradient(135deg,var(--gold3),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.wg-event{font-size:11px;color:var(--muted);margin-top:2px}
+
+.wg-scroll{padding:16px 16px 110px}
+
+/* Member profile card */
+.member-card{
+  background:var(--card);border:1px solid rgba(201,168,76,.1);
+  border-radius:10px;padding:14px;margin-bottom:10px;
+  display:flex;gap:12px;align-items:flex-start;cursor:pointer;
+  transition:border-color .2s;
+}
+.member-card:active{border-color:var(--gline)}
+
+.mc-avatar{
+  width:52px;height:52px;border-radius:50%;
+  border:2px solid var(--gline);flex-shrink:0;
+  background:linear-gradient(135deg,#1a1408,#2a2010);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gold);
+  position:relative;
+}
+.mc-avatar-img{width:100%;height:100%;border-radius:50%;object-fit:cover}
+.mc-tier-badge{position:absolute;bottom:-2px;right:-2px;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;border:2px solid var(--black)}
+.mc-tier-badge.vip{background:var(--gold)}
+.mc-tier-badge.reg{background:rgba(245,240,232,.2)}
+.mc-tier-badge.new{background:rgba(0,212,255,.3)}
+
+.mc-body{flex:1;min-width:0}
+.mc-name{font-size:15px;font-weight:500;color:var(--white);margin-bottom:2px}
+.mc-meta{font-size:11px;color:var(--muted);margin-bottom:6px}
+.mc-socials{display:flex;gap:6px;margin-bottom:8px}
+.mc-social{font-size:11px;padding:2px 8px;border-radius:20px;letter-spacing:.05em}
+.mc-social.ig{background:rgba(225,48,108,.12);color:var(--ig);border:1px solid rgba(225,48,108,.2)}
+.mc-social.tt{background:rgba(255,255,255,.06);color:var(--white);border:1px solid rgba(255,255,255,.12)}
+.mc-social.sc{background:rgba(255,252,0,.08);color:var(--snap);border:1px solid rgba(255,252,0,.15)}
+.mc-social.x{background:rgba(255,255,255,.06);color:var(--white);border:1px solid rgba(255,255,255,.12)}
+
+.connect-btn{
+  padding:6px 14px;border-radius:20px;font-size:11px;
+  font-weight:600;letter-spacing:.08em;cursor:pointer;
+  border:1px solid var(--gline);color:var(--gold);
+  background:var(--gdim);transition:all .2s;white-space:nowrap;
+}
+.connect-btn.connected{
+  background:rgba(0,232,154,.1);border-color:rgba(0,232,154,.3);
+  color:var(--green);
+}
+
+/* Member detail overlay */
+.member-overlay{
+  position:absolute;inset:0;z-index:200;
+  background:var(--black);
+  display:none;flex-direction:column;
+  overflow-y:auto;
+}
+.member-overlay.show{display:flex}
+
+.mo-back{
+  position:absolute;top:52px;left:16px;
+  width:36px;height:36px;border-radius:50%;
+  background:rgba(0,0,0,.6);border:1px solid var(--gline);
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;color:var(--gold);cursor:pointer;z-index:10;
+}
+
+.mo-cover{
+  height:200px;background:linear-gradient(160deg,#0e0a04,#05050f);
+  position:relative;overflow:hidden;flex-shrink:0;
+}
+.mo-cover::before{content:'';position:absolute;inset:0;background-image:repeating-linear-gradient(45deg,rgba(201,168,76,.04) 0,rgba(201,168,76,.04) 1px,transparent 1px,transparent 22px),repeating-linear-gradient(-45deg,rgba(201,168,76,.04) 0,rgba(201,168,76,.04) 1px,transparent 1px,transparent 22px)}
+.mo-cover-glow{position:absolute;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(201,168,76,.12) 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%)}
+
+.mo-avatar{
+  width:88px;height:88px;border-radius:50%;
+  border:3px solid var(--gold);
+  background:linear-gradient(135deg,#2a1a06,#1a0e04);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--gold);
+  position:absolute;bottom:-44px;left:24px;
+  box-shadow:0 8px 24px rgba(0,0,0,.6);
+}
+.mo-avatar img{width:100%;height:100%;border-radius:50%;object-fit:cover;display:none}
+
+.mo-body{padding:56px 24px 40px}
+.mo-name{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;color:var(--white);margin-bottom:4px}
+.mo-tier{display:inline-flex;align-items:center;gap:6px;font-size:10px;letter-spacing:.15em;color:var(--gold);background:var(--gdim);border:1px solid var(--gline);border-radius:20px;padding:4px 12px;margin-bottom:14px}
+.mo-stats{display:flex;gap:0;margin-bottom:20px;border:1px solid var(--gline);border-radius:8px;overflow:hidden}
+.mo-stat{flex:1;padding:14px 0;text-align:center;border-right:1px solid var(--gline)}
+.mo-stat:last-child{border-right:none}
+.mo-stat-val{font-family:'Bebas Neue',sans-serif;font-size:24px;background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.mo-stat-lbl{font-size:9px;color:var(--muted);letter-spacing:.1em;margin-top:2px}
+
+.mo-socials-section{margin-bottom:20px}
+.mo-sec-title{font-size:10px;letter-spacing:.2em;color:var(--gold);text-transform:uppercase;margin-bottom:10px}
+.mo-socials-list{display:flex;flex-direction:column;gap:8px}
+.mo-social-row{display:flex;align-items:center;justify-content:space-between;background:var(--card);border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:12px 14px}
+.mo-social-left{display:flex;align-items:center;gap:10px}
+.mo-social-ico{font-size:20px}
+.mo-social-info{}
+.mo-social-platform{font-size:11px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase}
+.mo-social-handle{font-size:14px;font-weight:500;color:var(--white)}
+.mo-social-follow{font-size:11px;padding:5px 12px;border-radius:20px;cursor:pointer;border:1px solid var(--gline);color:var(--gold);background:var(--gdim)}
+
+.mo-events{margin-bottom:20px}
+.mo-event-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.mo-event-dot{width:8px;height:8px;border-radius:50%;background:var(--gold);flex-shrink:0}
+.mo-event-name{font-size:13px;color:var(--muted2);flex:1}
+.mo-event-date{font-size:11px;color:var(--muted)}
+
+.mo-connect-btn{width:100%;padding:16px;background:linear-gradient(135deg,var(--gold3),var(--gold));border:none;border-radius:6px;font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:.18em;color:var(--black);cursor:pointer;transition:all .2s}
+
+/* ════════════════════════════
+   G3 — MY PASSES
+════════════════════════════ */
+#g3{background:var(--deep)}
+.passes-header{padding:52px 20px 16px;background:var(--black);border-bottom:1px solid var(--gline)}
+.passes-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.1em;background:linear-gradient(135deg,var(--gold3),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.passes-sub{font-size:11px;color:var(--muted);margin-top:2px}
+
+.passes-scroll{padding:16px 16px 110px}
+
+.pass-wallet-card{
+  border-radius:14px;overflow:hidden;margin-bottom:16px;
+  box-shadow:0 12px 40px rgba(0,0,0,.5),0 0 0 1px rgba(201,168,76,.2);
+  cursor:pointer;transition:transform .2s;
+}
+.pass-wallet-card:active{transform:scale(.98)}
+
+.pwc-top{padding:20px;position:relative;overflow:hidden}
+.pwc-top.vip{background:linear-gradient(135deg,var(--gold3) 0%,var(--gold4) 40%,var(--gold) 70%,var(--gold3) 100%)}
+.pwc-top.ga{background:linear-gradient(135deg,#1a1a22 0%,#242430 100%)}
+.pwc-top.new-pass{background:linear-gradient(135deg,rgba(0,212,255,.2) 0%,rgba(0,212,255,.05) 100%)}
+.pwc-top::before{content:'';position:absolute;inset:0;background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.05) 0,rgba(255,255,255,.05) 1px,transparent 1px,transparent 16px),repeating-linear-gradient(-45deg,rgba(255,255,255,.05) 0,rgba(255,255,255,.05) 1px,transparent 1px,transparent 16px)}
+
+.pwc-event{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.06em;position:relative;z-index:1}
+.pwc-event.vip{color:var(--black)}
+.pwc-event.ga{color:var(--white)}
+.pwc-event.new-pass{color:var(--cyan)}
+.pwc-tier-icon{position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:36px;opacity:.2;z-index:1}
+.pwc-date{font-size:11px;opacity:.7;position:relative;z-index:1;margin-top:3px}
+.pwc-date.vip{color:var(--black)}
+.pwc-date.ga,.pwc-date.new-pass{color:var(--muted2)}
+
+.pwc-mid{
+  background:var(--black);
+  display:flex;justify-content:space-between;align-items:center;
+  padding:14px 18px;
+  border-top:1px dashed rgba(201,168,76,.25);
+  position:relative;
+}
+.pwc-mid::before,.pwc-mid::after{content:'';position:absolute;width:18px;height:18px;border-radius:50%;background:var(--deep);top:50%;transform:translateY(-50%)}
+.pwc-mid::before{left:-9px}
+.pwc-mid::after{right:-9px}
+
+.pwc-guest{font-size:14px;font-weight:500;color:var(--white)}
+.pwc-tier-lbl{font-size:10px;letter-spacing:.1em;color:var(--gold);margin-top:2px}
+
+.pwc-status{text-align:right}
+.pwc-status-val{font-size:12px;font-weight:600;color:var(--green)}
+.pwc-status-lbl{font-size:10px;color:var(--muted)}
+
+.pwc-bottom{
+  background:var(--card);
+  display:flex;align-items:center;gap:12px;
+  padding:12px 16px;
+}
+.pwc-qr-small{width:44px;height:44px;background:var(--white);border-radius:4px;padding:4px;flex-shrink:0}
+.pwc-qr-small svg{width:100%;height:100%}
+.pwc-info{flex:1}
+.pwc-code{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:.1em;color:var(--muted2)}
+.pwc-scan-hint{font-size:10px;color:var(--muted)}
+.pwc-venue{font-size:11px;color:var(--gold);text-align:right}
+
+/* ════════════════════════════
+   G4 — MY PROFILE
+════════════════════════════ */
+#g4{background:var(--deep)}
+
+.profile-cover{
+  height:180px;
+  background:linear-gradient(160deg,#0e0a04 0%,#05050f 100%);
+  position:relative;overflow:hidden;
+}
+.profile-cover::before{content:'';position:absolute;inset:0;background-image:repeating-linear-gradient(45deg,rgba(201,168,76,.04) 0,rgba(201,168,76,.04) 1px,transparent 1px,transparent 22px),repeating-linear-gradient(-45deg,rgba(201,168,76,.04) 0,rgba(201,168,76,.04) 1px,transparent 1px,transparent 22px)}
+.profile-cover-glow{position:absolute;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(201,168,76,.1) 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%)}
+.profile-cover-h{font-family:'Bebas Neue',sans-serif;font-size:80px;background:linear-gradient(135deg,var(--gold3),var(--gold4));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 20px rgba(201,168,76,.3));position:absolute;bottom:-10px;right:20px;opacity:.15}
+
+.profile-av-wrap{position:relative;margin-top:-50px;margin-left:20px;margin-bottom:14px;display:inline-block}
+.profile-av{
+  width:96px;height:96px;border-radius:50%;
+  border:3px solid var(--gold);
+  background:linear-gradient(135deg,#2a1a06,#1a0e04);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--gold);
+  box-shadow:0 8px 24px rgba(0,0,0,.6);overflow:hidden;
+  cursor:pointer;
+}
+.profile-av img{width:100%;height:100%;object-fit:cover;display:none}
+.profile-av-edit{
+  position:absolute;bottom:0;right:0;
+  width:26px;height:26px;border-radius:50%;
+  background:var(--gold);border:2px solid var(--black);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;cursor:pointer;
+}
+
+.profile-body{padding:0 20px 110px}
+.profile-name{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:300;color:var(--white);margin-bottom:4px}
+.profile-tier{display:inline-flex;align-items:center;gap:6px;font-size:10px;letter-spacing:.15em;color:var(--gold);background:var(--gdim);border:1px solid var(--gline);border-radius:20px;padding:4px 12px;margin-bottom:16px}
+
+.profile-stats{display:flex;gap:0;border:1px solid var(--gline);border-radius:8px;overflow:hidden;margin-bottom:20px}
+.ps{flex:1;padding:14px 0;text-align:center;border-right:1px solid var(--gline)}
+.ps:last-child{border-right:none}
+.ps-val{font-family:'Bebas Neue',sans-serif;font-size:26px;background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.ps-lbl{font-size:9px;color:var(--muted);letter-spacing:.1em;margin-top:2px}
+
+.profile-sec{margin-bottom:20px}
+.profile-sec-title{font-size:10px;letter-spacing:.2em;color:var(--gold);text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
+.profile-sec-edit{font-size:11px;color:var(--muted);letter-spacing:.05em;cursor:pointer;text-transform:none}
+
+/* Social links on profile */
+.social-link-row{
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--card);border:1px solid rgba(255,255,255,.06);
+  border-radius:8px;padding:12px 14px;margin-bottom:8px;
+}
+.sl-left{display:flex;align-items:center;gap:10px}
+.sl-ico{font-size:22px}
+.sl-handle{font-size:14px;color:var(--white);font-weight:500}
+.sl-connected{font-size:10px;color:var(--green);letter-spacing:.1em}
+.sl-add{font-size:10px;color:var(--muted);letter-spacing:.1em;cursor:pointer}
+
+/* Event history */
+.history-row{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 0;border-bottom:1px solid rgba(255,255,255,.04);
+}
+.history-badge{
+  width:40px;height:40px;border-radius:8px;
+  background:linear-gradient(135deg,var(--gold3),var(--gdim));
+  border:1px solid var(--gline);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--gold);
+  flex-shrink:0;
+}
+.history-info{flex:1}
+.history-name{font-size:13px;color:var(--white);font-weight:500}
+.history-date{font-size:11px;color:var(--muted)}
+.history-tier{font-size:10px;padding:2px 8px;border-radius:20px;background:var(--gdim);border:1px solid var(--gline);color:var(--gold);letter-spacing:.08em}
+</style>
+</head>
+<body>
+<div class="shell">
+<div class="phone">
+
+  <!-- MEMBER DETAIL OVERLAY (global) -->
+  <div class="member-overlay" id="memberOverlay">
+    <div class="mo-back" onclick="closeMember()">‹</div>
+    <div class="mo-cover">
+      <div class="mo-cover-glow"></div>
+      <div class="mo-avatar" id="moAvatar">JB</div>
+    </div>
+    <div class="mo-body">
+      <div class="mo-name" id="moName">Jordan Banks</div>
+      <div class="mo-tier" id="moTier">👑 VIP Member</div>
+      <div class="mo-stats">
+        <div class="mo-stat">
+          <div class="mo-stat-val" id="moEvents">8</div>
+          <div class="mo-stat-lbl">Events</div>
+        </div>
+        <div class="mo-stat">
+          <div class="mo-stat-val" id="moConnections">142</div>
+          <div class="mo-stat-lbl">Connected</div>
+        </div>
+        <div class="mo-stat">
+          <div class="mo-stat-val" id="moSince">2024</div>
+          <div class="mo-stat-lbl">Member Since</div>
+        </div>
+      </div>
+
+      <div class="mo-socials-section">
+        <div class="mo-sec-title">Socials</div>
+        <div class="mo-socials-list" id="moSocials"></div>
+      </div>
+
+      <div class="mo-events">
+        <div class="mo-sec-title">Event History</div>
+        <div class="mo-event-row"><div class="mo-event-dot"></div><div class="mo-event-name">Hush STL — Saturday Night</div><div class="mo-event-date">May 10</div></div>
+        <div class="mo-event-row"><div class="mo-event-dot" style="background:var(--muted)"></div><div class="mo-event-name">Hush STL — Spring Edition</div><div class="mo-event-date">Apr 12</div></div>
+        <div class="mo-event-row"><div class="mo-event-dot" style="background:var(--muted)"></div><div class="mo-event-name">Hush STL — Valentine's</div><div class="mo-event-date">Feb 14</div></div>
+      </div>
+
+      <button class="mo-connect-btn" id="moConnectBtn" onclick="connectMember()">🤝 CONNECT</button>
+    </div>
+  </div>
+
+  <div style="position:absolute;inset:0;z-index:1">
+
+  <!-- ════ G0: ONBOARDING ════ -->
+  <div class="screen active" id="g0">
+    <div class="ob-glow"></div>
+    <div class="ob-logo">H</div>
+    <div class="ob-brand">HUSH AI</div>
+    <div class="ob-tag">Your membership. Your community.<br>Your world inside Hush.</div>
+
+    <div class="photo-upload" id="photoUpload" onclick="uploadPhoto()">
+      <div class="photo-upload-ico">📸</div>
+      <div class="photo-upload-lbl">Add Photo</div>
+    </div>
+
+    <div class="ob-form">
+      <div class="ob-field">
+        <label class="ob-label">Full Name</label>
+        <input class="ob-input" placeholder="Your name" value="Jordan Banks" id="profileName">
+      </div>
+      <div class="ob-field">
+        <label class="ob-label">Phone</label>
+        <input class="ob-input" placeholder="(314) 000-0000" value="(314) 555-0182" type="tel">
+      </div>
+
+      <div class="ob-label" style="margin-bottom:8px">Link Your Socials</div>
+      <div class="social-grid">
+        <div class="social-btn linked" id="igBtn" onclick="toggleSocial('ig')">
+          <span class="social-ico">📸</span>
+          <div>
+            <div class="social-name">Instagram</div>
+            <div class="social-handle">@jordanb_stl</div>
+          </div>
+        </div>
+        <div class="social-btn linked" id="ttBtn" onclick="toggleSocial('tt')">
+          <span class="social-ico">🎵</span>
+          <div>
+            <div class="social-name">TikTok</div>
+            <div class="social-handle">@jordanb</div>
+          </div>
+        </div>
+        <div class="social-btn" id="scBtn" onclick="toggleSocial('sc')">
+          <span class="social-ico">👻</span>
+          <div>
+            <div class="social-name">Snapchat</div>
+            <div class="social-handle">@jbanks_snap</div>
+          </div>
+        </div>
+        <div class="social-btn" id="xBtn" onclick="toggleSocial('x')">
+          <span class="social-ico">𝕏</span>
+          <div>
+            <div class="social-name">X / Twitter</div>
+            <div class="social-handle">@jordan_b</div>
+          </div>
+        </div>
+      </div>
+
+      <button class="ob-cta" onclick="goTo('g1')">🖤 JOIN THE COMMUNITY</button>
+    </div>
+  </div>
+
+  <!-- ════ G1: HOME FEED ════ -->
+  <div class="screen" id="g1">
+    <div class="feed-header">
+      <div class="feed-hush">HUSH AI</div>
+      <div class="feed-avatar" onclick="goTo('g4')">JB</div>
+    </div>
+    <div class="feed-scroll">
+
+      <div class="member-greeting">
+        <div class="mg-avatar">JB</div>
+        <div>
+          <div class="mg-name">Welcome back, Jordan 🖤</div>
+          <div class="mg-tier">👑 VIP Member · 8 events</div>
+        </div>
+      </div>
+
+      <!-- Upcoming event 1 -->
+      <div class="event-card" onclick="goTo('g2')">
+        <div class="event-card-top">
+          <div class="event-card-glow"></div>
+          <div class="event-card-h">H</div>
+          <div style="position:absolute;top:12px;right:12px;background:rgba(255,71,87,.15);border:1px solid rgba(255,71,87,.3);border-radius:4px;padding:3px 8px;font-size:10px;color:var(--red);letter-spacing:.1em">🔴 TONIGHT</div>
+        </div>
+        <div class="event-card-body">
+          <div class="ec-top">
+            <div class="ec-name">HUSH STL — SATURDAY NIGHT</div>
+            <div class="ec-date">MAY 10</div>
+          </div>
+          <div class="ec-details">
+            <div class="ec-detail">📍 Venue 9</div>
+            <div class="ec-detail">🕙 Doors 10PM</div>
+            <div class="ec-detail">21+</div>
+          </div>
+          <div class="wg-preview">
+            <div class="wg-av">JB</div>
+            <div class="wg-av">KM</div>
+            <div class="wg-av">DW</div>
+            <div class="wg-av">TR</div>
+            <div class="wg-av">MT</div>
+            <div class="wg-av" style="background:var(--gdim);border:1px solid var(--gline);color:var(--gold);font-size:9px;font-family:'Outfit',sans-serif">+42</div>
+            <div class="wg-count"><span>47 people</span> going tonight</div>
+          </div>
+          <div class="ec-btns">
+            <button class="ec-btn-primary">👑 GET YOUR PASS</button>
+            <div class="ec-btn-secondary" onclick="event.stopPropagation();goTo('g2')">Who's Going →</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Upcoming event 2 -->
+      <div class="event-card">
+        <div class="event-card-top" style="background:linear-gradient(160deg,#060510 0%,#0a0508 100%)">
+          <div class="event-card-glow" style="background:radial-gradient(circle,rgba(0,212,255,.08) 0%,transparent 70%)"></div>
+          <div class="event-card-h" style="background:linear-gradient(135deg,rgba(0,212,255,.6),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">H</div>
+          <div style="position:absolute;top:12px;right:12px;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.2);border-radius:4px;padding:3px 8px;font-size:10px;color:var(--cyan);letter-spacing:.1em">MAY 24</div>
+        </div>
+        <div class="event-card-body">
+          <div class="ec-top">
+            <div class="ec-name">HUSH STL — MEMORIAL WEEKEND</div>
+            <div class="ec-date">MAY 24</div>
+          </div>
+          <div class="ec-details">
+            <div class="ec-detail">📍 Venue 9</div>
+            <div class="ec-detail">🕙 Doors 9PM</div>
+            <div class="ec-detail">21+</div>
+          </div>
+          <div class="wg-preview">
+            <div class="wg-av">TK</div>
+            <div class="wg-av">SB</div>
+            <div class="wg-av" style="background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.2);color:var(--cyan);font-size:9px;font-family:'Outfit',sans-serif">+8</div>
+            <div class="wg-count"><span>10 people</span> already locked in</div>
+          </div>
+          <div class="ec-btns">
+            <button class="ec-btn-primary" style="background:linear-gradient(135deg,rgba(0,100,140,.8),rgba(0,212,255,.6));color:var(--white)">GET EARLY ACCESS</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="nav">
+      <div class="ni active" onclick="goTo('g1')"><div class="ni-ico">🏠</div><div class="ni-pip"></div><div class="ni-lbl">Home</div></div>
+      <div class="ni" onclick="goTo('g2')"><div class="ni-ico">👥</div><div class="ni-pip"></div><div class="ni-lbl">Who's Going</div></div>
+      <div class="ni" onclick="goTo('g3')"><div class="ni-ico">🎟️</div><div class="ni-pip"></div><div class="ni-lbl">My Passes</div></div>
+      <div class="ni" onclick="goTo('g4')"><div class="ni-ico">👤</div><div class="ni-pip"></div><div class="ni-lbl">Profile</div></div>
+    </div>
+  </div>
+
+  <!-- ════ G2: WHO'S GOING ════ -->
+  <div class="screen" id="g2">
+    <div class="wg-header">
+      <div class="wg-title">WHO'S GOING</div>
+      <div class="wg-event">Hush STL — Saturday Night · May 10</div>
+    </div>
+    <div class="wg-scroll">
+
+      <div style="display:flex;gap:8px;margin-bottom:16px">
+        <div style="padding:6px 14px;border-radius:20px;font-size:11px;cursor:pointer;background:var(--gold);color:var(--black);font-weight:600">All (47)</div>
+        <div style="padding:6px 14px;border-radius:20px;font-size:11px;cursor:pointer;background:var(--gdim);border:1px solid var(--gline);color:var(--gold)">VIP (8)</div>
+        <div style="padding:6px 14px;border-radius:20px;font-size:11px;cursor:pointer;background:rgba(245,240,232,.05);border:1px solid rgba(245,240,232,.1);color:var(--muted2)">Regular (24)</div>
+        <div style="padding:6px 14px;border-radius:20px;font-size:11px;cursor:pointer;background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.2);color:var(--cyan)">New (15)</div>
+      </div>
+
+      <!-- Member cards -->
+      <div class="member-card" onclick="openMember('Jordan Banks','JB','👑 VIP Member',8,142,2024,[{p:'Instagram',h:'@jordanb_stl',i:'📸'},{p:'TikTok',h:'@jordanb',i:'🎵'},{p:'Snapchat',h:'@jbanks_snap',i:'👻'}])">
+        <div class="mc-avatar">JB<div class="mc-tier-badge vip">👑</div></div>
+        <div class="mc-body">
+          <div class="mc-name">Jordan Banks</div>
+          <div class="mc-meta">8 Hush events · VIP since 2024</div>
+          <div class="mc-socials">
+            <div class="mc-social ig">@jordanb_stl</div>
+            <div class="mc-social tt">@jordanb</div>
+            <div class="mc-social sc">👻</div>
+          </div>
+        </div>
+        <div class="connect-btn connected">✓ Connected</div>
+      </div>
+
+      <div class="member-card" onclick="openMember('Keisha Monroe','KM','Regular Member',3,89,2025,[{p:'Instagram',h:'@keisham_stl',i:'📸'},{p:'TikTok',h:'@keisha.m',i:'🎵'}])">
+        <div class="mc-avatar" style="background:var(--card2);border-color:rgba(245,240,232,.15)"><span style="color:var(--muted2)">KM</span><div class="mc-tier-badge reg">🎟</div></div>
+        <div class="mc-body">
+          <div class="mc-name">Keisha Monroe</div>
+          <div class="mc-meta">3 Hush events · Regular member</div>
+          <div class="mc-socials">
+            <div class="mc-social ig">@keisham_stl</div>
+            <div class="mc-social tt">@keisha.m</div>
+          </div>
+        </div>
+        <div class="connect-btn" onclick="event.stopPropagation();connectInline(this)">Connect</div>
+      </div>
+
+      <div class="member-card" onclick="openMember('Marcus Taylor','MT','👑 VIP Member',6,204,2024,[{p:'Instagram',h:'@marcust_official',i:'📸'},{p:'X / Twitter',h:'@marcus_t',i:'𝕏'},{p:'Snapchat',h:'@mtaylor',i:'👻'}])">
+        <div class="mc-avatar">MT<div class="mc-tier-badge vip">👑</div></div>
+        <div class="mc-body">
+          <div class="mc-name">Marcus Taylor</div>
+          <div class="mc-meta">6 Hush events · VIP since 2024</div>
+          <div class="mc-socials">
+            <div class="mc-social ig">@marcust_official</div>
+            <div class="mc-social x">𝕏</div>
+          </div>
+        </div>
+        <div class="connect-btn" onclick="event.stopPropagation();connectInline(this)">Connect</div>
+      </div>
+
+      <div class="member-card" onclick="openMember('Tasha Rivers','TR','✨ New Member',1,12,2026,[{p:'Instagram',h:'@tasha.rivers',i:'📸'},{p:'TikTok',h:'@tashar',i:'🎵'},{p:'Snapchat',h:'@tashasnap',i:'👻'},{p:'X / Twitter',h:'@tasha_r',i:'𝕏'}])">
+        <div class="mc-avatar" style="background:rgba(0,212,255,.08);border-color:rgba(0,212,255,.2)"><span style="color:var(--cyan)">TR</span><div class="mc-tier-badge new">✨</div></div>
+        <div class="mc-body">
+          <div class="mc-name">Tasha Rivers</div>
+          <div class="mc-meta">First Hush event tonight ✨</div>
+          <div class="mc-socials">
+            <div class="mc-social ig">@tasha.rivers</div>
+            <div class="mc-social tt">@tashar</div>
+            <div class="mc-social sc">👻</div>
+            <div class="mc-social x">𝕏</div>
+          </div>
+        </div>
+        <div class="connect-btn" onclick="event.stopPropagation();connectInline(this)">Connect</div>
+      </div>
+
+      <div class="member-card" onclick="openMember('Dre Williams','DW','Regular Member',2,67,2025,[{p:'Instagram',h:'@dre.w_stl',i:'📸'},{p:'Snapchat',h:'@drewsnap',i:'👻'}])">
+        <div class="mc-avatar" style="background:var(--card2);border-color:rgba(245,240,232,.15)"><span style="color:var(--muted2)">DW</span><div class="mc-tier-badge reg">🎟</div></div>
+        <div class="mc-body">
+          <div class="mc-name">Dre Williams</div>
+          <div class="mc-meta">2 Hush events · Regular member</div>
+          <div class="mc-socials">
+            <div class="mc-social ig">@dre.w_stl</div>
+            <div class="mc-social sc">👻</div>
+          </div>
+        </div>
+        <div class="connect-btn" onclick="event.stopPropagation();connectInline(this)">Connect</div>
+      </div>
+
+      <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--muted)">+ 42 more members going tonight</div>
+    </div>
+    <div class="nav">
+      <div class="ni" onclick="goTo('g1')"><div class="ni-ico">🏠</div><div class="ni-pip"></div><div class="ni-lbl">Home</div></div>
+      <div class="ni active" onclick="goTo('g2')"><div class="ni-ico">👥</div><div class="ni-pip"></div><div class="ni-lbl">Who's Going</div></div>
+      <div class="ni" onclick="goTo('g3')"><div class="ni-ico">🎟️</div><div class="ni-pip"></div><div class="ni-lbl">My Passes</div></div>
+      <div class="ni" onclick="goTo('g4')"><div class="ni-ico">👤</div><div class="ni-pip"></div><div class="ni-lbl">Profile</div></div>
+    </div>
+  </div>
+
+  <!-- ════ G3: MY PASSES ════ -->
+  <div class="screen" id="g3">
+    <div class="passes-header">
+      <div class="passes-title">MY PASSES</div>
+      <div class="passes-sub">Your Hush AI ticket wallet</div>
+    </div>
+    <div class="passes-scroll">
+
+      <!-- Active pass -->
+      <div style="font-size:10px;letter-spacing:.2em;color:var(--green);text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px"><div style="width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 1.5s ease-in-out infinite"></div>Tonight</div>
+
+      <div class="pass-wallet-card">
+        <div class="pwc-top vip">
+          <div class="pwc-tier-icon">👑</div>
+          <div class="pwc-event vip">HUSH STL — SATURDAY NIGHT</div>
+          <div class="pwc-date vip">Saturday, May 10, 2026 · Venue 9</div>
+        </div>
+        <div class="pwc-mid">
+          <div><div class="pwc-guest">Jordan Banks</div><div class="pwc-tier-lbl">👑 VIP ACCESS · Party of 2</div></div>
+          <div class="pwc-status"><div class="pwc-status-val">✓ CONFIRMED</div><div class="pwc-status-lbl">Valid tonight only</div></div>
+        </div>
+        <div class="pwc-bottom">
+          <div class="pwc-qr-small">
+            <svg viewBox="0 0 70 70">
+              <rect x="2" y="2" width="18" height="18" fill="#040405" rx="2"/><rect x="4" y="4" width="14" height="14" fill="white" rx="1"/><rect x="6" y="6" width="10" height="10" fill="#040405" rx="1"/>
+              <rect x="50" y="2" width="18" height="18" fill="#040405" rx="2"/><rect x="52" y="4" width="14" height="14" fill="white" rx="1"/><rect x="54" y="6" width="10" height="10" fill="#040405" rx="1"/>
+              <rect x="2" y="50" width="18" height="18" fill="#040405" rx="2"/><rect x="4" y="52" width="14" height="14" fill="white" rx="1"/><rect x="6" y="54" width="10" height="10" fill="#040405" rx="1"/>
+              <rect x="24" y="4" width="4" height="4" fill="#040405"/><rect x="32" y="8" width="4" height="4" fill="#040405"/><rect x="40" y="4" width="4" height="4" fill="#040405"/>
+              <rect x="26" y="22" width="4" height="4" fill="#040405"/><rect x="38" y="28" width="4" height="4" fill="#040405"/><rect x="50" y="22" width="4" height="4" fill="#040405"/>
+              <rect x="60" y="34" width="4" height="4" fill="#040405"/><rect x="56" y="46" width="4" height="4" fill="#040405"/><rect x="64" y="58" width="4" height="4" fill="#040405"/>
+            </svg>
+          </div>
+          <div class="pwc-info"><div class="pwc-code">HSH-VIP-2026-0510</div><div class="pwc-scan-hint">Scan at the door · Priority entry</div></div>
+          <div class="pwc-venue" style="font-size:11px;color:var(--gold)">Doors<br>10PM</div>
+        </div>
+      </div>
+
+      <!-- Past passes -->
+      <div style="font-size:10px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;margin:16px 0 10px">Past Events</div>
+
+      <div class="pass-wallet-card">
+        <div class="pwc-top ga">
+          <div class="pwc-tier-icon" style="opacity:.15">🎟</div>
+          <div class="pwc-event ga">HUSH STL — SPRING EDITION</div>
+          <div class="pwc-date ga">Saturday, April 12, 2026 · Venue 9</div>
+        </div>
+        <div class="pwc-mid">
+          <div><div class="pwc-guest">Jordan Banks</div><div class="pwc-tier-lbl" style="color:var(--muted2)">🎟 VIP ACCESS</div></div>
+          <div class="pwc-status"><div class="pwc-status-val" style="color:var(--muted)">USED</div><div class="pwc-status-lbl">Apr 12, 2026</div></div>
+        </div>
+        <div class="pwc-bottom" style="opacity:.6">
+          <div class="pwc-qr-small">
+            <svg viewBox="0 0 70 70">
+              <rect x="2" y="2" width="18" height="18" fill="#040405" rx="2"/><rect x="4" y="4" width="14" height="14" fill="white" rx="1"/><rect x="6" y="6" width="10" height="10" fill="#040405" rx="1"/>
+              <rect x="50" y="2" width="18" height="18" fill="#040405" rx="2"/><rect x="52" y="4" width="14" height="14" fill="white" rx="1"/><rect x="54" y="6" width="10" height="10" fill="#040405" rx="1"/>
+              <rect x="2" y="50" width="18" height="18" fill="#040405" rx="2"/><rect x="4" y="52" width="14" height="14" fill="white" rx="1"/><rect x="6" y="54" width="10" height="10" fill="#040405" rx="1"/>
+            </svg>
+          </div>
+          <div class="pwc-info"><div class="pwc-code">HSH-VIP-2026-0412</div><div class="pwc-scan-hint">Used · April 12, 2026</div></div>
+        </div>
+      </div>
+
+    </div>
+    <div class="nav">
+      <div class="ni" onclick="goTo('g1')"><div class="ni-ico">🏠</div><div class="ni-pip"></div><div class="ni-lbl">Home</div></div>
+      <div class="ni" onclick="goTo('g2')"><div class="ni-ico">👥</div><div class="ni-pip"></div><div class="ni-lbl">Who's Going</div></div>
+      <div class="ni active" onclick="goTo('g3')"><div class="ni-ico">🎟️</div><div class="ni-pip"></div><div class="ni-lbl">My Passes</div></div>
+      <div class="ni" onclick="goTo('g4')"><div class="ni-ico">👤</div><div class="ni-pip"></div><div class="ni-lbl">Profile</div></div>
+    </div>
+  </div>
+
+  <!-- ════ G4: MY PROFILE ════ -->
+  <div class="screen" id="g4">
+    <div class="profile-cover">
+      <div class="profile-cover-glow"></div>
+      <div class="profile-cover-h">H</div>
+    </div>
+
+    <div class="profile-av-wrap">
+      <div class="profile-av" onclick="uploadPhoto()">JB</div>
+      <div class="profile-av-edit">✏️</div>
+    </div>
+
+    <div class="profile-body">
+      <div class="profile-name">Jordan Banks</div>
+      <div class="profile-tier">👑 VIP Member</div>
+
+      <div class="profile-stats">
+        <div class="ps"><div class="ps-val">8</div><div class="ps-lbl">Events</div></div>
+        <div class="ps"><div class="ps-val">142</div><div class="ps-lbl">Connected</div></div>
+        <div class="ps"><div class="ps-val">3</div><div class="ps-lbl">Passes</div></div>
+      </div>
+
+      <!-- Social links -->
+      <div class="profile-sec">
+        <div class="profile-sec-title">
+          My Socials
+          <span class="profile-sec-edit">Edit</span>
+        </div>
+        <div class="social-link-row">
+          <div class="sl-left"><span class="sl-ico">📸</span><div><div class="sl-handle">@jordanb_stl</div><div class="sl-connected">✓ Instagram Connected</div></div></div>
+        </div>
+        <div class="social-link-row">
+          <div class="sl-left"><span class="sl-ico">🎵</span><div><div class="sl-handle">@jordanb</div><div class="sl-connected">✓ TikTok Connected</div></div></div>
+        </div>
+        <div class="social-link-row" style="opacity:.5;border-style:dashed">
+          <div class="sl-left"><span class="sl-ico">👻</span><div><div class="sl-handle" style="color:var(--muted)">Add Snapchat</div></div></div>
+          <div class="sl-add">+ Link</div>
+        </div>
+        <div class="social-link-row" style="opacity:.5;border-style:dashed">
+          <div class="sl-left"><span class="sl-ico">𝕏</span><div><div class="sl-handle" style="color:var(--muted)">Add X / Twitter</div></div></div>
+          <div class="sl-add">+ Link</div>
+        </div>
+      </div>
+
+      <!-- Event history -->
+      <div class="profile-sec">
+        <div class="profile-sec-title">Event History</div>
+        <div class="history-row">
+          <div class="history-badge">H</div>
+          <div class="history-info"><div class="history-name">Hush STL — Saturday Night</div><div class="history-date">May 10, 2026 · Tonight</div></div>
+          <div class="history-tier">👑 VIP</div>
+        </div>
+        <div class="history-row">
+          <div class="history-badge" style="opacity:.6">H</div>
+          <div class="history-info"><div class="history-name">Hush STL — Spring Edition</div><div class="history-date">April 12, 2026</div></div>
+          <div class="history-tier" style="color:var(--muted2);border-color:rgba(245,240,232,.1);background:rgba(245,240,232,.04)">🎟 VIP</div>
+        </div>
+        <div class="history-row">
+          <div class="history-badge" style="opacity:.6">H</div>
+          <div class="history-info"><div class="history-name">Hush STL — Valentine's Night</div><div class="history-date">February 14, 2026</div></div>
+          <div class="history-tier" style="color:var(--muted2);border-color:rgba(245,240,232,.1);background:rgba(245,240,232,.04)">🎟 VIP</div>
+        </div>
+      </div>
+
+      <!-- Member since / powered by -->
+      <div style="text-align:center;padding:16px 0;border-top:1px solid var(--gline)">
+        <div style="font-size:10px;letter-spacing:.15em;color:var(--muted);text-transform:uppercase">Hush AI Member Since 2024</div>
+        <div style="font-size:9px;letter-spacing:.15em;color:rgba(245,240,232,.15);margin-top:6px;text-transform:uppercase">Powered by GoElev8.AI</div>
+      </div>
+    </div>
+
+    <div class="nav">
+      <div class="ni" onclick="goTo('g1')"><div class="ni-ico">🏠</div><div class="ni-pip"></div><div class="ni-lbl">Home</div></div>
+      <div class="ni" onclick="goTo('g2')"><div class="ni-ico">👥</div><div class="ni-pip"></div><div class="ni-lbl">Who's Going</div></div>
+      <div class="ni" onclick="goTo('g3')"><div class="ni-ico">🎟️</div><div class="ni-pip"></div><div class="ni-lbl">My Passes</div></div>
+      <div class="ni active" onclick="goTo('g4')"><div class="ni-ico">👤</div><div class="ni-pip"></div><div class="ni-lbl">Profile</div></div>
+    </div>
+  </div>
+
+  </div>
+</div>
+</div>
+
+<script>
+// ── NAV ──
+function goTo(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const t = document.getElementById(id);
+  if(t){ t.classList.add('active'); t.scrollTop = 0; }
+}
+
+// ── SOCIAL TOGGLE ──
+function toggleSocial(s) {
+  const btn = document.getElementById(s+'Btn');
+  if(!btn) return;
+  btn.classList.toggle('linked');
+}
+
+// ── PHOTO UPLOAD ──
+function uploadPhoto() {
+  const wrap = document.getElementById('photoUpload');
+  if(wrap){
+    wrap.classList.add('has-photo');
+    wrap.innerHTML = '<div style="font-size:40px">😊</div>';
+  }
+}
+
+// ── MEMBER OVERLAY ──
+function openMember(name, initials, tier, events, connections, since, socials) {
+  document.getElementById('moName').textContent = name;
+  document.getElementById('moAvatar').textContent = initials;
+  document.getElementById('moTier').textContent = tier;
+  document.getElementById('moEvents').textContent = events;
+  document.getElementById('moConnections').textContent = connections;
+  document.getElementById('moSince').textContent = since;
+
+  const sl = document.getElementById('moSocials');
+  sl.innerHTML = socials.map(s => `
+    <div class="mo-social-row">
+      <div class="mo-social-left">
+        <div class="mo-social-ico">${s.i}</div>
+        <div class="mo-social-info">
+          <div class="mo-social-platform">${s.p}</div>
+          <div class="mo-social-handle">${s.h}</div>
+        </div>
+      </div>
+      <div class="mo-social-follow">Follow</div>
+    </div>
+  `).join('');
+
+  document.getElementById('memberOverlay').classList.add('show');
+}
+
+function closeMember() {
+  document.getElementById('memberOverlay').classList.remove('show');
+}
+
+function connectMember() {
+  const btn = document.getElementById('moConnectBtn');
+  if(btn){
+    btn.textContent = '✓ CONNECTED';
+    btn.style.background = 'var(--green)';
+    btn.style.pointerEvents = 'none';
+  }
+}
+
+function connectInline(btn) {
+  btn.textContent = '✓ Connected';
+  btn.classList.add('connected');
+}
+
+// ── BLINK ──
+const style = document.createElement('style');
+style.textContent = '@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}';
+document.head.appendChild(style);
+</script>
+</body>
+</html>

@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Hush AI — Live Streaming</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --black:#040405;--deep:#07070a;--card:#0d0d11;--card2:#121216;
+  --gold:#C9A84C;--gold2:#e8c96a;--gold3:#a8862e;--gold4:#f5d98a;
+  --gdim:rgba(201,168,76,0.12);--gline:rgba(201,168,76,0.2);
+  --white:#f5f0e8;--muted:rgba(245,240,232,0.35);--muted2:rgba(245,240,232,0.6);
+  --green:#00e89a;--red:#ff4757;--cyan:#00d4ff;--purple:#a29bfe;
+  --live:#ff4757;--live-dim:rgba(255,71,87,0.12);--live-line:rgba(255,71,87,0.25);
+  --tip:#FFD700;--tip-dim:rgba(255,215,0,0.1);
+}
+html,body{height:100%;background:#000;overflow:hidden;font-family:'Outfit',sans-serif;color:var(--white)}
+.shell{width:100%;height:100vh;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 40%,#0f0208 0%,#040405 65%)}
+.phone{width:min(390px,100vw);height:min(844px,100vh);background:var(--black);border-radius:min(44px,5vw);overflow:hidden;position:relative;box-shadow:0 0 0 1px rgba(255,71,87,.2),0 0 80px rgba(255,71,87,.06),0 60px 140px rgba(0,0,0,.9)}
+.screen{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity .4s ease;overflow-y:auto;overflow-x:hidden;scrollbar-width:none}
+.screen::-webkit-scrollbar{display:none}
+.screen.active{opacity:1;pointer-events:all}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+@keyframes livePulse{0%,100%{box-shadow:0 0 0 0 rgba(255,71,87,.5)}70%{box-shadow:0 0 0 12px rgba(255,71,87,0)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes tipFloat{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-100px) scale(1.3)}}
+@keyframes emojiFloat{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-120px) scale(1.4)}}
+@keyframes msgSlide{from{opacity:0;transform:translateX(-16px)}to{opacity:1;transform:translateX(0)}}
+@keyframes scanline{0%{transform:translateY(-100%)}100%{transform:translateY(200%)}}
+@keyframes lockPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+@keyframes shimmer{0%,100%{opacity:.7}50%{opacity:1}}
+@keyframes countUp{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:scale(1)}}
+
+/* NAV */
+.bot-nav{position:absolute;bottom:0;left:0;right:0;background:rgba(4,4,5,.97);backdrop-filter:blur(20px);border-top:1px solid rgba(255,71,87,.12);display:flex;padding:10px 0 26px;z-index:100}
+.bn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px 0}
+.bn-ico{font-size:20px;opacity:.3;transition:opacity .2s}
+.bn-lbl{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);transition:color .2s}
+.bn-pip{width:4px;height:4px;border-radius:50%;background:var(--live);opacity:0;transition:opacity .2s;margin:0 auto}
+.bn.active .bn-ico{opacity:1}
+.bn.active .bn-lbl{color:var(--live)}
+.bn.active .bn-pip{opacity:1}
+
+/* ══════════════════════════════════
+   S1 — GUEST: GO LIVE LOCKED
+══════════════════════════════════ */
+#s1{background:var(--black);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px;position:relative;overflow:hidden}
+
+.lock-bg{position:absolute;inset:0;background-image:repeating-linear-gradient(45deg,rgba(255,71,87,.02) 0,rgba(255,71,87,.02) 1px,transparent 1px,transparent 26px),repeating-linear-gradient(-45deg,rgba(255,71,87,.02) 0,rgba(255,71,87,.02) 1px,transparent 1px,transparent 26px)}
+.lock-glow{position:absolute;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(162,155,254,.05) 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%)}
+
+.lock-icon{font-size:80px;margin-bottom:20px;position:relative;z-index:2;animation:lockPulse 3s ease-in-out infinite}
+.lock-title{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:.06em;color:var(--white);position:relative;z-index:2;text-align:center;line-height:1.1;margin-bottom:10px}
+.lock-sub{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:16px;color:var(--muted);text-align:center;position:relative;z-index:2;line-height:1.65;margin-bottom:28px;max-width:300px}
+
+/* Current status card */
+.status-card{width:100%;background:var(--card);border:1px solid var(--gline);border-radius:10px;padding:16px;margin-bottom:20px;position:relative;z-index:2}
+.sc-label{font-size:9px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;margin-bottom:10px}
+.sc-tiers{display:flex;flex-direction:column;gap:8px}
+.sc-tier{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:6px}
+.sc-tier.locked{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06)}
+.sc-tier.current{background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.15)}
+.sc-tier.live-enabled{background:rgba(162,155,254,.08);border:1px solid rgba(162,155,254,.2)}
+.sc-tier.live-elite{background:linear-gradient(135deg,rgba(201,168,76,.1),rgba(201,168,76,.04));border:1px solid var(--gline)}
+.sc-tier-ico{font-size:18px;flex-shrink:0}
+.sc-tier-info{flex:1}
+.sc-tier-name{font-size:13px;font-weight:500;color:var(--white)}
+.sc-tier-desc{font-size:10px;color:var(--muted)}
+.sc-tier-status{font-size:10px;padding:2px 8px;border-radius:20px;white-space:nowrap}
+.sc-tier-status.no{background:rgba(255,255,255,.06);color:var(--muted)}
+.sc-tier-status.yes{background:rgba(162,155,254,.15);border:1px solid rgba(162,155,254,.3);color:var(--purple)}
+.sc-tier-status.here{background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.2);color:var(--cyan)}
+.sc-tier-status.gold{background:linear-gradient(135deg,var(--gold3),var(--gold));color:var(--black);font-weight:700}
+
+/* Path to unlock */
+.unlock-path{width:100%;position:relative;z-index:2;margin-bottom:20px}
+.up-title{font-size:9px;letter-spacing:.2em;color:var(--purple);text-transform:uppercase;margin-bottom:12px;text-align:center}
+.up-steps{display:flex;flex-direction:column;gap:8px}
+.up-step{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid rgba(162,155,254,.1);border-radius:8px;padding:12px 14px}
+.up-step-num{width:24px;height:24px;border-radius:50%;background:rgba(162,155,254,.15);border:1px solid rgba(162,155,254,.25);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--purple);flex-shrink:0}
+.up-step-text{font-size:12px;color:var(--muted2);line-height:1.5}
+
+.unlock-cta{width:100%;padding:18px;background:linear-gradient(135deg,rgba(162,155,254,.6),rgba(162,155,254,.4));border:1px solid rgba(162,155,254,.3);border-radius:6px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.2em;color:var(--white);cursor:pointer;transition:all .2s;box-shadow:0 8px 32px rgba(162,155,254,.12);position:relative;z-index:2}
+.unlock-cta:active{transform:scale(.98)}
+
+/* ══════════════════════════════════
+   S2 — MODEL: GO LIVE SETUP
+══════════════════════════════════ */
+#s2{background:#000}
+
+.model-preview{height:340px;position:relative;overflow:hidden;background:linear-gradient(160deg,#0e0508 0%,#05050f 100%);flex-shrink:0}
+.mp-glow{position:absolute;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(162,155,254,.1) 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%)}
+.mp-diamonds{position:absolute;inset:0;background-image:repeating-linear-gradient(45deg,rgba(162,155,254,.02) 0,rgba(162,155,254,.02) 1px,transparent 1px,transparent 24px),repeating-linear-gradient(-45deg,rgba(162,155,254,.02) 0,rgba(162,155,254,.02) 1px,transparent 1px,transparent 24px)}
+.mp-self{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:2}
+.mp-av{width:88px;height:88px;border-radius:50%;border:3px solid var(--purple);background:rgba(162,155,254,.15);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--purple);animation:livePulse 2s ease-out infinite}
+.mp-name{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--white)}
+.mp-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;padding:4px 12px;border-radius:20px;background:linear-gradient(135deg,var(--gold3),var(--gold));color:var(--black);font-weight:700}
+.mp-controls{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);display:flex;gap:12px;z-index:5}
+.mpc{width:42px;height:42px;border-radius:50%;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer}
+
+.model-live-setup{padding:18px 20px 110px;overflow-y:auto}
+
+/* Revenue split card */
+.split-card{background:linear-gradient(135deg,rgba(162,155,254,.08),rgba(162,155,254,.03));border:1px solid rgba(162,155,254,.2);border-radius:10px;padding:16px;margin-bottom:14px}
+.split-title{font-size:10px;letter-spacing:.2em;color:var(--purple);text-transform:uppercase;margin-bottom:12px}
+.split-bars{display:flex;height:8px;border-radius:4px;overflow:hidden;margin-bottom:10px;gap:2px}
+.split-bar{border-radius:4px;transition:flex .4s ease}
+.split-bar.model-bar{background:linear-gradient(90deg,var(--purple),#c4b5fd);flex:70}
+.split-bar.hush-bar{background:linear-gradient(90deg,var(--gold3),var(--gold));flex:20}
+.split-bar.promoter-bar{background:linear-gradient(90deg,var(--green),#00c47a);flex:10}
+.split-legend{display:flex;gap:12px;flex-wrap:wrap}
+.sl-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted2)}
+.sl-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+/* Setup sections */
+.setup-section{background:var(--card);border:1px solid rgba(255,71,87,.1);border-radius:10px;padding:16px;margin-bottom:12px}
+.ss-title{font-size:10px;letter-spacing:.2em;color:var(--live);text-transform:uppercase;margin-bottom:12px}
+.field-input{width:100%;background:var(--deep);border:1px solid rgba(255,71,87,.15);border-radius:6px;padding:12px 14px;font-size:14px;color:var(--white);font-family:'Outfit',sans-serif;outline:none;transition:border-color .2s}
+.field-input:focus{border-color:var(--live)}
+.field-input::placeholder{color:var(--muted)}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.toggle-row:last-child{margin-bottom:0}
+.tr-label{font-size:13px;color:var(--white);font-weight:500}
+.tr-sub{font-size:10px;color:var(--muted);margin-top:2px}
+.toggle{width:46px;height:25px;border-radius:13px;background:rgba(255,255,255,.1);position:relative;cursor:pointer;transition:all .3s;flex-shrink:0}
+.toggle.on{background:var(--live)}
+.toggle.gold{background:linear-gradient(135deg,var(--gold3),var(--gold))}
+.toggle.purple{background:var(--purple)}
+.toggle-dot{width:19px;height:19px;border-radius:50%;background:var(--white);position:absolute;top:3px;left:3px;transition:all .3s;box-shadow:0 2px 4px rgba(0,0,0,.3)}
+.toggle.on .toggle-dot,.toggle.gold .toggle-dot,.toggle.purple .toggle-dot{left:24px}
+
+/* PPV price grid */
+.ppv-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+.ppv-opt{background:var(--deep);border:1px solid rgba(255,71,87,.12);border-radius:6px;padding:10px 6px;text-align:center;cursor:pointer;transition:all .2s}
+.ppv-opt.sel{border-color:var(--live);background:var(--live-dim)}
+.ppv-opt-price{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--white)}
+.ppv-opt-lbl{font-size:9px;color:var(--muted);letter-spacing:.06em;margin-top:2px}
+
+/* Revenue calculator */
+.rev-calc{background:var(--deep);border:1px solid rgba(162,155,254,.15);border-radius:8px;padding:14px;margin-top:12px}
+.rc-title{font-size:9px;letter-spacing:.18em;color:var(--purple);text-transform:uppercase;margin-bottom:10px}
+.rc-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.03);font-size:12px}
+.rc-row:last-child{border-bottom:none;padding-top:10px;margin-top:4px;border-top:1px solid rgba(255,255,255,.06)}
+.rc-label{color:var(--muted)}
+.rc-val{font-weight:500}
+.rc-val.purple{color:var(--purple)}
+.rc-val.gold{color:var(--gold)}
+.rc-val.green{color:var(--green)}
+.rc-val.live{color:var(--live)}
+
+.go-live-btn{width:100%;padding:20px;background:linear-gradient(135deg,var(--live),#ff6b6b);border:none;border-radius:6px;font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.22em;color:var(--white);cursor:pointer;box-shadow:0 8px 32px rgba(255,71,87,.3);transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px;margin-top:4px}
+.go-live-btn:active{transform:scale(.98)}
+.glb-dot{width:10px;height:10px;border-radius:50%;background:var(--white);animation:blink .8s ease-in-out infinite}
+
+/* ══════════════════════════════════
+   S3 — MODEL LIVE STREAM (ACTIVE)
+══════════════════════════════════ */
+#s3{background:#000;display:flex;flex-direction:column}
+
+.stream-bg{flex:1;position:relative;overflow:hidden;background:linear-gradient(160deg,#1a0310 0%,#0e0215 40%,#040510 100%);min-height:0}
+.sbg-grain{position:absolute;inset:0;opacity:.03;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.sbg-glow{position:absolute;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(162,155,254,.1) 0%,transparent 70%);top:40%;left:50%;transform:translate(-50%,-50%)}
+.sbg-scanline{position:absolute;inset:0;overflow:hidden}
+.sbg-scanline::after{content:'';position:absolute;top:0;left:0;right:0;height:50px;background:linear-gradient(180deg,transparent,rgba(255,255,255,.01),transparent);animation:scanline 5s linear infinite}
+
+.stream-content{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:2;text-align:center}
+.sc-emoji{font-size:64px;animation:float 3s ease-in-out infinite;display:block;margin-bottom:10px}
+.sc-text{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:16px;color:rgba(255,255,255,.4)}
+
+/* Broadcaster header */
+.broadcaster-header{position:absolute;top:0;left:0;right:0;padding:52px 14px 14px;background:linear-gradient(180deg,rgba(0,0,0,.85) 0%,transparent 100%);z-index:10}
+.bh-row1{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.bh-back{width:32px;height:32px;border-radius:50%;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--white);cursor:pointer}
+.bh-live{background:var(--live);border-radius:4px;padding:4px 10px;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:.15em;color:var(--white);display:flex;align-items:center;gap:4px;animation:livePulse 2s ease-out infinite}
+.bh-live-dot{width:5px;height:5px;border-radius:50%;background:var(--white)}
+.bh-end{padding:5px 12px;border:1px solid rgba(255,71,87,.4);border-radius:20px;font-size:11px;color:var(--live);cursor:pointer;background:rgba(255,71,87,.1)}
+
+/* Stats row */
+.bh-stats{display:flex;gap:8px}
+.bh-stat{background:rgba(0,0,0,.5);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:4px 10px;font-size:11px;color:var(--white);display:flex;align-items:center;gap:5px}
+.bh-stat.earnings{border-color:rgba(201,168,76,.3);color:var(--gold)}
+.bh-stat.tips{border-color:rgba(255,215,0,.3);color:var(--tip)}
+.bh-stat.viewers{border-color:rgba(255,71,87,.25);color:var(--live)}
+
+/* Float zones */
+.float-zone{position:absolute;right:10px;bottom:250px;width:44px;pointer-events:none;z-index:6;display:flex;flex-direction:column;gap:4px}
+.float-item{font-size:22px;animation:emojiFloat 2.5s ease-out forwards;opacity:0}
+.tip-float-zone{position:absolute;left:10px;bottom:280px;pointer-events:none;z-index:6}
+.tip-float{font-size:13px;font-weight:700;color:var(--tip);animation:tipFloat 2s ease-out forwards;opacity:0;background:rgba(0,0,0,.6);border:1px solid rgba(255,215,0,.3);border-radius:20px;padding:4px 10px;white-space:nowrap}
+
+/* Live chat */
+.live-chat{position:absolute;bottom:170px;left:0;right:60px;padding:0 12px;max-height:200px;overflow:hidden;z-index:5;display:flex;flex-direction:column;justify-content:flex-end;gap:5px;pointer-events:none}
+.lc-msg{display:flex;align-items:flex-start;gap:6px;animation:msgSlide .3s ease both}
+.lc-av{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0;margin-top:1px}
+.lc-av.vip{background:var(--gdim);color:var(--gold);border:1px solid var(--gline)}
+.lc-av.reg{background:rgba(255,255,255,.08);color:var(--muted2)}
+.lc-av.tipper{background:rgba(255,215,0,.15);color:var(--tip);border:1px solid rgba(255,215,0,.3)}
+.lc-bubble{background:rgba(0,0,0,.55);backdrop-filter:blur(8px);border-radius:10px;padding:5px 9px;max-width:220px}
+.lc-name{font-size:9px;font-weight:700;letter-spacing:.05em;margin-bottom:1px}
+.lc-name.vip{color:var(--gold)}
+.lc-name.reg{color:var(--muted2)}
+.lc-name.tipper{color:var(--tip)}
+.lc-text{font-size:12px;color:var(--white);line-height:1.4}
+.lc-tip-event{background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.25);border-radius:10px;padding:5px 10px;font-size:12px;color:var(--tip);font-weight:500}
+
+/* Controls bar */
+.broadcast-controls{position:absolute;bottom:90px;left:0;right:0;padding:0 14px;z-index:10}
+.bc-input-row{display:flex;gap:8px;margin-bottom:8px}
+.bc-input{flex:1;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:9px 14px;font-size:13px;color:var(--white);font-family:'Outfit',sans-serif;outline:none}
+.bc-input::placeholder{color:rgba(255,255,255,.3)}
+.bc-send{width:36px;height:36px;border-radius:50%;background:var(--live);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+
+.bc-quick{display:flex;justify-content:space-between;align-items:center}
+.bc-emojis{display:flex;gap:8px}
+.bc-emoji{font-size:22px;cursor:pointer;transition:transform .1s}
+.bc-emoji:active{transform:scale(1.3)}
+.bc-cam-controls{display:flex;gap:8px}
+.bc-ctrl{width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer}
+
+/* ══════════════════════════════════
+   S4 — VIEWER: WATCHING WITH TIPS
+══════════════════════════════════ */
+#s4{background:#000;display:flex;flex-direction:column}
+
+.viewer-stream-bg{flex:1;position:relative;overflow:hidden;background:linear-gradient(160deg,#0e0508 0%,#050510 100%);min-height:0}
+.vsb-glow{position:absolute;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(162,155,254,.1) 0%,transparent 70%);top:40%;left:50%;transform:translate(-50%,-50%)}
+.vsb-content{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:2;text-align:center}
+
+/* Viewer header */
+.viewer-header{position:absolute;top:0;left:0;right:0;padding:52px 14px 14px;background:linear-gradient(180deg,rgba(0,0,0,.85) 0%,transparent 100%);z-index:10;display:flex;align-items:flex-start;justify-content:space-between}
+.vh-left{}
+.vh-back{width:32px;height:32px;border-radius:50%;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--white);cursor:pointer;margin-bottom:8px}
+.vh-model{display:flex;align-items:center;gap:8px}
+.vh-av{width:36px;height:36px;border-radius:50%;border:2px solid var(--purple);background:rgba(162,155,254,.15);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:13px;color:var(--purple)}
+.vh-name{font-size:13px;font-weight:500;color:var(--white)}
+.vh-badge{font-size:9px;padding:2px 8px;border-radius:20px;background:linear-gradient(135deg,var(--gold3),var(--gold));color:var(--black);font-weight:700;display:inline-block;margin-top:2px}
+.vh-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.vh-live-badge{background:var(--live);border-radius:4px;padding:4px 10px;font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:.12em;color:var(--white);display:flex;align-items:center;gap:4px;animation:livePulse 2s ease-out infinite}
+.vh-viewers{background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:3px 9px;font-size:11px;color:var(--white);display:flex;align-items:center;gap:4px}
+
+/* Viewer float zones */
+.viewer-float-zone{position:absolute;right:10px;bottom:230px;width:44px;pointer-events:none;z-index:6}
+.viewer-tip-zone{position:absolute;left:10px;bottom:250px;pointer-events:none;z-index:6}
+
+/* Viewer chat */
+.viewer-chat{position:absolute;bottom:160px;left:0;right:56px;padding:0 12px;max-height:180px;overflow:hidden;z-index:5;display:flex;flex-direction:column;justify-content:flex-end;gap:5px;pointer-events:none}
+
+/* Viewer controls */
+.viewer-controls{position:absolute;bottom:90px;left:0;right:0;padding:0 14px;z-index:10}
+.vc-chat-row{display:flex;gap:8px;margin-bottom:8px}
+.vc-input{flex:1;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:9px 14px;font-size:13px;color:var(--white);font-family:'Outfit',sans-serif;outline:none}
+.vc-input::placeholder{color:rgba(255,255,255,.3)}
+.vc-send{width:36px;height:36px;border-radius:50%;background:var(--live);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+
+.vc-actions{display:flex;justify-content:space-between;align-items:center}
+.vc-emojis{display:flex;gap:8px}
+.vc-emoji{font-size:22px;cursor:pointer;transition:transform .1s}
+.vc-emoji:active{transform:scale(1.3)}
+
+/* TIP BUTTON */
+.tip-btn{background:linear-gradient(135deg,rgba(255,215,0,.25),rgba(255,215,0,.12));border:1px solid rgba(255,215,0,.4);border-radius:20px;padding:7px 16px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:.1em;color:var(--tip);cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .2s}
+.tip-btn:active{transform:scale(.96)}
+
+/* ══════════════════════════════════
+   S5 — MODEL WALLET
+══════════════════════════════════ */
+#s5{background:var(--deep)}
+
+.wallet-header{padding:52px 20px 18px;background:var(--black);border-bottom:1px solid var(--gline);position:sticky;top:0;z-index:10}
+.wh-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.1em;background:linear-gradient(135deg,var(--gold3),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.wh-sub{font-size:11px;color:var(--muted);margin-top:2px}
+
+.wallet-scroll{padding:20px 20px 110px}
+
+/* Total balance hero */
+.wallet-hero{background:linear-gradient(135deg,rgba(162,155,254,.1),rgba(162,155,254,.03));border:1px solid rgba(162,155,254,.2);border-radius:12px;padding:24px;margin-bottom:16px;text-align:center;position:relative;overflow:hidden}
+.wallet-hero::before{content:'';position:absolute;inset:0;background-image:repeating-linear-gradient(45deg,rgba(162,155,254,.02) 0,rgba(162,155,254,.02) 1px,transparent 1px,transparent 22px),repeating-linear-gradient(-45deg,rgba(162,155,254,.02) 0,rgba(162,155,254,.02) 1px,transparent 1px,transparent 22px)}
+.wh-eyebrow{font-size:9px;letter-spacing:.25em;color:var(--purple);text-transform:uppercase;margin-bottom:8px;position:relative;z-index:1}
+.wh-balance{font-family:'Bebas Neue',sans-serif;font-size:60px;line-height:1;background:linear-gradient(135deg,var(--purple),#c4b5fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 20px rgba(162,155,254,.35));position:relative;z-index:1}
+.wh-sub-note{font-size:11px;color:var(--muted);margin-top:6px;position:relative;z-index:1}
+.wh-stage-name{font-size:12px;color:var(--purple);margin-top:4px;position:relative;z-index:1}
+
+/* Three income streams */
+.income-streams{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px}
+.is-card{background:var(--card);border-radius:8px;padding:14px 10px;text-align:center}
+.is-card.booking{border:1px solid var(--gline)}
+.is-card.stream{border:1px solid rgba(255,71,87,.2)}
+.is-card.tips{border:1px solid rgba(255,215,0,.2)}
+.is-ico{font-size:22px;margin-bottom:6px}
+.is-val{font-family:'Bebas Neue',sans-serif;font-size:22px;line-height:1}
+.is-card.booking .is-val{background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.is-card.stream .is-val{color:var(--live)}
+.is-card.tips .is-val{color:var(--tip)}
+.is-lbl{font-size:9px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-top:3px}
+
+/* Revenue split reminder */
+.split-reminder{background:var(--card);border:1px solid rgba(162,155,254,.15);border-radius:8px;padding:14px;margin-bottom:16px}
+.sr-title{font-size:10px;letter-spacing:.18em;color:var(--purple);text-transform:uppercase;margin-bottom:10px}
+.sr-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:12px}
+.sr-row:last-child{border-bottom:none}
+.sr-label{color:var(--muted2);display:flex;align-items:center;gap:6px}
+.sr-pct{font-weight:600}
+.sr-pct.model{color:var(--purple)}
+.sr-pct.hush{color:var(--gold)}
+.sr-pct.promoter{color:var(--green)}
+
+/* Payout button */
+.payout-btn{width:100%;padding:16px;background:linear-gradient(135deg,rgba(0,232,154,.5),rgba(0,232,154,.3));border:1px solid rgba(0,232,154,.3);border-radius:6px;font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:.18em;color:var(--white);cursor:pointer;transition:all .2s;margin-bottom:14px}
+
+/* Txn history */
+.txn{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.txn-ico{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.txn-ico.booking{background:var(--gdim);border:1px solid var(--gline)}
+.txn-ico.stream{background:var(--live-dim);border:1px solid var(--live-line)}
+.txn-ico.tip{background:var(--tip-dim);border:1px solid rgba(255,215,0,.25)}
+.txn-body{flex:1}
+.txn-title{font-size:13px;color:var(--white);font-weight:500}
+.txn-sub{font-size:10px;color:var(--muted);margin-top:2px}
+.txn-amt{font-family:'Bebas Neue',sans-serif;font-size:19px;color:var(--green)}
+
+/* Tip overlay */
+.tip-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:300;align-items:flex-end;justify-content:center;padding-bottom:20px}
+.tip-box{background:var(--card);border:1px solid rgba(255,215,0,.3);border-radius:16px 16px 8px 8px;padding:28px 24px;width:100%;max-width:390px;text-align:center}
+.tb-ico{font-size:48px;margin-bottom:12px;display:block;animation:float 2s ease-in-out infinite}
+.tb-title{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.08em;color:var(--tip);margin-bottom:4px}
+.tb-sub{font-size:12px;color:var(--muted);margin-bottom:20px;line-height:1.5}
+.tb-model{font-size:14px;color:var(--white);font-weight:500;margin-bottom:16px}
+.tip-amounts{display:flex;gap:8px;margin-bottom:16px}
+.tip-amt{flex:1;background:var(--deep);border:1px solid rgba(255,215,0,.15);border-radius:8px;padding:14px 8px;text-align:center;cursor:pointer;transition:all .2s}
+.tip-amt.sel{border-color:var(--tip);background:var(--tip-dim)}
+.tip-amt-val{font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--tip)}
+.tip-amt-lbl{font-size:9px;color:var(--muted);margin-top:2px}
+.tip-send-btn{width:100%;padding:16px;background:linear-gradient(135deg,rgba(255,215,0,.5),rgba(255,215,0,.35));border:1px solid rgba(255,215,0,.4);border-radius:6px;font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:.15em;color:var(--black);cursor:pointer;transition:all .2s;margin-bottom:8px}
+.tip-cancel{font-size:12px;color:var(--muted);cursor:pointer}
+</style>
+</head>
+<body>
+<div class="shell">
+<div class="phone">
+
+  <!-- ════ S1: GUEST — GO LIVE LOCKED ════ -->
+  <div class="screen active" id="s1">
+    <div class="lock-bg"></div>
+    <div class="lock-glow"></div>
+
+    <div class="lock-icon">🔴</div>
+    <div class="lock-title">LIVE STREAMING<br>IS A MODEL FEATURE</div>
+    <div class="lock-sub">Only Featured and Elite Event Models can go live on Hush AI. Build your profile, earn your badge, unlock the camera.</div>
+
+    <!-- Current tier status -->
+    <div class="status-card">
+      <div class="sc-label">Live Streaming Access By Tier</div>
+      <div class="sc-tiers">
+        <div class="sc-tier current">
+          <div class="sc-tier-ico">🎉</div>
+          <div class="sc-tier-info">
+            <div class="sc-tier-name">Party Profile</div>
+            <div class="sc-tier-desc">Free · Everyone gets this · Your current level</div>
+          </div>
+          <div class="sc-tier-status here">You're Here</div>
+        </div>
+        <div class="sc-tier locked">
+          <div class="sc-tier-ico">↑</div>
+          <div class="sc-tier-info">
+            <div class="sc-tier-name">Rising Model</div>
+            <div class="sc-tier-desc">Unlock for 500✦ · Watch streams, apply to events</div>
+          </div>
+          <div class="sc-tier-status no">No Live</div>
+        </div>
+        <div class="sc-tier live-enabled">
+          <div class="sc-tier-ico">✦</div>
+          <div class="sc-tier-info">
+            <div class="sc-tier-name">Featured Model</div>
+            <div class="sc-tier-desc">3+ events · 4.5+ rating · Live streaming unlocked</div>
+          </div>
+          <div class="sc-tier-status yes">✓ Can Go Live</div>
+        </div>
+        <div class="sc-tier live-elite">
+          <div class="sc-tier-ico">⭐</div>
+          <div class="sc-tier-info">
+            <div class="sc-tier-name">Elite Model</div>
+            <div class="sc-tier-desc">10+ events · 4.8+ rating · Priority placement + live</div>
+          </div>
+          <div class="sc-tier-status gold">Can Go Live</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Path to unlock -->
+    <div class="unlock-path">
+      <div class="up-title">Your Path to Going Live</div>
+      <div class="up-steps">
+        <div class="up-step">
+          <div class="up-step-num">1</div>
+          <div class="up-step-text">Spend <strong style="color:var(--gold)">500✦ credits</strong> to unlock your Event Model profile and join the marketplace</div>
+        </div>
+        <div class="up-step">
+          <div class="up-step-num">2</div>
+          <div class="up-step-text">Get booked at <strong style="color:var(--purple)">3+ events</strong> and maintain a <strong style="color:var(--purple)">4.5+ star rating</strong> to reach Featured tier</div>
+        </div>
+        <div class="up-step">
+          <div class="up-step-num">3</div>
+          <div class="up-step-text"><strong style="color:var(--live)">Go Live</strong> — charge viewers $5–$25 to watch, earn tips, build your audience across every city on Hush</div>
+        </div>
+      </div>
+    </div>
+
+    <button class="unlock-cta" onclick="goTo('s5')">💃 UNLOCK MODEL STATUS — 500✦</button>
+
+    <div class="bot-nav">
+      <div class="bn active" onclick="goTo('s1')"><div class="bn-ico">🔒</div><div class="bn-pip"></div><div class="bn-lbl">Locked</div></div>
+      <div class="bn" onclick="goTo('s4')"><div class="bn-ico">👁</div><div class="bn-pip"></div><div class="bn-lbl">Watch Live</div></div>
+      <div class="bn" onclick="goTo('s5')"><div class="bn-ico">💰</div><div class="bn-pip"></div><div class="bn-lbl">Wallet</div></div>
+    </div>
+  </div>
+
+  <!-- ════ S2: MODEL — GO LIVE SETUP ════ -->
+  <div class="screen" id="s2">
+    <!-- Camera preview -->
+    <div class="model-preview">
+      <div class="mp-glow"></div>
+      <div class="mp-diamonds"></div>
+      <div class="mp-self">
+        <div class="mp-av">AB</div>
+        <div class="mp-name">Alexis Blue</div>
+        <div class="mp-badge">✦ Featured Model</div>
+      </div>
+      <div class="mp-controls">
+        <div class="mpc">🔄</div>
+        <div class="mpc">🎤</div>
+        <div class="mpc">💡</div>
+      </div>
+    </div>
+
+    <div class="model-live-setup">
+
+      <!-- Revenue split -->
+      <div class="split-card">
+        <div class="split-title">Your Revenue Split</div>
+        <div class="split-bars">
+          <div class="split-bar model-bar"></div>
+          <div class="split-bar hush-bar"></div>
+          <div class="split-bar promoter-bar"></div>
+        </div>
+        <div class="split-legend">
+          <div class="sl-item"><div class="sl-dot" style="background:var(--purple)"></div>You — 70%</div>
+          <div class="sl-item"><div class="sl-dot" style="background:var(--gold)"></div>Hush AI — 20%</div>
+          <div class="sl-item"><div class="sl-dot" style="background:var(--green)"></div>Promoter — 10%</div>
+        </div>
+      </div>
+
+      <!-- Stream title -->
+      <div class="setup-section">
+        <div class="ss-title">Stream Title</div>
+        <input class="field-input" value="Getting ready for Hush STL tonight 🖤✨" placeholder="What are you streaming?">
+      </div>
+
+      <!-- Settings -->
+      <div class="setup-section">
+        <div class="ss-title">Stream Settings</div>
+        <div class="toggle-row">
+          <div><div class="tr-label">Visible to Everyone</div><div class="tr-sub">All Hush users · Any city · Maximum reach</div></div>
+          <div class="toggle on" onclick="this.classList.toggle('on')"><div class="toggle-dot"></div></div>
+        </div>
+        <div class="toggle-row">
+          <div><div class="tr-label">Pay-Per-View</div><div class="tr-sub">Charge viewers to watch your stream</div></div>
+          <div class="toggle gold" id="ppvToggle" onclick="togglePPVSetup()"><div class="toggle-dot"></div></div>
+        </div>
+        <div class="toggle-row">
+          <div><div class="tr-label">Tip Jar Enabled</div><div class="tr-sub">Viewers can send you tips during the stream</div></div>
+          <div class="toggle purple" onclick="this.classList.toggle('purple')"><div class="toggle-dot"></div></div>
+        </div>
+      </div>
+
+      <!-- PPV pricing -->
+      <div class="setup-section" id="ppvPricing">
+        <div class="ss-title">PPV Price</div>
+        <div class="ppv-grid">
+          <div class="ppv-opt" onclick="setPPV(this,5)"><div class="ppv-opt-price">$5</div><div class="ppv-opt-lbl">Standard</div></div>
+          <div class="ppv-opt sel" onclick="setPPV(this,10)"><div class="ppv-opt-price">$10</div><div class="ppv-opt-lbl">Popular</div></div>
+          <div class="ppv-opt" onclick="setPPV(this,15)"><div class="ppv-opt-price">$15</div><div class="ppv-opt-lbl">Premium</div></div>
+          <div class="ppv-opt" onclick="setPPV(this,25)"><div class="ppv-opt-price">$25</div><div class="ppv-opt-lbl">VIP Only</div></div>
+        </div>
+        <div class="rev-calc">
+          <div class="rc-title">If 200 Viewers Pay · Revenue Preview</div>
+          <div class="rc-row"><div class="rc-label">Gross stream revenue</div><div class="rc-val" id="grossStream">$2,000</div></div>
+          <div class="rc-row"><div class="rc-label">Your cut (70%)</div><div class="rc-val purple" id="modelCut">$1,400</div></div>
+          <div class="rc-row"><div class="rc-label">Hush AI (20%)</div><div class="rc-val gold">$400</div></div>
+          <div class="rc-row"><div class="rc-label">Promoter at venue (10%)</div><div class="rc-val green" id="promoterCut">$200</div></div>
+          <div class="rc-row"><div class="rc-label">At 500 viewers — your earnings</div><div class="rc-val live" id="bigEarnings">$3,500</div></div>
+        </div>
+      </div>
+
+      <button class="go-live-btn" onclick="startModelLive()">
+        <div class="glb-dot"></div>
+        GO LIVE
+      </button>
+    </div>
+
+    <div class="bot-nav">
+      <div class="bn" onclick="goTo('s1')"><div class="bn-ico">🔒</div><div class="bn-pip"></div><div class="bn-lbl">Guest View</div></div>
+      <div class="bn active" onclick="goTo('s2')"><div class="bn-ico">🎥</div><div class="bn-pip"></div><div class="bn-lbl">Go Live</div></div>
+      <div class="bn" onclick="goTo('s5')"><div class="bn-ico">💰</div><div class="bn-pip"></div><div class="bn-lbl">Wallet</div></div>
+    </div>
+  </div>
+
+  <!-- ════ S3: BROADCASTER VIEW ════ -->
+  <div class="screen" id="s3">
+    <div class="stream-bg">
+      <div class="sbg-grain"></div>
+      <div class="sbg-glow"></div>
+      <div class="sbg-scanline"></div>
+      <div class="stream-content">
+        <span class="sc-emoji">💃</span>
+        <div class="sc-text">Getting ready for Hush STL tonight 🖤</div>
+      </div>
+
+      <!-- Header -->
+      <div class="broadcaster-header">
+        <div class="bh-row1">
+          <div class="bh-back" onclick="goTo('s2')">‹</div>
+          <div class="bh-live"><div class="bh-live-dot"></div>LIVE</div>
+          <div class="bh-end" onclick="endStream()">End Stream</div>
+        </div>
+        <div class="bh-stats">
+          <div class="bh-stat viewers">👁 <span id="bcViewers">0</span></div>
+          <div class="bh-stat earnings">💰 $<span id="bcEarnings">0</span></div>
+          <div class="bh-stat tips">🌟 Tips: $<span id="bcTips">0</span></div>
+        </div>
+      </div>
+
+      <!-- Float zones -->
+      <div class="float-zone" id="bcFloatZone"></div>
+      <div class="tip-float-zone" id="bcTipZone"></div>
+
+      <!-- Chat -->
+      <div class="live-chat" id="bcChat"></div>
+
+      <!-- Controls -->
+      <div class="broadcast-controls">
+        <div class="bc-input-row">
+          <input class="bc-input" id="bcChatInput" placeholder="Say something to your viewers..." onkeydown="if(event.key==='Enter')sendBcChat()">
+          <button class="bc-send" onclick="sendBcChat()">➤</button>
+        </div>
+        <div class="bc-quick">
+          <div class="bc-emojis">
+            <span class="bc-emoji" onclick="fireStreamEmoji('🔥','bcFloatZone')">🔥</span>
+            <span class="bc-emoji" onclick="fireStreamEmoji('💃','bcFloatZone')">💃</span>
+            <span class="bc-emoji" onclick="fireStreamEmoji('✨','bcFloatZone')">✨</span>
+            <span class="bc-emoji" onclick="fireStreamEmoji('👑','bcFloatZone')">👑</span>
+          </div>
+          <div class="bc-cam-controls">
+            <div class="bc-ctrl">🔄</div>
+            <div class="bc-ctrl">🎤</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bot-nav">
+      <div class="bn" onclick="goTo('s1')"><div class="bn-ico">🔒</div><div class="bn-pip"></div><div class="bn-lbl">Guest View</div></div>
+      <div class="bn active" onclick="goTo('s3')"><div class="bn-ico">🔴</div><div class="bn-pip"></div><div class="bn-lbl">Broadcasting</div></div>
+      <div class="bn" onclick="goTo('s5')"><div class="bn-ico">💰</div><div class="bn-pip"></div><div class="bn-lbl">Wallet</div></div>
+    </div>
+  </div>
+
+  <!-- ════ S4: VIEWER WITH TIP JAR ════ -->
+  <div class="screen" id="s4">
+    <div class="viewer-stream-bg">
+      <div class="vsb-glow"></div>
+      <div class="sbg-scanline"></div>
+      <div class="vsb-content">
+        <div style="text-align:center">
+          <span style="font-size:64px;animation:float 3s ease-in-out infinite;display:block;margin-bottom:10px">💃</span>
+          <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:16px;color:rgba(255,255,255,.4)">Alexis Blue · Pre-show stream</div>
+        </div>
+      </div>
+
+      <!-- Viewer header -->
+      <div class="viewer-header">
+        <div class="vh-left">
+          <div class="vh-back" onclick="goTo('s1')">‹</div>
+          <div class="vh-model">
+            <div class="vh-av">AB</div>
+            <div>
+              <div class="vh-name">Alexis Blue</div>
+              <div class="vh-badge">✦ Featured</div>
+            </div>
+          </div>
+        </div>
+        <div class="vh-right">
+          <div class="vh-live-badge"><div class="bh-live-dot"></div>LIVE</div>
+          <div class="vh-viewers">👁 <span id="viewerViewCount">312</span></div>
+        </div>
+      </div>
+
+      <!-- Float zones -->
+      <div class="viewer-float-zone" id="viewerFloatZone"></div>
+      <div class="viewer-tip-zone" id="viewerTipZone"></div>
+
+      <!-- Chat -->
+      <div class="viewer-chat" id="viewerChat">
+        <div class="lc-msg"><div class="lc-av vip">JB</div><div class="lc-bubble"><div class="lc-name vip">Jordan B.</div><div class="lc-text">You look amazing 😍</div></div></div>
+        <div class="lc-msg"><div class="lc-av reg">KM</div><div class="lc-bubble"><div class="lc-name reg">Keisha M.</div><div class="lc-text">Can't wait to see you tonight!</div></div></div>
+        <div class="lc-tip-event">🌟 Marcus just tipped $10 · "You're incredible!"</div>
+        <div class="lc-msg"><div class="lc-av reg">TR</div><div class="lc-bubble"><div class="lc-name reg">Tasha R.</div><div class="lc-text">What's the dress code tonight?</div></div></div>
+        <div class="lc-msg"><div class="lc-av tipper">DW</div><div class="lc-bubble"><div class="lc-name tipper">Dre W.</div><div class="lc-text">First time watching a Hush stream. Worth it 🔥</div></div></div>
+      </div>
+
+      <!-- Viewer controls -->
+      <div class="viewer-controls">
+        <div class="vc-chat-row">
+          <input class="vc-input" id="viewerChatInput" placeholder="Say something..." onkeydown="if(event.key==='Enter')sendViewerChat()">
+          <button class="vc-send" onclick="sendViewerChat()">➤</button>
+        </div>
+        <div class="vc-actions">
+          <div class="vc-emojis">
+            <span class="vc-emoji" onclick="fireStreamEmoji('🔥','viewerFloatZone')">🔥</span>
+            <span class="vc-emoji" onclick="fireStreamEmoji('❤️','viewerFloatZone')">❤️</span>
+            <span class="vc-emoji" onclick="fireStreamEmoji('💃','viewerFloatZone')">💃</span>
+            <span class="vc-emoji" onclick="fireStreamEmoji('✨','viewerFloatZone')">✨</span>
+          </div>
+          <div class="tip-btn" onclick="showTipJar()">🌟 Send Tip</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bot-nav">
+      <div class="bn" onclick="goTo('s1')"><div class="bn-ico">🔒</div><div class="bn-pip"></div><div class="bn-lbl">Go Live</div></div>
+      <div class="bn active" onclick="goTo('s4')"><div class="bn-ico">👁</div><div class="bn-pip"></div><div class="bn-lbl">Watching</div></div>
+      <div class="bn" onclick="goTo('s5')"><div class="bn-ico">💰</div><div class="bn-pip"></div><div class="bn-lbl">Wallet</div></div>
+    </div>
+  </div>
+
+  <!-- ════ S5: MODEL WALLET ════ -->
+  <div class="screen" id="s5">
+    <div class="wallet-header">
+      <div class="wh-title">MY EARNINGS</div>
+      <div class="wh-sub">All income streams in one place</div>
+    </div>
+    <div class="wallet-scroll">
+
+      <div class="wallet-hero">
+        <div class="wh-eyebrow">Total Balance · Alexis Blue</div>
+        <div class="wh-balance">$3,840</div>
+        <div class="wh-sub-note">Bookings + Streams + Tips · Ready to payout</div>
+        <div class="wh-stage-name">🔒 Legal name secured · Stage name public</div>
+      </div>
+
+      <!-- Three income streams -->
+      <div class="income-streams">
+        <div class="is-card booking">
+          <div class="is-ico">💃</div>
+          <div class="is-val">$2,400</div>
+          <div class="is-lbl">Bookings</div>
+        </div>
+        <div class="is-card stream">
+          <div class="is-ico">🔴</div>
+          <div class="is-val">$1,260</div>
+          <div class="is-lbl">Streams</div>
+        </div>
+        <div class="is-card tips">
+          <div class="is-ico">🌟</div>
+          <div class="is-val">$180</div>
+          <div class="is-lbl">Tips</div>
+        </div>
+      </div>
+
+      <!-- Revenue split reminder -->
+      <div class="split-reminder">
+        <div class="sr-title">Your Revenue Split</div>
+        <div class="sr-row">
+          <div class="sr-label"><span style="color:var(--purple)">💃</span> Stream & tip revenue — You</div>
+          <div class="sr-pct model">70%</div>
+        </div>
+        <div class="sr-row">
+          <div class="sr-label"><span style="color:var(--gold)">✦</span> Platform fee — Hush AI</div>
+          <div class="sr-pct hush">20%</div>
+        </div>
+        <div class="sr-row">
+          <div class="sr-label"><span style="color:var(--green)">🎉</span> Venue promoter override</div>
+          <div class="sr-pct promoter">10%</div>
+        </div>
+        <div class="sr-row" style="padding-top:10px;border-top:1px solid rgba(255,255,255,.06);margin-top:4px">
+          <div class="sr-label" style="color:var(--white);font-weight:500">Booking pay — You keep</div>
+          <div class="sr-pct model">90%</div>
+        </div>
+      </div>
+
+      <button class="payout-btn" onclick="doPayout()">💸 PAYOUT $3,840 TO BANK</button>
+
+      <!-- Transaction history -->
+      <div style="font-size:10px;letter-spacing:.2em;color:var(--gold);text-transform:uppercase;margin-bottom:12px">Recent Earnings</div>
+
+      <div class="txn">
+        <div class="txn-ico stream">🔴</div>
+        <div class="txn-body"><div class="txn-title">Stream Revenue — Pre-show</div><div class="txn-sub">312 viewers · $10 PPV · Your 70% cut</div></div>
+        <div class="txn-amt">+$1,260</div>
+      </div>
+      <div class="txn">
+        <div class="txn-ico tip">🌟</div>
+        <div class="txn-body"><div class="txn-title">Tips — Pre-show Stream</div><div class="txn-sub">14 tips received · Your 70% cut</div></div>
+        <div class="txn-amt" style="color:var(--tip)">+$180</div>
+      </div>
+      <div class="txn">
+        <div class="txn-ico booking">💃</div>
+        <div class="txn-body"><div class="txn-title">Booking — Hush STL Saturday</div><div class="txn-sub">Released on check-in · $200 cash · 10% fee deducted</div></div>
+        <div class="txn-amt">+$180</div>
+      </div>
+      <div class="txn">
+        <div class="txn-ico booking">💃</div>
+        <div class="txn-body"><div class="txn-title">Booking — TK Promotions</div><div class="txn-sub">Released on check-in · $150 cash · 10% fee deducted</div></div>
+        <div class="txn-amt">+$135</div>
+      </div>
+      <div class="txn">
+        <div class="txn-ico stream">🔴</div>
+        <div class="txn-body"><div class="txn-title">Stream Revenue — Last Saturday</div><div class="txn-sub">289 viewers · $10 PPV · Your 70% cut</div></div>
+        <div class="txn-amt">+$1,260</div>
+      </div>
+      <div class="txn">
+        <div class="txn-ico tip">🌟</div>
+        <div class="txn-body"><div class="txn-title">Tips — Last Saturday Stream</div><div class="txn-sub">11 tips received · Your 70% cut</div></div>
+        <div class="txn-amt" style="color:var(--tip)">+$140</div>
+      </div>
+
+    </div>
+    <div class="bot-nav">
+      <div class="bn" onclick="goTo('s1')"><div class="bn-ico">🔒</div><div class="bn-pip"></div><div class="bn-lbl">Go Live</div></div>
+      <div class="bn" onclick="goTo('s4')"><div class="bn-ico">👁</div><div class="bn-pip"></div><div class="bn-lbl">Watch Live</div></div>
+      <div class="bn active" onclick="goTo('s5')"><div class="bn-ico">💰</div><div class="bn-pip"></div><div class="bn-lbl">Wallet</div></div>
+    </div>
+  </div>
+
+  <!-- TIP JAR OVERLAY -->
+  <div class="tip-overlay" id="tipOverlay">
+    <div class="tip-box">
+      <span class="tb-ico">🌟</span>
+      <div class="tb-title">SEND A TIP</div>
+      <div class="tb-sub">Show Alexis some love. 70% goes straight to her. The rest keeps Hush running.</div>
+      <div class="tb-model">Tipping: <strong style="color:var(--purple)">Alexis Blue ✦ Featured</strong></div>
+      <div class="tip-amounts">
+        <div class="tip-amt" onclick="selectTip(this,1)"><div class="tip-amt-val">$1</div><div class="tip-amt-lbl">Love</div></div>
+        <div class="tip-amt sel" onclick="selectTip(this,5)"><div class="tip-amt-val">$5</div><div class="tip-amt-lbl">Fire</div></div>
+        <div class="tip-amt" onclick="selectTip(this,10)"><div class="tip-amt-val">$10</div><div class="tip-amt-lbl">Queen</div></div>
+        <div class="tip-amt" onclick="selectTip(this,25)"><div class="tip-amt-val">$25</div><div class="tip-amt-lbl">Elite</div></div>
+      </div>
+      <button class="tip-send-btn" id="tipSendBtn" onclick="sendTip()">🌟 SEND $5 TIP</button>
+      <div class="tip-cancel" onclick="hideTipJar()">Cancel</div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<script>
+// ── NAV ──
+function goTo(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const t = document.getElementById(id);
+  if(t){ t.classList.add('active'); t.scrollTop = 0; }
+  if(id === 's3') initBroadcast();
+  if(id === 's4') initViewerStream();
+}
+
+// ── PPV SETUP ──
+let ppvPrice = 10;
+function togglePPVSetup() {
+  const t = document.getElementById('ppvToggle');
+  const p = document.getElementById('ppvPricing');
+  t.classList.toggle('gold');
+  if(p) p.style.display = t.classList.contains('gold') ? 'block' : 'none';
+}
+function setPPV(el, price) {
+  el.parentElement.querySelectorAll('.ppv-opt').forEach(o => o.classList.remove('sel'));
+  el.classList.add('sel');
+  ppvPrice = price;
+  const gross200 = price * 200;
+  const gross500 = price * 500;
+  const gs = document.getElementById('grossStream');
+  const mc = document.getElementById('modelCut');
+  const pc = document.getElementById('promoterCut');
+  const be = document.getElementById('bigEarnings');
+  if(gs) gs.textContent = '$' + gross200.toLocaleString();
+  if(mc) mc.textContent = '$' + Math.floor(gross200 * .7).toLocaleString();
+  if(pc) pc.textContent = '$' + Math.floor(gross200 * .1).toLocaleString();
+  if(be) be.textContent = '$' + Math.floor(gross500 * .7).toLocaleString();
+}
+
+// ── BROADCAST ──
+let bcViewers = 0, bcEarnings = 0, bcTipsTotal = 0, bcInterval;
+const bcMessages = [
+  {av:'JB',type:'vip',name:'Jordan B.',text:'Go off sis 💃'},
+  {av:'TR',type:'reg',name:'Tasha R.',text:'You look beautiful!'},
+  {av:'DW',type:'reg',name:'Dre W.',text:'Just paid to watch and it was worth it 🔥'},
+  {av:'KM',type:'vip',name:'Keisha M.',text:'Cannot WAIT for tonight 🥂'},
+  {av:'MR',type:'reg',name:'Marcus · Chicago',text:'Watching from Chi. Hush needs to come here!'},
+  {av:'TK',type:'tipper',name:'TK just tipped $10',text:'"You\'re incredible!" 🌟'},
+  {av:'SB',type:'reg',name:'Savvy B.',text:'The vibe is everything fr'},
+  {av:'AL',type:'vip',name:'Alexis L.',text:'👑👑👑'},
+];
+let bcMsgIdx = 0;
+
+function initBroadcast() {
+  clearInterval(bcInterval);
+  bcViewers = 0; bcEarnings = 0; bcTipsTotal = 0;
+  updateBcStats();
+  const chat = document.getElementById('bcChat');
+  if(chat) chat.innerHTML = '';
+
+  bcInterval = setInterval(() => {
+    bcViewers += Math.floor(Math.random() * 8) + 2;
+    bcEarnings = Math.floor(bcViewers * ppvPrice * .7);
+    updateBcStats();
+
+    if(bcMsgIdx < bcMessages.length) {
+      addBcMsg(bcMessages[bcMsgIdx]);
+      bcMsgIdx++;
+      if(bcMessages[bcMsgIdx-1].type === 'tipper') {
+        const tipAmt = Math.floor(Math.random() * 4 + 1) * 5;
+        bcTipsTotal += Math.floor(tipAmt * .7);
+        document.getElementById('bcTips').textContent = bcTipsTotal;
+        fireTipFloat('bcTipZone', '+$' + tipAmt);
+      }
+    } else { bcMsgIdx = 0; }
+  }, 2200);
+}
+
+function updateBcStats() {
+  const bv = document.getElementById('bcViewers');
+  const be = document.getElementById('bcEarnings');
+  if(bv) bv.textContent = bcViewers.toLocaleString();
+  if(be) be.textContent = bcEarnings.toLocaleString();
+}
+
+function addBcMsg(msg) {
+  const chat = document.getElementById('bcChat');
+  if(!chat) return;
+  let el;
+  if(msg.type === 'tipper') {
+    el = document.createElement('div');
+    el.className = 'lc-tip-event';
+    el.textContent = '🌟 ' + msg.name + ' · ' + msg.text;
+  } else {
+    el = document.createElement('div');
+    el.className = 'lc-msg';
+    el.innerHTML = `<div class="lc-av ${msg.type}">${msg.av}</div><div class="lc-bubble"><div class="lc-name ${msg.type}">${msg.name}</div><div class="lc-text">${msg.text}</div></div>`;
+  }
+  chat.appendChild(el);
+  if(chat.children.length > 6) chat.removeChild(chat.children[0]);
+}
+
+function sendBcChat() {
+  const input = document.getElementById('bcChatInput');
+  if(!input || !input.value.trim()) return;
+  addBcMsg({av:'AB',type:'vip',name:'Alexis Blue',text:input.value});
+  input.value = '';
+}
+
+function endStream() {
+  clearInterval(bcInterval);
+  const btn = document.querySelector('.bh-end');
+  if(btn){ btn.textContent='Ended'; btn.style.color='var(--muted)'; }
+  setTimeout(() => goTo('s5'), 800);
+}
+
+// ── VIEWER STREAM ──
+let viewerInterval;
+const viewerMsgs = [
+  {av:'JB',type:'vip',name:'Jordan B.',text:'She\'s so beautiful 😍'},
+  {av:'RJ',type:'reg',name:'Rico · Houston',text:'When does Hush come to Houston???'},
+  {av:'PD',type:'tipper',name:'Pam just tipped $5',text:'"Love your energy!" 🌟'},
+  {av:'ZN',type:'reg',name:'Zara N.',text:'This is the content I needed today'},
+  {av:'AL',type:'vip',name:'Alexis L.',text:'You\'re so real. That\'s why we love you 🖤'},
+];
+let viewerMsgIdx = 0;
+
+function initViewerStream() {
+  clearInterval(viewerInterval);
+  let vCount = 312;
+  document.getElementById('viewerViewCount').textContent = vCount;
+
+  viewerInterval = setInterval(() => {
+    vCount += Math.floor(Math.random() * 5) - 1;
+    if(vCount < 300) vCount = 300;
+    document.getElementById('viewerViewCount').textContent = vCount;
+
+    if(viewerMsgIdx < viewerMsgs.length) {
+      addViewerMsg(viewerMsgs[viewerMsgIdx]);
+      viewerMsgIdx++;
+      if(viewerMsgs[viewerMsgIdx-1].type === 'tipper') {
+        fireTipFloat('viewerTipZone', '🌟 $5 tip sent!');
+      }
+    } else { viewerMsgIdx = 0; }
+  }, 2800);
+}
+
+function addViewerMsg(msg) {
+  const chat = document.getElementById('viewerChat');
+  if(!chat) return;
+  let el;
+  if(msg.type === 'tipper') {
+    el = document.createElement('div');
+    el.className = 'lc-tip-event';
+    el.textContent = '🌟 ' + msg.name + ' · ' + msg.text;
+  } else {
+    el = document.createElement('div');
+    el.className = 'lc-msg';
+    el.innerHTML = `<div class="lc-av ${msg.type}">${msg.av}</div><div class="lc-bubble"><div class="lc-name ${msg.type}">${msg.name}</div><div class="lc-text">${msg.text}</div></div>`;
+  }
+  chat.appendChild(el);
+  if(chat.children.length > 6) chat.removeChild(chat.children[0]);
+}
+
+function sendViewerChat() {
+  const input = document.getElementById('viewerChatInput');
+  if(!input || !input.value.trim()) return;
+  addViewerMsg({av:'N',type:'vip',name:'You',text:input.value});
+  input.value = '';
+}
+
+// ── EMOJI REACTIONS ──
+function fireStreamEmoji(emoji, zoneId) {
+  const zone = document.getElementById(zoneId);
+  if(!zone) return;
+  const el = document.createElement('div');
+  el.className = 'float-item';
+  el.textContent = emoji;
+  el.style.animationDelay = (Math.random() * .3) + 's';
+  zone.appendChild(el);
+  setTimeout(() => el.remove(), 2800);
+}
+
+function fireTipFloat(zoneId, text) {
+  const zone = document.getElementById(zoneId);
+  if(!zone) return;
+  const el = document.createElement('div');
+  el.className = 'tip-float';
+  el.textContent = text;
+  zone.appendChild(el);
+  setTimeout(() => el.remove(), 2200);
+}
+
+// ── TIP JAR ──
+let selectedTip = 5;
+function showTipJar() { document.getElementById('tipOverlay').style.display='flex'; }
+function hideTipJar() { document.getElementById('tipOverlay').style.display='none'; }
+
+function selectTip(el, amt) {
+  el.parentElement.querySelectorAll('.tip-amt').forEach(t => t.classList.remove('sel'));
+  el.classList.add('sel');
+  selectedTip = amt;
+  const btn = document.getElementById('tipSendBtn');
+  if(btn) btn.textContent = '🌟 SEND $' + amt + ' TIP';
+}
+
+function sendTip() {
+  const btn = document.getElementById('tipSendBtn');
+  if(!btn) return;
+  btn.textContent = '✓ TIP SENT! ALEXIS SEES IT NOW';
+  btn.style.background = 'rgba(0,232,154,.4)';
+  btn.style.borderColor = 'rgba(0,232,154,.4)';
+  btn.style.color = 'var(--white)';
+  btn.style.pointerEvents = 'none';
+
+  // Show tip event in viewer chat
+  addViewerMsg({av:'★',type:'tipper',name:'You just tipped $'+selectedTip,text:'"Keep being amazing!" 🌟'});
+  fireTipFloat('viewerTipZone', '🌟 $' + selectedTip + ' sent!');
+
+  setTimeout(() => {
+    hideTipJar();
+    btn.textContent = '🌟 SEND $' + selectedTip + ' TIP';
+    btn.style.background = '';
+    btn.style.borderColor = '';
+    btn.style.color = 'var(--black)';
+    btn.style.pointerEvents = 'all';
+  }, 1800);
+}
+
+// ── START LIVE ──
+function startModelLive() {
+  const btn = document.querySelector('.go-live-btn');
+  if(!btn) return;
+  btn.innerHTML = '<div class="glb-dot"></div> GOING LIVE...';
+  btn.style.opacity = '.7';
+  btn.style.pointerEvents = 'none';
+  setTimeout(() => goTo('s3'), 1200);
+}
+
+// ── WALLET PAYOUT ──
+function doPayout() {
+  const btn = document.querySelector('.payout-btn');
+  if(!btn) return;
+  btn.textContent = '⚡ PROCESSING...';
+  btn.style.opacity = '.7';
+  btn.style.pointerEvents = 'none';
+  setTimeout(() => {
+    btn.textContent = '✓ $3,840 SENT TO YOUR BANK';
+    btn.style.background = 'rgba(0,232,154,.2)';
+    btn.style.opacity = '1';
+    const bal = document.querySelector('.wh-balance');
+    if(bal) bal.textContent = '$0';
+  }, 1500);
+}
+</script>
+</body>
+</html>
