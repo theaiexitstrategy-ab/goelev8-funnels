@@ -13,6 +13,11 @@ const nextConfig = {
           source: '/willpower',
           destination: '/willpower-index.html',
         },
+        // goelev8.ai/hush → HushSTL demo landing page.
+        {
+          source: '/hush',
+          destination: '/hush-index.html',
+        },
       ],
       afterFiles: [
         {
