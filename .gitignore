@@ -5,3 +5,9 @@ node_modules/
 .env.*.local
 
 tsconfig.tsbuildinfo
+
+# next-pwa build artifacts (regenerated each build; only manifest.json is tracked)
+public/hush/sw.js
+public/hush/sw.js.map
+public/hush/workbox-*.js
+public/hush/workbox-*.js.map

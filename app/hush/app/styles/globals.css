@@ -1,0 +1,25 @@
+/* (c) 2026 GoElev8.ai | Aaron Bryant. All rights reserved.
+   Hush PWA stylesheet. Imported only from app/hush/app/layout.tsx so
+   Tailwind preflight does not bleed into other route groups. */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .pt-safe { padding-top: env(safe-area-inset-top); }
+  .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+  .pl-safe { padding-left: env(safe-area-inset-left); }
+  .pr-safe { padding-right: env(safe-area-inset-right); }
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+  .scrollbar-hide { scrollbar-width: none; -ms-overflow-style: none; }
+}
+
+@layer base {
+  body {
+    background: #040405;
+    color: #f5f0e8;
+    font-family: 'Outfit', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+}
