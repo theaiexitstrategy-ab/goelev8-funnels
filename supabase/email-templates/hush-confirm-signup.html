@@ -1,0 +1,119 @@
+<!--
+  HUSH-BRANDED EMAIL — CONFIRM SIGNUP
+  ====================================
+  How to apply:
+    1. Supabase Dashboard → goelev8-funnels project
+       → Authentication → Email Templates → Confirm Signup
+    2. Replace the entire template body with the HTML below
+    3. Save
+
+  Sender rebrand (separate from template):
+    Authentication → SMTP Settings → "Sender name"
+    Change "Supabase Auth" → "Hush AI"   (or "GoElev8" for parent brand)
+
+  Heads-up: this template is sent for EVERY signup on the project,
+  including goelev8.ai/auth/signup. If goelev8 ever needs its own
+  branded email, we'll need to fork the template at the Supabase
+  level (one project = one template) or move auth to a separate
+  project.
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Confirm your Hush account</title>
+  </head>
+  <body
+    style="margin:0;padding:0;background:#040405;color:#f5f0e8;font-family:'Helvetica Neue',Arial,sans-serif;-webkit-font-smoothing:antialiased;"
+  >
+    <table
+      role="presentation"
+      width="100%"
+      cellspacing="0"
+      cellpadding="0"
+      border="0"
+      style="background:#040405;padding:48px 24px;"
+    >
+      <tr>
+        <td align="center">
+          <table
+            role="presentation"
+            width="100%"
+            cellspacing="0"
+            cellpadding="0"
+            border="0"
+            style="max-width:420px;background:#0d0d11;border:1px solid rgba(201,168,76,0.2);border-radius:14px;padding:40px 32px;"
+          >
+            <tr>
+              <td align="center">
+                <!-- Hush wordmark (gold gradient simulated via solid gold for email-client compatibility) -->
+                <div
+                  style="font-family:'Bebas Neue','Helvetica Neue',Arial,sans-serif;font-size:56px;line-height:1;letter-spacing:0.04em;color:#C9A84C;margin:0;"
+                >
+                  HUSH
+                </div>
+                <div
+                  style="font-family:'Bebas Neue','Helvetica Neue',Arial,sans-serif;font-size:11px;letter-spacing:0.35em;color:rgba(201,168,76,0.5);margin-top:6px;"
+                >
+                  AI
+                </div>
+
+                <p
+                  style="margin:24px 0 0;font-style:italic;font-size:16px;color:rgba(245,240,232,0.6);font-family:Georgia,serif;"
+                >
+                  You're one tap away from the list.
+                </p>
+
+                <p
+                  style="margin:32px 0 28px;font-size:14px;line-height:1.6;color:rgba(245,240,232,0.75);"
+                >
+                  Confirm your email to finish creating your account.
+                  Once you're in, pick how you'll show up tonight —
+                  guest, promoter, or model.
+                </p>
+
+                <a
+                  href="{{ .ConfirmationURL }}"
+                  style="display:inline-block;background:linear-gradient(135deg,#a8862e,#C9A84C);color:#040405;text-decoration:none;font-family:'Bebas Neue','Helvetica Neue',Arial,sans-serif;font-size:16px;letter-spacing:0.18em;padding:16px 36px;border-radius:6px;font-weight:600;"
+                >
+                  CONFIRM EMAIL
+                </a>
+
+                <p
+                  style="margin:28px 0 0;font-size:11px;line-height:1.6;color:rgba(245,240,232,0.35);"
+                >
+                  If the button doesn't work, paste this link into your
+                  browser:
+                </p>
+                <p
+                  style="margin:6px 0 0;font-size:11px;line-height:1.5;color:rgba(245,240,232,0.5);word-break:break-all;"
+                >
+                  <a
+                    href="{{ .ConfirmationURL }}"
+                    style="color:rgba(201,168,76,0.7);text-decoration:underline;"
+                  >{{ .ConfirmationURL }}</a>
+                </p>
+
+                <hr
+                  style="border:none;border-top:1px solid rgba(201,168,76,0.15);margin:32px 0;"
+                />
+
+                <p
+                  style="margin:0;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(245,240,232,0.35);"
+                >
+                  Powered by GoElev8.ai
+                </p>
+                <p
+                  style="margin:8px 0 0;font-size:10px;line-height:1.5;color:rgba(245,240,232,0.25);"
+                >
+                  Didn't sign up? You can safely ignore this email.
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
