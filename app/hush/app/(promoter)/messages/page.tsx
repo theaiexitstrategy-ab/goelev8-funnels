@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import MessagesTabs from './MessagesTabs';
 import KeywordRow from './KeywordRow';
+import SmsFeed from './SmsFeed';
 
 type SearchParams = { tab?: string };
 
@@ -26,7 +27,7 @@ export default async function MessagesPage({
 
   const tab = searchParams.tab === 'feed' ? 'feed' : 'keywords';
 
-  const [keywordsRes, eventsRes] = await Promise.all([
+  const [keywordsRes, eventsRes, messagesRes] = await Promise.all([
     supabase
       .from('hush_keywords')
       .select('id, keyword, tier, price, ai_reply, booking_url, is_active, used_count, event_id, hush_events!inner(title, event_date)')
@@ -36,10 +37,31 @@ export default async function MessagesPage({
       .from('hush_events')
       .select('id', { count: 'exact', head: true })
       .eq('promoter_id', promoter.id),
+    supabase
+      .from('hush_messages')
+      .select('id, direction, body, from_phone, to_phone, matched, created_at, keyword_id, hush_keywords(keyword)')
+      .eq('promoter_id', promoter.id)
+      .order('created_at', { ascending: false })
+      .limit(80),
   ]);
 
   const keywords = keywordsRes.data ?? [];
   const eventCount = eventsRes.count ?? 0;
+  const messages = (messagesRes.data ?? []).map((m) => {
+    const kw = Array.isArray(m.hush_keywords)
+      ? m.hush_keywords[0]
+      : (m.hush_keywords as { keyword: string } | null);
+    return {
+      id: m.id as string,
+      direction: m.direction as 'inbound' | 'outbound',
+      body: m.body as string,
+      fromPhone: m.from_phone as string,
+      toPhone: m.to_phone as string,
+      matched: !!m.matched,
+      createdAt: m.created_at as string,
+      keyword: kw?.keyword ?? null,
+    };
+  });
 
   return (
     <main className="mx-auto flex w-full max-w-[420px] flex-col px-5 pt-6">
@@ -113,19 +135,7 @@ export default async function MessagesPage({
           )}
         </section>
       ) : (
-        <section className="mt-5">
-          <div className="rounded-xl border border-hush-gline bg-hush-card px-5 py-12 text-center">
-            <p className="font-cormorant text-[16px] italic text-hush-white">
-              Live SMS feed coming next.
-            </p>
-            <p className="mt-2 font-outfit text-[12px] leading-snug text-hush-muted2">
-              When a guest texts your prefix, their message and your AI reply land here in real time.
-            </p>
-            <p className="mt-4 font-outfit text-[10px] uppercase tracking-[0.25em] text-hush-muted">
-              Wires up in Priority 2C
-            </p>
-          </div>
-        </section>
+        <SmsFeed messages={messages} />
       )}
     </main>
   );
