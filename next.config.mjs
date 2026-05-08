@@ -50,6 +50,11 @@ const nextConfig = {
           source: '/hush',
           destination: '/hush-index.html',
         },
+        // goelev8.ai/mcclainlaw → McClain Law funnel page.
+        {
+          source: '/mcclainlaw',
+          destination: '/mcclainlaw_v3.html',
+        },
       ],
       afterFiles: [
         {
