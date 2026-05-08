@@ -554,6 +554,7 @@ export default function HomePage() {
               setup:300, mo:127, feat:false,
               features:['Missed call text-back (60 sec)','Automated booking calendar','Dedicated business phone number','Client portal dashboard','Monthly lead report','300 SMS/mo included','$0.05/msg overage'],
               off:['AI voice assistant (Vapi)'],
+              link: process.env.NEXT_PUBLIC_STRIPE_LINK_STARTER,
             },
             {
               name:'GROWTH',
@@ -561,6 +562,7 @@ export default function HomePage() {
               setup:400, mo:197, feat:true,
               features:['Everything in Starter','AI voice assistant (Vapi)','Lead qualification flow','SMS campaign automation','Portal analytics + GA4','Priority support','600 SMS/mo + 60 min included','$0.05/msg · $0.15/min overage'],
               off:[],
+              link: process.env.NEXT_PUBLIC_STRIPE_LINK_GROWTH,
             },
             {
               name:'PRO',
@@ -568,6 +570,7 @@ export default function HomePage() {
               setup:600, mo:297, feat:false,
               features:['Everything in Growth','Multi-agent team dashboard','Agent routing logic','Broker pipeline view','Custom SMS campaigns','Dedicated account manager','1,200 SMS/mo + 120 min included','$0.05/msg · $0.15/min overage'],
               off:[],
+              link: process.env.NEXT_PUBLIC_STRIPE_LINK_PRO,
             },
           ].map(plan => (
             <div key={plan.name} className={`${s.pc} ${plan.feat ? s.feat : ''}`} role="listitem">
@@ -582,7 +585,10 @@ export default function HomePage() {
                 {plan.features.map((f, i) => <li key={i}>{f}</li>)}
                 {plan.off.map((f, i) => <li key={`off-${i}`} className={s.off}>{f}</li>)}
               </ul>
-              <a href="https://book.goelev8.ai/go" target="_blank" rel="noopener noreferrer" className={s.tcta}>BOOK A SETUP CALL →</a>
+              {plan.link
+                ? <a href={plan.link} target="_blank" rel="noopener noreferrer" className={s.tcta}>GET {plan.name} →</a>
+                : <a href="https://book.goelev8.ai/go" target="_blank" rel="noopener noreferrer" className={s.tcta}>BOOK A SETUP CALL →</a>
+              }
             </div>
           ))}
         </div>
