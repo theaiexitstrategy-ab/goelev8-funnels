@@ -97,7 +97,6 @@
   <div class="hero-name">Happy Mother's<br><em>Day,</em> Wife</div>
   <div class="hero-subtitle">My partner. My love. My greatest team member.</div>
 <!-- BOUQUET IMAGE -->
-<div class="bouquet-label" id="bouquetLabel" style="text-align:center;font-size:10px;letter-spacing:5px;text-transform:uppercase;color:var(--rose);margin-bottom:8px;opacity:0;transition:opacity 0.8s ease;">Your Roses</div>
 <div class="bouquet-wrapper" style="width:100%;display:flex;justify-content:center;padding:20px 0 30px;">
   <div id="bouquetImg" style="
     width: min(360px, 90vw);
@@ -122,23 +121,8 @@
   <p>Thank you for being the kind of mother our kids can look back on and feel proud of. Thank you for being my wife. And thank you for never giving up on us — on this family we're building together.</p>
   <div class="message-sig">Forever yours — Aaron 🤎</div>
 </section>
-
-<div class="divider">
-  <div class="divider-line"></div>
-  <div class="divider-heart">🤎</div>
-  <div class="divider-line right"></div>
-</div>
-
-
-</div>
-
-<div class="divider" style="opacity:1;">
-  <div class="divider-line"></div>
-  <div class="divider-heart">🤎</div>
-  <div class="divider-line right"></div>
-</div>
-
 <!-- Photo Collage -->
+
 <section class="collage-section">
   <div class="collage-label">Our Moments Together</div>
 
@@ -213,14 +197,12 @@ for (let i = 0; i < 22; i++) {
 
 // Bouquet image reveal on scroll
 const bouquetImg = document.getElementById('bouquetImg');
-const bouquetLabel = document.getElementById('bouquetLabel');
 let bouquetShown = false;
 new IntersectionObserver((entries) => {
   entries.forEach(e => {
     if (e.isIntersecting && !bouquetShown) {
       bouquetShown = true;
       setTimeout(() => {
-        bouquetLabel.style.opacity = '1';
         bouquetImg.style.opacity = '1';
         bouquetImg.style.transform = 'translateY(0) scale(1)';
       }, 100);
