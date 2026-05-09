@@ -130,6 +130,12 @@ export async function generateMessage(profile: Profile, instructionLine: string)
   return ensureClosing(raw);
 }
 
+// First-touch instruction for the immediate opt-in reply (when someone
+// texts the keyword in). Heartfelt and personal — but still 1-2 sentences.
+export function instructionForOptIn(): string {
+  return `She just texted in for the first time. Make it heartfelt and personal — open in Aaron's voice with how much he loves her, woven into the moment. This is the message she'll save and re-read; make it land.`;
+}
+
 // Day-themed instruction line for the 3-day nudge cron.
 export function instructionForDay(day: 1 | 2 | 3): string {
   if (day === 1) {

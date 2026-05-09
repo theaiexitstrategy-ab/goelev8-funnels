@@ -27,6 +27,7 @@ import {
   CLOSING,
   generateMessage,
   instructionForDown,
+  instructionForOptIn,
 } from '@/lib/sms-uplift';
 
 // ─── Config ──────────────────────────────────────────────────────
@@ -131,8 +132,9 @@ const FALLBACK_REPLY =
 const RATE_LIMITED_REPLY =
   `Easy 🤎 You've gotten a few from us already this hour — give it a bit and try again. ${CLOSING}`;
 
-function optInAck(profile: Profile): string {
-  return `Hey ${profile.name} 🤎 Your ${profile.aaronRole} loves you more than words. You'll hear from him at 9 AM each day for the next three. ${CLOSING}`;
+// Static fallback if Claude fails on the first-touch reply.
+function optInFallback(profile: Profile): string {
+  return `Hey ${profile.name} 🤎 Your ${profile.aaronRole} Aaron loves you more than words can say — exactly as you are, today and always. ${CLOSING}`;
 }
 
 // ─── Twilio reply helpers ────────────────────────────────────────
@@ -203,9 +205,15 @@ export async function POST(req: NextRequest) {
 
   // ── Decide intent ──
 
-  // 1) Keyword match → opt them into the 3-day nudge sequence and ack.
+  // 1) Keyword match → opt them into the 3-day nudge sequence + send a
+  //    heartfelt Claude-generated first-touch message.
   if (matched) {
-    const replyText = optInAck(matched.profile);
+    let replyText = optInFallback(matched.profile);
+    try {
+      replyText = await generateMessage(matched.profile, instructionForOptIn());
+    } catch (err) {
+      console.error('[sms-uplift] opt-in generation failed, using fallback:', err);
+    }
     if (supabase) {
       try { await scheduleNudges(supabase, from, matched.key); }
       catch (err) { console.error('[sms-uplift] scheduleNudges failed:', err); }
