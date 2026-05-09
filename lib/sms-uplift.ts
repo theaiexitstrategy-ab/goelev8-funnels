@@ -16,7 +16,8 @@ export const CLOSING = '— Aaron 🤎';
 export type Profile = {
   name: string;
   relationship: string;     // her relationship TO Aaron
-  aaronRole: string;        // Aaron's role TO her — used in messaging
+  aaronRole: string;        // Aaron's role TO her — used in messaging ("son" / "husband" / "brother" / "uncle")
+  endearment: string;       // how Aaron addresses her — "Mom" / "Wife" / "Sis" / "Niece"
   traits: string[];
   coretruth: string | string[];
   context: string;
@@ -30,6 +31,7 @@ export const PROFILES: Record<string, Profile> = {
     name: 'Barbara',
     relationship: 'mother',
     aaronRole: 'son',
+    endearment: 'Mom',
     traits: ['faith-driven', 'strong', 'nurturing', 'sacrificial', 'wise', 'steady'],
     coretruth: [
       'Her faith keeps the family grounded',
@@ -44,6 +46,7 @@ export const PROFILES: Record<string, Profile> = {
     name: 'Courtney',
     relationship: 'wife',
     aaronRole: 'husband',
+    endearment: 'Wife',
     traits: ['resilient', 'devoted', 'graceful', 'strong', 'loving', 'patient'],
     coretruth: [
       'She holds the family together quietly',
@@ -57,6 +60,7 @@ export const PROFILES: Record<string, Profile> = {
     name: 'Ashlen',
     relationship: 'sister',
     aaronRole: 'brother',
+    endearment: 'Sis',
     traits: ['strong', 'selfless', 'tough', 'tender', 'fun', 'energetic'],
     coretruth: 'Aaron is immensely proud of the mother and role model Ashlen has become',
     context:
@@ -67,6 +71,7 @@ export const PROFILES: Record<string, Profile> = {
     name: 'Mariah',
     relationship: 'niece',
     aaronRole: 'uncle',
+    endearment: 'Niece',
     traits: ['brave', 'resilient', 'loving', 'determined', 'soft-hearted', 'strong'],
     coretruth: 'She is breaking cycles and building something new for her family',
     context:
@@ -86,7 +91,8 @@ function buildSystemPrompt(): string {
   return [
     `You write short, warm, personalized SMS messages from Aaron Bryant to a specific woman in his life.`,
     `Each message must be 1 to 2 sentences MAX, written in Aaron's voice in the first person ("I").`,
-    `Reference the woman's relationship to Aaron explicitly the first time you address her — e.g. "your son Aaron", "your husband Aaron", "your brother Aaron", "your uncle Aaron" — so it's clear who is sending.`,
+    `Open with the salutation given in the prompt — e.g. "Hey Mom,", "Hey Wife,", "Hey Sis,", or "Hey Niece," — verbatim, no variations and no first names.`,
+    `Reference Aaron's role to her once, exactly as given — "your son Aaron", "your husband Aaron", "your brother Aaron", or "your uncle Aaron" — so the sender is unmistakable.`,
     `Two themes must come through somewhere across each message: (1) Aaron loves her sincerely, more than words can express; (2) he loves her exactly as she is, even on days she wants to "bum it out" and not be celebrated.`,
     `Never mention AI, GoElev8.ai, automation, or that this is a system. Never open with "Happy Mother's Day" — be more creative.`,
     `Always close with exactly: "${CLOSING}".`,
@@ -106,8 +112,9 @@ export async function generateMessage(profile: Profile, instructionLine: string)
   const userPrompt = [
     `Write a short SMS from Aaron to ${profile.name}.`,
     ``,
+    `Salutation to open with (verbatim): "Hey ${profile.endearment},"`,
+    `Aaron's role phrase to include once: "your ${profile.aaronRole} Aaron"`,
     `Her relationship to Aaron: ${profile.relationship}`,
-    `Aaron's role to her: ${profile.aaronRole} (use "your ${profile.aaronRole} Aaron" once)`,
     `Her traits: ${profile.traits.join(', ')}`,
     `Core truths: ${coretruth}`,
     `Context: ${profile.context}`,
@@ -115,7 +122,11 @@ export async function generateMessage(profile: Profile, instructionLine: string)
     ``,
     instructionLine,
     ``,
-    `Hard rule: 1-2 sentences MAX. End with exactly "${CLOSING}".`,
+    `Hard rules:`,
+    `- Open with exactly "Hey ${profile.endearment},"`,
+    `- Use "your ${profile.aaronRole} Aaron" once`,
+    `- 1-2 sentences MAX`,
+    `- End with exactly "${CLOSING}"`,
   ].join('\n');
 
   const response = await client.messages.create({

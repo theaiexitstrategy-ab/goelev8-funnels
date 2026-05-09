@@ -104,7 +104,7 @@ async function processNudges(): Promise<{ processed: number; sent: number; faile
     try {
       message = await generateMessage(profile, instructionForDay(day));
     } catch (err: any) {
-      message = `Hey ${profile.name} 🤎 Your ${profile.aaronRole} Aaron loves you more than words today and every day. ${CLOSING}`;
+      message = `Hey ${profile.endearment}, your ${profile.aaronRole} Aaron loves you more than words today and every day. ${CLOSING}`;
       console.error(`[uplift-nudges] Claude failed for ${row.id}:`, err?.message || err);
     }
 

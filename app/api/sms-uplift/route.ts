@@ -134,7 +134,7 @@ const RATE_LIMITED_REPLY =
 
 // Static fallback if Claude fails on the first-touch reply.
 function optInFallback(profile: Profile): string {
-  return `Hey ${profile.name} 🤎 Your ${profile.aaronRole} Aaron loves you more than words can say — exactly as you are, today and always. ${CLOSING}`;
+  return `Hey ${profile.endearment}, your ${profile.aaronRole} Aaron loves you more than words can say — exactly as you are, today and always. ${CLOSING}`;
 }
 
 // ─── Twilio reply helpers ────────────────────────────────────────
@@ -236,7 +236,7 @@ export async function POST(req: NextRequest) {
       try { replyText = await generateMessage(profile, instructionForDown()); }
       catch (err) {
         console.error('[sms-uplift] down-message generation failed:', err);
-        replyText = `Hey ${profile.name} 🤎 Your ${profile.aaronRole} Aaron loves you exactly as you are today — no need to perform. ${CLOSING}`;
+        replyText = `Hey ${profile.endearment}, your ${profile.aaronRole} Aaron loves you exactly as you are today — no need to perform. ${CLOSING}`;
       }
     }
     try {
