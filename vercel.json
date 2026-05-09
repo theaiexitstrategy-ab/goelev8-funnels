@@ -15,5 +15,11 @@
       "source": "/rome/barber",
       "destination": "/rome-barber.html"
     }
+  ],
+  "crons": [
+    {
+      "path": "/api/cron/uplift-nudges",
+      "schedule": "0 14 * * *"
+    }
   ]
 }
