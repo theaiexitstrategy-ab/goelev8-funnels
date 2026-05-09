@@ -55,6 +55,11 @@ const nextConfig = {
           source: '/mcclainlaw',
           destination: '/mcclainlaw_v3.html',
         },
+        // Mother's Day uplift landing pages — one per profile.
+        { source: '/courtney', destination: '/courtney.html' },
+        { source: '/ashlen',   destination: '/ashlen.html' },
+        { source: '/mariah',   destination: '/mariah.html' },
+        { source: '/mom',      destination: '/mom.html' },
       ],
       afterFiles: [
         {
