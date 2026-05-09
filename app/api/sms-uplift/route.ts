@@ -1,10 +1,15 @@
 // (c) 2026 GoElev8.ai | Aaron Bryant. All rights reserved.
 //
-// Mother's Day SMS Uplift Assistant — Vapi inbound SMS webhook.
-// A woman texts her name to +1 (888) 814-6142, we look up her profile,
-// generate a personalized message via Claude, and send it back via Vapi.
+// Mother's Day SMS Uplift Assistant — inbound SMS webhook.
 //
-// Returns { reply: "..." } per the Vapi SMS webhook contract.
+// Wired to Twilio's Messaging webhook on +1 (888) 814-6142. A woman texts
+// her name, we match a profile, generate a personalized message via Claude,
+// and reply via TwiML <Message>.
+//
+// Also accepts JSON callers (Vapi or direct) for parity / future-proofing —
+// if Content-Type is application/x-www-form-urlencoded we treat it as Twilio
+// and respond with TwiML; otherwise we parse JSON and respond with
+// { reply: "..." }.
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
@@ -138,17 +143,48 @@ const RATE_LIMITED_REPLY =
 
 // ─── Main handler ────────────────────────────────────────────────
 
+// Twilio escapes XML special chars in TwiML <Message> bodies — &, <, >, ', "
+function escapeXml(s: string): string {
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+}
+
+function twimlReply(message: string) {
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<Response><Message>${escapeXml(message)}</Message></Response>`;
+  return new NextResponse(xml, {
+    status: 200,
+    headers: { 'Content-Type': 'text/xml; charset=utf-8' },
+  });
+}
+
 export async function POST(req: NextRequest) {
+  // Twilio's inbound SMS webhook posts application/x-www-form-urlencoded and
+  // expects a TwiML XML response. Vapi (and direct callers) post JSON. Sniff
+  // the content type and parse accordingly.
+  const contentType = (req.headers.get('content-type') || '').toLowerCase();
+  const isTwilio = contentType.includes('application/x-www-form-urlencoded');
+
   let body: any = {};
   try {
-    body = await req.json();
+    if (isTwilio) {
+      const form = await req.formData();
+      body = Object.fromEntries(form.entries());
+    } else {
+      body = await req.json();
+    }
   } catch {
-    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
+    return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
   }
 
   const { text, from } = extractInbound(body);
 
   if (!from) {
+    if (isTwilio) return twimlReply('Could not read sender — please try again.');
     return NextResponse.json({ error: 'Missing sender' }, { status: 400 });
   }
 
@@ -173,7 +209,9 @@ export async function POST(req: NextRequest) {
           message_sent: null,
           rate_limited: true,
         });
-        return NextResponse.json({ reply: RATE_LIMITED_REPLY });
+        return isTwilio
+          ? twimlReply(RATE_LIMITED_REPLY)
+          : NextResponse.json({ reply: RATE_LIMITED_REPLY });
       }
     } catch (err) {
       console.error('[sms-uplift] rate-limit check failed:', err);
@@ -209,7 +247,9 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  return NextResponse.json({ reply: replyText });
+  return isTwilio
+    ? twimlReply(replyText)
+    : NextResponse.json({ reply: replyText });
 }
 
 async function generateUpliftMessage(profile: Profile): Promise<string> {
