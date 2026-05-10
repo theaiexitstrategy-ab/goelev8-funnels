@@ -28,6 +28,7 @@ import {
   generateMessage,
   instructionForDown,
   instructionForOptIn,
+  canonicalProfileKey,
 } from '@/lib/sms-uplift';
 
 // ─── Config ──────────────────────────────────────────────────────
@@ -56,13 +57,30 @@ function extractInbound(body: any): { text: string; from: string } {
   return { text: String(text || '').trim(), from: String(from || '').trim() };
 }
 
+// Map of every keyword the inbound SMS might contain (lowercased) to a
+// canonical profile key. Includes both the canonical keys themselves and
+// any legacy aliases (e.g. "mom" → "barbara") so old keywords still work.
+const KEYWORDS: Record<string, string> = (() => {
+  const map: Record<string, string> = {};
+  for (const k of Object.keys(PROFILES)) map[k] = k;
+  map['mom'] = 'barbara'; // legacy alias from earlier version
+  return map;
+})();
+
 function matchProfile(text: string): { key: string; profile: Profile } | null {
   if (!text) return null;
   const norm = text.toLowerCase().replace(/[^\w\s]/g, ' ');
+
   const single = norm.trim();
-  if (PROFILES[single]) return { key: single, profile: PROFILES[single] };
+  if (KEYWORDS[single]) {
+    const key = canonicalProfileKey(KEYWORDS[single]);
+    return { key, profile: PROFILES[key] };
+  }
   for (const tok of norm.split(/\s+/).filter(Boolean)) {
-    if (PROFILES[tok]) return { key: tok, profile: PROFILES[tok] };
+    if (KEYWORDS[tok]) {
+      const key = canonicalProfileKey(KEYWORDS[tok]);
+      return { key, profile: PROFILES[key] };
+    }
   }
   return null;
 }
@@ -134,7 +152,7 @@ const RATE_LIMITED_REPLY =
 
 // Static fallback if Claude fails on the first-touch reply.
 function optInFallback(profile: Profile): string {
-  return `Hey ${profile.endearment}, your ${profile.aaronRole} Aaron loves you more than words can say — exactly as you are, today and always. ${CLOSING}`;
+  return `Hey ${profile.addressAs}, ${profile.fromLine} loves you more than words can say — exactly as you are, today and always. ${CLOSING}`;
 }
 
 // ─── Twilio reply helpers ────────────────────────────────────────
@@ -236,7 +254,7 @@ export async function POST(req: NextRequest) {
       try { replyText = await generateMessage(profile, instructionForDown()); }
       catch (err) {
         console.error('[sms-uplift] down-message generation failed:', err);
-        replyText = `Hey ${profile.endearment}, your ${profile.aaronRole} Aaron loves you exactly as you are today — no need to perform. ${CLOSING}`;
+        replyText = `Hey ${profile.addressAs}, ${profile.fromLine} loves you exactly as you are today — no need to perform. ${CLOSING}`;
       }
     }
     try {

@@ -12,7 +12,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-import { PROFILES, CLOSING, generateMessage, instructionForDay } from '@/lib/sms-uplift';
+import { PROFILES, CLOSING, generateMessage, instructionForDay, canonicalProfileKey } from '@/lib/sms-uplift';
 
 const supabaseUrl =
   process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || '';
@@ -87,7 +87,8 @@ async function processNudges(): Promise<{ processed: number; sent: number; faile
   const results: Array<Record<string, unknown>> = [];
 
   for (const row of due) {
-    const profile = PROFILES[row.profile_key as string];
+    const key = canonicalProfileKey(row.profile_key as string);
+    const profile = PROFILES[key];
     const day = row.day_number as 1 | 2 | 3;
 
     if (!profile) {
@@ -104,7 +105,7 @@ async function processNudges(): Promise<{ processed: number; sent: number; faile
     try {
       message = await generateMessage(profile, instructionForDay(day));
     } catch (err: any) {
-      message = `Hey ${profile.endearment}, your ${profile.aaronRole} Aaron loves you more than words today and every day. ${CLOSING}`;
+      message = `Hey ${profile.addressAs}, ${profile.fromLine} loves you more than words today and every day. ${CLOSING}`;
       console.error(`[uplift-nudges] Claude failed for ${row.id}:`, err?.message || err);
     }
 
