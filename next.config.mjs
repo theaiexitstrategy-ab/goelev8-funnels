@@ -60,6 +60,8 @@ const nextConfig = {
         { source: '/ashlen',   destination: '/ashlen.html' },
         { source: '/mariah',   destination: '/mariah.html' },
         { source: '/mom',      destination: '/mom.html' },
+        { source: '/toya',     destination: '/toya.html' },
+        { source: '/natasha',  destination: '/natasha.html' },
       ],
       afterFiles: [
         {

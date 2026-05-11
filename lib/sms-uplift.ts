@@ -82,10 +82,13 @@ export const PROFILES: Record<string, Profile> = {
     relationship: 'sister-in-law (married to Aaron\'s brother)',
     addressAs: 'Sis',
     fromLine: 'your brother Aaron',
-    traits: ['devoted', 'strong', 'loyal', 'nurturing', 'resilient', 'entrepreneurial'],
-    coretruth: 'She holds Aaron\'s brother\'s world together — and it doesn\'t go unnoticed',
+    traits: ['devoted', 'strong', 'loyal', 'nurturing', 'resilient'],
+    coretruth: [
+      'She holds Aaron\'s brother\'s world together — and it doesn\'t go unnoticed',
+      'She is the type of woman the whole family is better because of',
+    ],
     context:
-      "Toya is the wife of Aaron's brother. She is a mother who shows up every single day for her family. She won an Entrepreneur Award — she's not just a mother, she's a builder. Aaron wants her to know that the way she holds his brother's world together is seen, appreciated, and means everything to the family.",
+      "Toya is the wife of Aaron's brother. She is a mother who shows up every single day for her family. The way she holds his brother's world together is seen, appreciated, and means everything to the family. She is the type of woman our whole family is better because of.",
     tone: 'warm and brotherly — like a brother-in-law who genuinely sees her and wants her to know it',
   },
   tasha: {
