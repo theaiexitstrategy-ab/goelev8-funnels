@@ -14,6 +14,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { isOptedOut, withOptOutNotice } from '@/lib/sms-opt-outs';
 
 const twilioAccountSid = process.env.TWILIO_ACCOUNT_SID!;
 const twilioAuthToken = process.env.TWILIO_AUTH_TOKEN!;
@@ -48,8 +49,22 @@ function toE164(raw: string): string {
   return `+${digits}`;
 }
 
-async function sendSms(to: string, body: string) {
+// Set `internal: true` for operator pings (e.g. "you have an incoming call")
+// sent to Aaron's cell. Internal pings skip the opt-out gate and skip the
+// STOP reminder append. Anything sent to a caller MUST use internal: false.
+async function sendSms(to: string, body: string, opts: { internal?: boolean } = {}) {
   if (!twilioAccountSid || !twilioAuthToken || !twilioNumber) return;
+  if (!opts.internal) {
+    try {
+      if (await isOptedOut(supa(), to)) {
+        console.log('[inbound] skipped SMS to opted-out number', to);
+        return;
+      }
+    } catch (err) {
+      console.error('[inbound] opt-out check failed (proceeding anyway):', err);
+    }
+  }
+  const finalBody = opts.internal ? body : withOptOutNotice(body);
   const url = `https://api.twilio.com/2010-04-01/Accounts/${twilioAccountSid}/Messages.json`;
   await fetch(url, {
     method: 'POST',
@@ -57,7 +72,7 @@ async function sendSms(to: string, body: string) {
       'Authorization': 'Basic ' + Buffer.from(`${twilioAccountSid}:${twilioAuthToken}`).toString('base64'),
       'Content-Type': 'application/x-www-form-urlencoded',
     },
-    body: new URLSearchParams({ To: to, From: twilioNumber, Body: body }),
+    body: new URLSearchParams({ To: to, From: twilioNumber, Body: finalBody }),
   });
 }
 
@@ -138,7 +153,7 @@ async function handleIncoming(req: NextRequest) {
   // Fire-and-forget so Twilio doesn't time out on our response
   insertRinging(callSid, callerNumber).catch(() => {});
   if (aaronCell) {
-    sendSms(aaronCell, `📞 Incoming GoElev8 call from ${callerNumber}`).catch(() => {});
+    sendSms(aaronCell, `📞 Incoming GoElev8 call from ${callerNumber}`, { internal: true }).catch(() => {});
   }
 
   // Query params for downstream action callbacks
@@ -192,7 +207,7 @@ async function handleWhisperAction(req: NextRequest) {
       caller,
       "Hey! Sorry we missed your call at GoElev8.ai. How can we help? Reply to this text and we'll get right back to you. - GoElev8.ai Team"
     ).catch(() => {});
-    if (aaronCell) sendSms(aaronCell, `📱 Text-back sent to ${caller}`).catch(() => {});
+    if (aaronCell) sendSms(aaronCell, `📱 Text-back sent to ${caller}`, { internal: true }).catch(() => {});
     return twiml(`<?xml version="1.0" encoding="UTF-8"?><Response><Say voice="Polly.Joanna">Text back sent.</Say><Hangup/></Response>`);
   }
 
@@ -200,7 +215,7 @@ async function handleWhisperAction(req: NextRequest) {
   if (digit === '3') {
     await updateCall(callSid, { status: 'routed-to-vapi', vapi_used: true });
     startVapiCallback(caller).catch(() => {});
-    if (aaronCell) sendSms(aaronCell, `✅ Handed off to Vapi — ${caller}`).catch(() => {});
+    if (aaronCell) sendSms(aaronCell, `✅ Handed off to Vapi — ${caller}`, { internal: true }).catch(() => {});
     return twiml(`<?xml version="1.0" encoding="UTF-8"?><Response><Say voice="Polly.Joanna">Handing off to the AI assistant.</Say><Hangup/></Response>`);
   }
 

@@ -49,7 +49,13 @@ export default function SmsPolicyPage() {
         <p>Phone numbers collected through our platform are stored securely in our database with encryption at rest. Phone numbers are not sold or shared with third parties beyond our messaging provider (Twilio). Numbers are retained only for the duration of the business relationship.</p>
 
         <h2 style={{ color: '#fff', fontSize: 20, marginTop: 32, marginBottom: 12 }}>6. A2P Registration</h2>
-        <p>All messaging through GoElev8.ai is sent through registered A2P channels under our master Twilio account. We maintain compliance with carrier requirements including 10DLC registration for US traffic.</p>
+        <p>All messaging through GoElev8.ai is sent through registered A2P channels under our master Twilio account. We maintain compliance with US carrier requirements:</p>
+        <ul style={{ paddingLeft: 20 }}>
+          <li><strong style={{ color: '#ccc' }}>Toll-Free Verification (TFV):</strong> Our primary platform numbers are toll-free (888 prefix) and are submitted for Twilio Toll-Free Verification, which includes business identity review, use-case approval, and sample message review.</li>
+          <li><strong style={{ color: '#ccc' }}>10DLC:</strong> Where a client funnel uses a dedicated 10-digit local number, that number is registered for A2P 10DLC under our master brand prior to any traffic.</li>
+          <li><strong style={{ color: '#ccc' }}>Opt-out keywords:</strong> STOP, STOPALL, UNSUBSCRIBE, CANCEL, END, and QUIT are honored on every number — both at the carrier level and in our application code, and they suppress future messages across our entire platform, not just the number the STOP arrived on.</li>
+          <li><strong style={{ color: '#ccc' }}>HELP keyword:</strong> HELP and INFO return our business identification and opt-out instructions on every number.</li>
+        </ul>
 
         <h2 style={{ color: '#fff', fontSize: 20, marginTop: 32, marginBottom: 12 }}>7. Prohibited Content</h2>
         <p>Messages sent through GoElev8 must not contain:</p>

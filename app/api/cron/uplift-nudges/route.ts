@@ -13,6 +13,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
 import { PROFILES, CLOSING, generateMessage, instructionForDay, canonicalProfileKey } from '@/lib/sms-uplift';
+import { getOptedOutSet, withOptOutNotice } from '@/lib/sms-opt-outs';
 
 const supabaseUrl =
   process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || '';
@@ -82,11 +83,26 @@ async function processNudges(): Promise<{ processed: number; sent: number; faile
     return { processed: 0, sent: 0, failed: 0, results: [] };
   }
 
+  // Bulk-load the opt-out set for every phone in this batch up front, so we
+  // don't roundtrip to Supabase once per row.
+  const optedOut = await getOptedOutSet(supabase, due.map((r) => r.phone as string));
+
   let sent = 0;
   let failed = 0;
   const results: Array<Record<string, unknown>> = [];
 
   for (const row of due) {
+    // Skip opted-out phones; mark the row as terminally handled so we don't
+    // keep retrying it on every cron tick.
+    if (optedOut.has(row.phone as string)) {
+      await supabase
+        .from('sms_uplift_nudges')
+        .update({ sent_at: new Date().toISOString(), error: 'opted-out' })
+        .eq('id', row.id);
+      results.push({ id: row.id, status: 'skipped-opt-out', phone: row.phone });
+      continue;
+    }
+
     const key = canonicalProfileKey(row.profile_key as string);
     const profile = PROFILES[key];
     const day = row.day_number as 1 | 2 | 3;
@@ -108,6 +124,9 @@ async function processNudges(): Promise<{ processed: number; sent: number; faile
       message = `Hey ${profile.addressAs}, ${profile.fromLine} loves you more than words today and every day. ${CLOSING}`;
       console.error(`[uplift-nudges] Claude failed for ${row.id}:`, err?.message || err);
     }
+
+    // Every outbound nudge ends with the opt-out reminder.
+    message = withOptOutNotice(message);
 
     const { sid, error: smsErr } = await sendSms(row.phone as string, message);
     if (smsErr) {

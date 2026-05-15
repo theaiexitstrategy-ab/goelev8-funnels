@@ -30,6 +30,16 @@ import {
   instructionForOptIn,
   canonicalProfileKey,
 } from '@/lib/sms-uplift';
+import {
+  detectComplianceIntent,
+  markOptedOut,
+  clearOptOut,
+  isOptedOut,
+  withOptOutNotice,
+  STOP_CONFIRMATION,
+  START_CONFIRMATION,
+  HELP_RESPONSE,
+} from '@/lib/sms-opt-outs';
 
 // ─── Config ──────────────────────────────────────────────────────
 
@@ -196,9 +206,59 @@ export async function POST(req: NextRequest) {
   }
 
   const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null;
-  const matched = matchProfile(text);
   const respond = (msg: string) =>
     isTwilio ? twimlReply(msg) : NextResponse.json({ reply: msg });
+
+  // ── Compliance intent ALWAYS runs first ──
+  // STOP/UNSUBSCRIBE/HELP/START are carrier-required keywords. They have to
+  // be honored before any rate limiting, keyword matching, or generation.
+  const compliance = detectComplianceIntent(text);
+  if (compliance === 'stop') {
+    if (supabase) {
+      try { await markOptedOut(supabase, from, 'sms-uplift', text); }
+      catch (err) { console.error('[sms-uplift] markOptedOut failed:', err); }
+      try {
+        await supabase.from('sms_uplift_log').insert({
+          phone: from, name_received: text, matched: false,
+          matched_profile: null, message_sent: STOP_CONFIRMATION, rate_limited: false,
+        });
+      } catch (err) { console.error('[sms-uplift] log insert (stop) failed:', err); }
+    }
+    return respond(STOP_CONFIRMATION);
+  }
+  if (compliance === 'start') {
+    if (supabase) {
+      try { await clearOptOut(supabase, from); }
+      catch (err) { console.error('[sms-uplift] clearOptOut failed:', err); }
+      try {
+        await supabase.from('sms_uplift_log').insert({
+          phone: from, name_received: text, matched: false,
+          matched_profile: null, message_sent: START_CONFIRMATION, rate_limited: false,
+        });
+      } catch (err) { console.error('[sms-uplift] log insert (start) failed:', err); }
+    }
+    return respond(START_CONFIRMATION);
+  }
+  if (compliance === 'help') {
+    if (supabase) {
+      try {
+        await supabase.from('sms_uplift_log').insert({
+          phone: from, name_received: text, matched: false,
+          matched_profile: null, message_sent: HELP_RESPONSE, rate_limited: false,
+        });
+      } catch (err) { console.error('[sms-uplift] log insert (help) failed:', err); }
+    }
+    return respond(HELP_RESPONSE);
+  }
+
+  // ── Suppression check ── Even if they didn't text STOP just now, they
+  // may have opted out earlier. Don't process anything for opted-out phones.
+  if (supabase && await isOptedOut(supabase, from)) {
+    // Silently no-op — Twilio's TFV expects we don't reply to opted-out users.
+    return respond('');
+  }
+
+  const matched = matchProfile(text);
 
   // ── Rate limit ──
   if (supabase) {
@@ -232,6 +292,8 @@ export async function POST(req: NextRequest) {
     } catch (err) {
       console.error('[sms-uplift] opt-in generation failed, using fallback:', err);
     }
+    // First message of a series — must include opt-out instructions.
+    replyText = withOptOutNotice(replyText);
     if (supabase) {
       try { await scheduleNudges(supabase, from, matched.key); }
       catch (err) { console.error('[sms-uplift] scheduleNudges failed:', err); }
