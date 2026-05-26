@@ -4,12 +4,12 @@
 <!-- © 2026 GoElev8.ai | Aaron Bryant. All rights reserved. Unauthorized use prohibited. -->
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Corine | A Nu Day Therapy</title>
+<title>Kimberly Myers | A Nu Day Therapy</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
 <style>
-:root{--cream:#F6F2EC;--warm-white:#FDFAF6;--sage:#6B9478;--deep-sage:#3E5E4A;--terra:#B85C42;--gold:#C4A05A;--charcoal:#28231F;--warm-gray:#857870;--border:rgba(0,0,0,0.09);--accent:#9E7A6B;--accent-dark:#5E3E28;--accent-bg:rgba(158,122,107,0.09);}
+:root{--cream:#F6F2EC;--warm-white:#FDFAF6;--sage:#6B9478;--deep-sage:#3E5E4A;--terra:#B85C42;--gold:#C4A05A;--charcoal:#28231F;--warm-gray:#857870;--border:rgba(0,0,0,0.09);--accent:#7A8A9E;--accent-dark:#3A4A5E;--accent-bg:rgba(122,138,158,0.09);}
 *{margin:0;padding:0;box-sizing:border-box;}html{scroll-behavior:smooth;}
 body{font-family:'Lato',sans-serif;background:var(--cream);color:var(--charcoal);overflow-x:hidden;}
 nav{position:fixed;top:0;left:0;width:100%;z-index:999;height:66px;display:flex;align-items:center;justify-content:space-between;padding:0 52px;background:rgba(246,242,236,0.96);backdrop-filter:blur(12px);border-bottom:1px solid rgba(107,148,120,0.2);}
@@ -23,15 +23,16 @@ nav{position:fixed;top:0;left:0;width:100%;z-index:999;height:66px;display:flex;
 .nav-cta:hover{background:var(--charcoal)!important;}
 
 .profile-hero{display:grid;grid-template-columns:480px 1fr;min-height:calc(100vh - 66px);margin-top:66px;}
-.hero-visual{background:linear-gradient(160deg,#3E2418,#5E3E28 50%,#8A6048);display:flex;flex-direction:column;justify-content:flex-end;padding:64px 52px;position:relative;overflow:hidden;}
-.hero-visual::before{content:'C';position:absolute;top:-30px;right:-20px;font-family:'Cormorant Garamond',serif;font-size:22rem;font-weight:700;color:rgba(255,255,255,.04);line-height:1;pointer-events:none;}
+.hero-visual{background:linear-gradient(160deg,#1E2A38,#2E3E52 50%,#4A5E78);display:flex;flex-direction:column;justify-content:flex-end;padding:64px 52px;position:relative;overflow:hidden;}
+.hero-visual::before{content:'K';position:absolute;top:-30px;right:-20px;font-family:'Cormorant Garamond',serif;font-size:22rem;font-weight:700;color:rgba(255,255,255,.04);line-height:1;pointer-events:none;}
 .hero-avatar{font-size:7rem;margin-bottom:28px;filter:drop-shadow(0 8px 24px rgba(0,0,0,.3));position:relative;z-index:1;}
 .hero-visual h1{font-family:'Cormorant Garamond',serif;font-size:2.6rem;font-weight:600;color:white;margin-bottom:6px;position:relative;z-index:1;line-height:1.1;}
 .hero-cred{font-size:.7rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:22px;position:relative;z-index:1;}
 .hero-tags{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:28px;position:relative;z-index:1;}
 .htag{padding:5px 13px;border-radius:20px;font-size:.66rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;border:1px solid rgba(255,255,255,.22);color:rgba(255,255,255,.7);background:rgba(255,255,255,.06);}
-.avail-strip{display:flex;align-items:center;gap:8px;font-size:.78rem;font-weight:300;color:rgba(255,255,255,.65);position:relative;z-index:1;}
-.avail-strip .dot{width:8px;height:8px;border-radius:50%;background:#6eda8b;box-shadow:0 0 8px #6eda8b;flex-shrink:0;}
+.avail-strip{display:flex;flex-direction:column;gap:6px;position:relative;z-index:1;}
+.avail-row{display:flex;align-items:center;gap:8px;font-size:.78rem;font-weight:300;color:rgba(255,255,255,.65);}
+.avail-row .dot{width:8px;height:8px;border-radius:50%;background:#6eda8b;box-shadow:0 0 8px #6eda8b;flex-shrink:0;}
 
 .hero-content{background:var(--warm-white);padding:80px 72px;display:flex;flex-direction:column;justify-content:center;}
 .eyebrow{font-size:.66rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);display:flex;align-items:center;gap:10px;margin-bottom:18px;}
@@ -40,14 +41,14 @@ nav{position:fixed;top:0;left:0;width:100%;z-index:999;height:66px;display:flex;
 .hero-content h2 em{font-style:italic;color:var(--accent);}
 .hero-content p{font-size:1rem;font-weight:300;line-height:1.9;color:var(--warm-gray);margin-bottom:16px;}
 .hero-content p strong{color:var(--charcoal);font-weight:700;}
-.hero-content p em{font-style:italic;}
-.highlight-box{background:rgba(158,122,107,.09);border:1px solid rgba(158,122,107,.22);border-radius:3px;padding:20px 24px;margin-top:24px;}
-.highlight-box p{font-size:.95rem;font-weight:400;color:var(--charcoal);line-height:1.75;margin:0;}
-.highlight-box strong{color:var(--accent-dark);}
 
-.pull-quote{border-left:3px solid var(--accent);padding:20px 24px;background:var(--accent-bg);border-radius:0 3px 3px 0;margin:28px 0;}
+.review-box{background:white;border:1px solid var(--border);border-radius:3px;padding:24px 28px;margin:24px 0;position:relative;}
+.review-box::before{content:'"';position:absolute;top:-10px;left:16px;font-family:'Cormorant Garamond',serif;font-size:4rem;color:var(--accent);line-height:1;opacity:.6;}
+.review-box p{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-style:italic;color:var(--charcoal);line-height:1.7;padding-top:10px;}
+
+.pull-quote{border-left:3px solid var(--accent);padding:20px 24px;background:var(--accent-bg);border-radius:0 3px 3px 0;margin:20px 0;}
 .pq-label{font-size:.62rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--warm-gray);margin-bottom:8px;}
-.pull-quote p{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-style:italic;color:var(--charcoal);line-height:1.7;font-weight:400;}
+.pull-quote p{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-style:italic;color:var(--charcoal);line-height:1.7;font-weight:400;}
 
 .specialties-section{background:white;padding:72px 80px;}
 .section-title{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;color:var(--charcoal);margin-bottom:40px;}
@@ -61,20 +62,31 @@ nav{position:fixed;top:0;left:0;width:100%;z-index:999;height:66px;display:flex;
 .spec-card h4{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:600;color:var(--charcoal);margin-bottom:8px;}
 .spec-card p{font-size:.86rem;font-weight:300;line-height:1.8;color:var(--warm-gray);}
 
+/* Availability banner */
+.avail-banner{background:var(--accent-bg);border:1px solid rgba(122,138,158,.25);border-radius:3px;padding:28px 36px;margin:48px 0 0;display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
+.ab-item{text-align:center;}
+.ab-item .ab-label{font-size:.64rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin-bottom:6px;}
+.ab-item .ab-val{font-size:.92rem;font-weight:400;color:var(--charcoal);}
+
 .background-section{background:var(--cream);padding:72px 80px;display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:start;}
 .bg-col h3{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:400;color:var(--charcoal);margin-bottom:20px;}
 .bg-col p{font-size:.95rem;font-weight:300;line-height:1.9;color:var(--warm-gray);margin-bottom:14px;}
 .bg-col p strong{color:var(--charcoal);font-weight:700;}
-.modalities-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;}
-.mod-pill{padding:6px 14px;border:1px solid rgba(158,122,107,.28);border-radius:20px;font-size:.75rem;font-weight:700;letter-spacing:.08em;color:var(--accent);}
+.bg-col ul{list-style:none;display:flex;flex-direction:column;gap:10px;}
+.bg-col ul li{display:flex;align-items:flex-start;gap:10px;font-size:.9rem;font-weight:300;color:var(--warm-gray);line-height:1.5;}
+.bg-col ul li::before{content:'–';color:var(--accent);flex-shrink:0;}
+.bg-col ul li strong{color:var(--charcoal);font-weight:700;}
 
-.lead-section{background:linear-gradient(160deg,#3E2418,#5E3E28);padding:80px;}
+.lead-section{background:linear-gradient(160deg,#1E2A38,#2E3E52);padding:80px;}
 .lead-inner{display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center;max-width:1100px;margin:0 auto;}
 .lead-text h2{font-family:'Cormorant Garamond',serif;font-size:2.6rem;font-weight:300;color:white;line-height:1.2;margin-bottom:14px;}
-.lead-text h2 em{font-style:italic;color:#e8c4a8;}
+.lead-text h2 em{font-style:italic;color:#a8bcdc;}
 .lead-text p{font-size:.97rem;font-weight:300;color:rgba(255,255,255,.62);line-height:1.85;margin-bottom:28px;}
 .lead-text .phone{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:400;color:white;}
 .lead-text .phone span{font-size:.68rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.4);display:block;margin-bottom:4px;}
+.lead-text .scheduler{margin-top:20px;}
+.lead-text .scheduler a{display:inline-block;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:white;font-size:.72rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:11px 22px;border-radius:2px;text-decoration:none;transition:background .2s;}
+.lead-text .scheduler a:hover{background:rgba(255,255,255,.18);}
 .lead-form{background:var(--warm-white);border-radius:4px;padding:40px 36px;}
 .lead-form h3{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:400;color:var(--charcoal);margin-bottom:5px;}
 .lead-form .fsub{font-size:.82rem;font-weight:300;color:var(--warm-gray);margin-bottom:24px;}
@@ -84,7 +96,7 @@ nav{position:fixed;top:0;left:0;width:100%;z-index:999;height:66px;display:flex;
 .fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--accent-dark);}
 .fg textarea{height:88px;resize:none;}
 .fg-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-.sms-row{display:flex;gap:10px;align-items:flex-start;padding:12px;background:rgba(158,122,107,.08);border:1px solid rgba(158,122,107,.22);border-radius:3px;margin-bottom:16px;}
+.sms-row{display:flex;gap:10px;align-items:flex-start;padding:12px;background:rgba(122,138,158,.08);border:1px solid rgba(122,138,158,.22);border-radius:3px;margin-bottom:16px;}
 .sms-row input{width:auto;accent-color:var(--accent-dark);margin-top:3px;flex-shrink:0;}
 .sms-row span{font-size:.78rem;font-weight:300;color:var(--warm-gray);line-height:1.6;}
 .sms-row strong{color:var(--accent-dark);font-weight:700;}
@@ -111,6 +123,7 @@ footer{background:#1d2820;padding:40px 80px 20px;}
   .hero-content{padding:48px 24px;}
   .specialties-section,.background-section{padding:48px 24px;}
   .spec-grid{grid-template-columns:1fr;}.background-section{grid-template-columns:1fr;gap:36px;}
+  .avail-banner{grid-template-columns:1fr;gap:16px;}
   .lead-section{padding:48px 24px;}.lead-inner{grid-template-columns:1fr;gap:36px;}
   footer{padding:32px 20px 16px;}
 }
@@ -119,114 +132,133 @@ footer{background:#1d2820;padding:40px 80px 20px;}
 <body>
 
 <nav>
-  <a class="nav-logo" href="clinicians-index.html">A <span>Nu</span> Day Therapy</a>
+  <a class="nav-logo" href="/demo/anudaytherapy/clinicians">A <span>Nu</span> Day Therapy</a>
   <ul class="nav-links">
-    <li><a href="clinicians-index.html" class="nav-back">Meet the Team</a></li>
-    <li><a href="clinician-sylvia.html">Sylvia Ogilvie</a></li>
-    <li><a href="clinician-kim.html">Kimberly Myers</a></li>
-    <li><a href="#lead" class="nav-cta">Book with Corine</a></li>
+    <li><a href="/demo/anudaytherapy/clinicians" class="nav-back">Meet the Team</a></li>
+    <li><a href="/demo/anudaytherapy/clinicians/sylvia">Sylvia Ogilvie</a></li>
+    <li><a href="/demo/anudaytherapy/clinicians/corine">Corine</a></li>
+    <li><a href="#lead" class="nav-cta">Book with Kim</a></li>
   </ul>
 </nav>
 
 <div class="profile-hero">
   <div class="hero-visual">
-    <div class="hero-avatar">👩🏾</div>
-    <h1>Corine</h1>
-    <div class="hero-cred">Licensed Clinician</div>
+    <div class="hero-avatar">👩🏻</div>
+    <h1>Kimberly Myers</h1>
+    <div class="hero-cred">MA · LPC</div>
     <div class="hero-tags">
-      <span class="htag">Life Transitions</span>
-      <span class="htag">Anxiety</span>
-      <span class="htag">Depression</span>
-      <span class="htag">Teens & Young Adults</span>
+      <span class="htag">Youth & Teens</span>
+      <span class="htag">Trauma-Informed</span>
+      <span class="htag">Special Needs</span>
+      <span class="htag">Self-Esteem</span>
     </div>
-    <div class="avail-strip"><div class="dot"></div>Accepting new clients</div>
+    <div class="avail-strip">
+      <div class="avail-row"><div class="dot"></div>Accepting new clients · Virtual Only</div>
+      <div class="avail-row" style="padding-left:16px;opacity:.7;">Mon–Thurs 3:30–7:30pm · Sat 12–3pm</div>
+    </div>
   </div>
 
   <div class="hero-content">
-    <div class="eyebrow">Life Transitions Specialist</div>
-    <h2>Meeting You <em>Where You Are</em><br>in the Journey</h2>
-    <p>Throughout our lives we experience many ups and downs, changes, and transitions. When we experience these alongside trauma, anxiety, or depression, the challenges can feel especially overwhelming. Corine believes the <strong>support, guidance, and tools we gather along the way</strong> are what carry us through.</p>
-    <p>Her goal as a therapist is to support her clients in finding what works for <em>them</em> when navigating these difficult moments. She uses a <strong>client-centered approach</strong> — meeting you exactly where you are — while incorporating Cognitive Behavioral Therapy and Motivational Interviewing to support the work.</p>
+    <div class="eyebrow">18 Years in the Field</div>
+    <h2>Speaking Their Language.<br><em>Changing Their Story.</em></h2>
+    <p>Kim brings <strong>18 years of experience</strong> working with youth — with deep expertise in teenagers struggling with school behaviors, emotional regulation, connection, and the weight of growing up in a complex world. Her experience in a Special Needs School District gave her an exceptional ability to reach teens where they are.</p>
+    <p>She uses a <strong>trauma-informed approach</strong> to assist youth with crisis behaviors, substance-use counseling, self-esteem development, and executive functioning in the classroom. She speaks their language — and that's not a cliché. It's how she builds the trust that makes real therapeutic work possible.</p>
 
-    <div class="highlight-box">
-      <p><strong>Especially for teens & young adults:</strong> If you're experiencing anxiety, looking for help with boundary setting, or building confidence through life transitions, Corine is passionate about building a therapeutic relationship that gives you real tools to move forward — with confidence and strength.</p>
+    <div class="review-box">
+      <p>"Kim is an incredible advocate for clients and engages them in change behaviors in order to reach a potential that they did not see in themselves. She is compassionate and caring with just the right amount of challenging to see youth and young adults grow."</p>
     </div>
 
-    <div class="pull-quote" style="margin-top:28px;">
-      <div class="pq-label">In Corine's Words</div>
-      <p>"Healing is often not linear and can be challenging — but I hope to provide you with the tools and support you need to tackle these challenges with confidence and strength. You are not alone in this process."</p>
+    <div class="pull-quote">
+      <div class="pq-label">About Kim's Work</div>
+      <p>Currently working toward her LCPC licensure under the supervision of Adrianne Martin, LCSW — deepening her clinical expertise while already delivering powerful results for the young people she serves.</p>
     </div>
   </div>
 </div>
 
 <section class="specialties-section">
   <div class="eyebrow" style="margin-bottom:14px;">Areas of Focus</div>
-  <div class="section-title">Where Corine Does <em>Her Best Work</em></div>
+  <div class="section-title">Where Kim <em>Makes the Difference</em></div>
   <div class="spec-grid">
     <div class="spec-card">
-      <div class="sc-icon">🔄</div>
-      <h4>Life Transitions</h4>
-      <p>Starting college, changing careers, ending relationships, becoming a parent — transitions are hard. Corine helps clients find footing and confidence when the ground shifts beneath them.</p>
+      <div class="sc-icon">🎒</div>
+      <h4>Teen Behavioral Issues</h4>
+      <p>Struggles at school, conflict at home, acting out — Kim digs past the behavior to find the unmet need underneath. Then she helps teens build the skills to meet it in healthier ways.</p>
     </div>
     <div class="spec-card">
-      <div class="sc-icon">😤</div>
-      <h4>Anxiety</h4>
-      <p>Using CBT and Motivational Interviewing to help clients understand their anxiety patterns, challenge unhelpful thoughts, and build practical coping tools that actually work in real life.</p>
+      <div class="sc-icon">🛡️</div>
+      <h4>Trauma-Informed Care</h4>
+      <p>Every behavior has a history. Kim approaches youth through a trauma-informed lens — understanding that challenging behaviors are often trauma responses, not character flaws.</p>
     </div>
     <div class="spec-card">
-      <div class="sc-icon">🌧️</div>
-      <h4>Depression</h4>
-      <p>Client-centered, compassionate support for people moving through depression — with no judgment about how you got here and full focus on where you want to go.</p>
+      <div class="sc-icon">🚨</div>
+      <h4>Crisis Behaviors</h4>
+      <p>Skilled in de-escalation and supporting youth through behavioral crises — with the ability to remain calm, connected, and effective even in high-intensity moments.</p>
     </div>
     <div class="spec-card">
-      <div class="sc-icon">🧑</div>
-      <h4>Teens & Young Adults</h4>
-      <p>A specialty in supporting teens and young adults navigating anxiety, identity, confidence, and growing up. Corine builds real therapeutic relationships with young people — not just talking at them.</p>
-    </div>
-    <div class="spec-card">
-      <div class="sc-icon">🚧</div>
-      <h4>Boundary Setting</h4>
-      <p>Teaching clients how to identify, communicate, and hold boundaries — in relationships, at work, and with family — without guilt or shame.</p>
+      <div class="sc-icon">🧪</div>
+      <h4>Substance-Use Counseling</h4>
+      <p>Non-judgmental support for teens navigating substance use — understanding the role it plays in their world while building motivation for healthier coping strategies.</p>
     </div>
     <div class="spec-card">
       <div class="sc-icon">💪</div>
-      <h4>Building Confidence</h4>
-      <p>Helping clients discover and strengthen their sense of self — especially those who have been taught to doubt their own instincts, worth, or capabilities.</p>
+      <h4>Self-Esteem Development</h4>
+      <p>Helping young people discover strengths they didn't know they had — and believe in a version of themselves that's genuinely worth becoming.</p>
+    </div>
+    <div class="spec-card">
+      <div class="sc-icon">📚</div>
+      <h4>Executive Functioning</h4>
+      <p>Supporting teens with organization, focus, planning, and follow-through — bridging the gap between what they're capable of and what they're currently achieving in the classroom.</p>
+    </div>
+  </div>
+
+  <div class="avail-banner">
+    <div class="ab-item">
+      <div class="ab-label">Schedule</div>
+      <div class="ab-val">Mon–Thurs · 3:30pm – 7:30pm</div>
+    </div>
+    <div class="ab-item">
+      <div class="ab-label">Weekend Hours</div>
+      <div class="ab-val">Saturday · 12:00pm – 3:00pm</div>
+    </div>
+    <div class="ab-item">
+      <div class="ab-label">Format</div>
+      <div class="ab-val">Virtual Appointments Only</div>
     </div>
   </div>
 </section>
 
 <section class="background-section">
   <div class="bg-col">
-    <h3>Her Therapeutic Approach</h3>
-    <p>Corine's style is <strong>client-centered</strong> at its core — she follows your lead, respects your pace, and adapts the work to what you actually need rather than a preset formula.</p>
-    <p>She integrates <strong>Cognitive Behavioral Therapy</strong> to help identify and shift unhelpful thinking patterns, and <strong>Motivational Interviewing</strong> to help clients tap into their own reasons for change. The combination gives her flexibility to meet a wide range of needs without rigidity.</p>
-    <p>Most importantly: she believes reaching out — even when it feels overwhelming — is always worth it. Healing isn't easy, but you don't have to do it alone.</p>
+    <h3>Her Approach</h3>
+    <p>Kim pulls from a <strong>variety of therapeutic methods</strong> — always filtered through a trauma-informed lens. She's skilled in connecting with teenagers on their level, using their language, their references, and meeting them without judgment.</p>
+    <p>After 18 years in the field — including work in a Special Needs School District — she understands that every student who walks into a school or a session has a story. She helps them write a better next chapter.</p>
   </div>
   <div class="bg-col">
-    <h3>Modalities & Approaches</h3>
-    <p>Corine draws from a range of evidence-based approaches to match the right tools to each client's unique situation:</p>
-    <div class="modalities-list">
-      <span class="mod-pill">Client-Centered Therapy</span>
-      <span class="mod-pill">Cognitive Behavioral Therapy</span>
-      <span class="mod-pill">Motivational Interviewing</span>
-      <span class="mod-pill">Strengths-Based</span>
-      <span class="mod-pill">Psychoeducation</span>
-      <span class="mod-pill">Goal-Oriented</span>
-    </div>
+    <h3>Credentials & Background</h3>
+    <ul>
+      <li><strong>MA, LPC</strong> — Licensed Professional Counselor</li>
+      <li>Working toward <strong>LCPC</strong> under supervision of Adrianne Martin, LCSW</li>
+      <li><strong>18 years</strong> of clinical experience with youth</li>
+      <li>Experience in <strong>Special Needs School District</strong> settings</li>
+      <li>Substance-use counseling certification</li>
+      <li>Schedule directly via <a href="https://therapyfinder.com/therapist/kimberly-myers-ma-lpc-lpc-a-cra-ate-richmond-heights-mo" target="_blank" style="color:var(--accent-dark);font-weight:700;">TherapyFinder.com</a></li>
+    </ul>
   </div>
 </section>
 
 <section class="lead-section" id="lead">
   <div class="lead-inner">
     <div class="lead-text">
-      <h2>Ready to Work<br>with <em>Corine?</em></h2>
-      <p>Fill out the form and Corine's team will reach out within one business day — via SMS if you opted in.</p>
-      <div class="phone"><span>Call Directly</span>636-896-5867</div>
+      <h2>Ready to Work<br>with <em>Kim?</em></h2>
+      <p>Kim is accepting new clients virtually — evenings and Saturdays. Fill out the form or schedule directly through TherapyFinder.</p>
+      <div class="phone"><span>A Nu Day Main Line</span>636-896-5867</div>
+      <div class="scheduler">
+        <a href="https://therapyfinder.com/therapist/kimberly-myers-ma-lpc-lpc-a-cra-ate-richmond-heights-mo" target="_blank">Schedule a 30-Min Consultation →</a>
+      </div>
     </div>
     <div class="lead-form" id="form-wrap">
       <h3>Request a Session</h3>
-      <div class="fsub">Especially welcoming teens, young adults, and those navigating life transitions.</div>
+      <div class="fsub">Virtual only · Evenings & Saturdays · Youth specialist.</div>
       <div class="fg fg-row">
         <div class="fg"><label>First Name</label><input type="text" id="fn" placeholder="First name"/></div>
         <div class="fg"><label>Last Name</label><input type="text" placeholder="Last name"/></div>
@@ -237,16 +269,16 @@ footer{background:#1d2820;padding:40px 80px 20px;}
         <label>What brings you here?</label>
         <select id="need">
           <option value="">Select a focus area</option>
-          <option>Life transitions</option>
-          <option>Anxiety</option>
-          <option>Depression</option>
-          <option>Support for my teenager</option>
-          <option>Boundary setting</option>
-          <option>Building confidence</option>
-          <option>Not sure — I just need to talk to someone</option>
+          <option>Behavioral issues at school or home</option>
+          <option>Trauma or PTSD</option>
+          <option>Substance use</option>
+          <option>Self-esteem & confidence</option>
+          <option>Executive functioning</option>
+          <option>Crisis support</option>
+          <option>Not sure — I just need help for my teen</option>
         </select>
       </div>
-      <div class="fg"><label>Anything else? (optional)</label><textarea placeholder="Share as much or as little as you're comfortable with…"></textarea></div>
+      <div class="fg"><label>Anything else? (optional)</label><textarea placeholder="Feel free to tell us about your teenager and what you're hoping therapy will help with…"></textarea></div>
       <div class="sms-row">
         <input type="checkbox" id="sms" checked/>
         <label for="sms"><span><strong>📲 Text me back.</strong> Receive a response & reminders via SMS. Reply STOP anytime.</span></label>
@@ -256,7 +288,7 @@ footer{background:#1d2820;padding:40px 80px 20px;}
       <div class="form-success" id="fs">
         <div class="si">🌿</div>
         <h4>Request Received</h4>
-        <p>Corine's team will be in touch within one business day. You took the first step — and that matters.</p>
+        <p>Kim's team will be in touch within one business day. Your teenager is lucky to have someone advocating for them.</p>
       </div>
     </div>
   </div>
@@ -264,11 +296,11 @@ footer{background:#1d2820;padding:40px 80px 20px;}
 
 <footer>
   <div class="ft-bottom">
-    <p>© 2026 A Nu Day Therapy · Corine · All rights reserved. | <a href="https://goelev8.ai" target="_blank">Powered by GoElev8.ai</a></p>
+    <p>© 2026 A Nu Day Therapy · Kimberly Myers, LPC · All rights reserved. | <a href="https://goelev8.ai" target="_blank">Powered by GoElev8.ai</a></p>
     <div class="ft-nav">
-      <a href="clinicians-index.html">← All Clinicians</a>
-      <a href="clinician-sylvia.html">Sylvia Ogilvie</a>
-      <a href="clinician-kim.html">Kimberly Myers</a>
+      <a href="/demo/anudaytherapy/clinicians">← All Clinicians</a>
+      <a href="/demo/anudaytherapy/clinicians/sylvia">Sylvia Ogilvie</a>
+      <a href="/demo/anudaytherapy/clinicians/corine">Corine</a>
     </div>
   </div>
 </footer>
