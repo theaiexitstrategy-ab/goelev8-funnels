@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- © 2026 GoElev8.ai | Aaron Bryant. All rights reserved. Unauthorized use prohibited. -->
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sylvia Ogilvie | A Nu Day Therapy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+<style>
+:root{--cream:#F6F2EC;--warm-white:#FDFAF6;--sage:#6B9478;--deep-sage:#3E5E4A;--dark-sage:#2B4335;--terra:#B85C42;--gold:#C4A05A;--charcoal:#28231F;--warm-gray:#857870;--border:rgba(0,0,0,0.09);--accent:#7A9E87;--accent-dark:#3E5E4A;--accent-bg:rgba(122,158,135,0.1);}
+*{margin:0;padding:0;box-sizing:border-box;}html{scroll-behavior:smooth;}
+body{font-family:'Lato',sans-serif;background:var(--cream);color:var(--charcoal);overflow-x:hidden;}
+nav{position:fixed;top:0;left:0;width:100%;z-index:999;height:66px;display:flex;align-items:center;justify-content:space-between;padding:0 52px;background:rgba(246,242,236,0.96);backdrop-filter:blur(12px);border-bottom:1px solid rgba(107,148,120,0.2);}
+.nav-logo{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:600;letter-spacing:.07em;color:var(--charcoal);text-decoration:none;}
+.nav-logo span{color:var(--deep-sage);}
+.nav-links{display:flex;align-items:center;gap:32px;list-style:none;}
+.nav-links a{font-size:.73rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--warm-gray);text-decoration:none;cursor:pointer;transition:color .2s;}
+.nav-links a:hover{color:var(--deep-sage);}
+.nav-back{display:flex;align-items:center;gap:6px;font-size:.73rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--warm-gray);text-decoration:none;cursor:pointer;transition:color .2s;}
+.nav-back:hover{color:var(--deep-sage);}
+.nav-back::before{content:'←';font-size:.9rem;}
+.nav-cta{background:var(--deep-sage);color:white!important;padding:10px 22px;border-radius:2px;}
+.nav-cta:hover{background:var(--charcoal)!important;}
+
+/* HERO */
+.profile-hero{display:grid;grid-template-columns:480px 1fr;min-height:calc(100vh - 66px);margin-top:66px;}
+.hero-visual{background:linear-gradient(160deg,#2B4335,#3E5E4A 50%,#5A8068);display:flex;flex-direction:column;justify-content:flex-end;padding:64px 52px;position:relative;overflow:hidden;}
+.hero-visual::before{content:'S';position:absolute;top:-30px;right:-20px;font-family:'Cormorant Garamond',serif;font-size:22rem;font-weight:700;color:rgba(255,255,255,.04);line-height:1;pointer-events:none;}
+.hero-avatar{font-size:7rem;margin-bottom:28px;filter:drop-shadow(0 8px 24px rgba(0,0,0,.3));position:relative;z-index:1;}
+.hero-visual h1{font-family:'Cormorant Garamond',serif;font-size:2.6rem;font-weight:600;color:white;margin-bottom:6px;position:relative;z-index:1;line-height:1.1;}
+.hero-cred{font-size:.7rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:22px;position:relative;z-index:1;}
+.hero-tags{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:28px;position:relative;z-index:1;}
+.htag{padding:5px 13px;border-radius:20px;font-size:.66rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;border:1px solid rgba(255,255,255,.22);color:rgba(255,255,255,.7);background:rgba(255,255,255,.06);}
+.avail-strip{display:flex;align-items:center;gap:8px;font-size:.78rem;font-weight:300;color:rgba(255,255,255,.65);position:relative;z-index:1;}
+.avail-strip .dot{width:8px;height:8px;border-radius:50%;background:#6eda8b;box-shadow:0 0 8px #6eda8b;flex-shrink:0;}
+
+.hero-content{background:var(--warm-white);padding:80px 72px;display:flex;flex-direction:column;justify-content:center;}
+.eyebrow{font-size:.66rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);display:flex;align-items:center;gap:10px;margin-bottom:18px;}
+.eyebrow::before{content:'';width:22px;height:1.5px;background:var(--accent);}
+.hero-content h2{font-family:'Cormorant Garamond',serif;font-size:2.8rem;font-weight:300;color:var(--charcoal);line-height:1.2;margin-bottom:24px;}
+.hero-content h2 em{font-style:italic;color:var(--accent);}
+.hero-content p{font-size:1rem;font-weight:300;line-height:1.9;color:var(--warm-gray);margin-bottom:16px;}
+.hero-content p strong{color:var(--charcoal);font-weight:700;}
+.hero-content p em{font-style:italic;color:var(--charcoal);}
+
+/* APPROACH PULL QUOTE */
+.pull-quote{border-left:3px solid var(--accent);padding:20px 24px;background:var(--accent-bg);border-radius:0 3px 3px 0;margin:28px 0;}
+.pq-label{font-size:.62rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--warm-gray);margin-bottom:8px;}
+.pull-quote p{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-style:italic;color:var(--charcoal);line-height:1.7;font-weight:400;}
+
+/* SPECIALTIES */
+.specialties-section{background:white;padding:72px 80px;}
+.section-title{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;color:var(--charcoal);margin-bottom:40px;}
+.section-title em{font-style:italic;color:var(--accent);}
+.spec-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);}
+.spec-card{background:white;padding:32px 28px;transition:background .2s;position:relative;overflow:hidden;}
+.spec-card:hover{background:var(--warm-white);}
+.spec-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .3s;}
+.spec-card:hover::after{transform:scaleX(1);}
+.sc-icon{font-size:1.6rem;margin-bottom:12px;}
+.spec-card h4{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:600;color:var(--charcoal);margin-bottom:8px;}
+.spec-card p{font-size:.86rem;font-weight:300;line-height:1.8;color:var(--warm-gray);}
+
+/* BACKGROUND */
+.background-section{background:var(--cream);padding:72px 80px;display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:start;}
+.bg-col h3{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:400;color:var(--charcoal);margin-bottom:24px;}
+.bg-col ul{list-style:none;display:flex;flex-direction:column;gap:12px;}
+.bg-col ul li{display:flex;align-items:flex-start;gap:12px;font-size:.9rem;font-weight:300;color:var(--warm-gray);line-height:1.6;}
+.bg-col ul li::before{content:'–';color:var(--accent);flex-shrink:0;margin-top:1px;}
+.bg-col ul li strong{color:var(--charcoal);font-weight:700;}
+
+/* LEAD CAPTURE */
+.lead-section{background:var(--dark-sage);padding:80px;}
+.lead-inner{display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center;max-width:1100px;margin:0 auto;}
+.lead-text h2{font-family:'Cormorant Garamond',serif;font-size:2.6rem;font-weight:300;color:white;line-height:1.2;margin-bottom:14px;}
+.lead-text h2 em{font-style:italic;color:#a8d4b8;}
+.lead-text p{font-size:.97rem;font-weight:300;color:rgba(255,255,255,.62);line-height:1.85;margin-bottom:28px;}
+.lead-text .phone{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:400;color:white;}
+.lead-text .phone span{font-size:.68rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.4);display:block;margin-bottom:4px;}
+
+.lead-form{background:var(--warm-white);border-radius:4px;padding:40px 36px;}
+.lead-form h3{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:400;color:var(--charcoal);margin-bottom:5px;}
+.lead-form .fsub{font-size:.82rem;font-weight:300;color:var(--warm-gray);margin-bottom:24px;}
+.fg{margin-bottom:16px;}
+.fg label{display:block;font-size:.66rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--warm-gray);margin-bottom:6px;}
+.fg input,.fg select,.fg textarea{width:100%;padding:11px 13px;border:1.5px solid rgba(0,0,0,.11);border-radius:2px;font-family:'Lato',sans-serif;font-size:.9rem;font-weight:300;color:var(--charcoal);background:white;outline:none;appearance:none;transition:border-color .2s;}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--deep-sage);}
+.fg textarea{height:88px;resize:none;}
+.fg-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.sms-row{display:flex;gap:10px;align-items:flex-start;padding:12px;background:rgba(107,148,120,.08);border:1px solid rgba(107,148,120,.22);border-radius:3px;margin-bottom:16px;}
+.sms-row input{width:auto;accent-color:var(--deep-sage);margin-top:3px;flex-shrink:0;}
+.sms-row span{font-size:.78rem;font-weight:300;color:var(--warm-gray);line-height:1.6;}
+.sms-row strong{color:var(--deep-sage);font-weight:700;}
+.btn-submit{width:100%;background:var(--accent-dark);color:white;padding:13px;border-radius:2px;font-family:'Lato',sans-serif;font-size:.76rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;border:none;transition:background .2s;}
+.btn-submit:hover{background:var(--charcoal);}
+.form-note{text-align:center;font-size:.72rem;font-weight:300;color:var(--warm-gray);margin-top:10px;}
+
+.form-success{display:none;text-align:center;padding:20px 0;}
+.form-success .si{font-size:2.5rem;margin-bottom:12px;}
+.form-success h4{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:400;color:var(--charcoal);margin-bottom:8px;}
+.form-success p{font-size:.86rem;font-weight:300;color:var(--warm-gray);line-height:1.7;}
+
+/* FOOTER */
+footer{background:#1d2820;padding:40px 80px 20px;}
+.ft-bottom{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;}
+.ft-bottom p{font-size:.72rem;color:rgba(255,255,255,.2);font-weight:300;}
+.ft-bottom a{font-size:.68rem;color:rgba(196,160,90,.5);text-decoration:none;transition:color .2s;}
+.ft-bottom a:hover{color:var(--gold);}
+.ft-nav{display:flex;gap:24px;}
+.ft-nav a{font-size:.76rem;font-weight:300;color:rgba(255,255,255,.4);text-decoration:none;cursor:pointer;transition:color .2s;}
+.ft-nav a:hover{color:var(--gold);}
+
+@media(max-width:960px){
+  nav{padding:0 20px;}
+  .nav-links{display:none;}
+  .profile-hero{grid-template-columns:1fr;}
+  .hero-visual{min-height:340px;}
+  .hero-content{padding:48px 24px;}
+  .specialties-section{padding:48px 24px;}
+  .spec-grid{grid-template-columns:1fr;}
+  .background-section{grid-template-columns:1fr;padding:48px 24px;gap:36px;}
+  .lead-section{padding:48px 24px;}
+  .lead-inner{grid-template-columns:1fr;gap:36px;}
+  footer{padding:32px 20px 16px;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="clinicians-index.html">A <span>Nu</span> Day Therapy</a>
+  <ul class="nav-links">
+    <li><a href="clinicians-index.html" class="nav-back">Meet the Team</a></li>
+    <li><a href="clinician-corine.html">Corine</a></li>
+    <li><a href="clinician-kim.html">Kimberly Myers</a></li>
+    <li><a href="#lead" class="nav-cta">Book with Sylvia</a></li>
+  </ul>
+</nav>
+
+<!-- PROFILE HERO -->
+<div class="profile-hero">
+  <div class="hero-visual">
+    <div class="hero-avatar">👩🏽</div>
+    <h1>Sylvia Ogilvie</h1>
+    <div class="hero-cred">MA · MSW · LMSW</div>
+    <div class="hero-tags">
+      <span class="htag">Trauma</span>
+      <span class="htag">Grief</span>
+      <span class="htag">Addiction</span>
+      <span class="htag">Crisis Intervention</span>
+      <span class="htag">Harm Reduction</span>
+    </div>
+    <div class="avail-strip"><div class="dot"></div>Accepting new clients · MO · AR · IL · KS</div>
+  </div>
+
+  <div class="hero-content">
+    <div class="eyebrow">10 Years of Experience</div>
+    <h2>Rooted in Crisis.<br>Grounded in <em>Humanity.</em></h2>
+    <p>Sylvia's background is rooted in crisis intervention with a strong passion for <strong>harm reduction</strong>. She specializes in trauma, grief, and addiction — and her approach is about meeting people where they are, on a human level.</p>
+    <p>Having personally experienced loss and trauma, she understands how <strong>isolating and stigmatizing</strong> that journey can be. She doesn't see herself as above her clients — she's alongside you, creating a space where you can be completely honest without fear of judgment.</p>
+    <div class="pull-quote">
+      <div class="pq-label">In Sylvia's Words</div>
+      <p>"I truly believe I can't help with problems I don't know about, so transparency is key. Together, we'll work through whatever life throws your way with compassion and understanding."</p>
+    </div>
+  </div>
+</div>
+
+<!-- SPECIALTIES -->
+<section class="specialties-section">
+  <div class="eyebrow" style="margin-bottom:14px;">Areas of Focus</div>
+  <div class="section-title">Sylvia Specializes In <em>What Others Avoid</em></div>
+  <div class="spec-grid">
+    <div class="spec-card">
+      <div class="sc-icon">🧠</div>
+      <h4>Trauma & PTSD</h4>
+      <p>Using brief intervention techniques and active listening to help clients process and move through traumatic experiences — at their own pace, with full support.</p>
+    </div>
+    <div class="spec-card">
+      <div class="sc-icon">🕊️</div>
+      <h4>Grief & Loss</h4>
+      <p>Grief is not linear and it doesn't have a timeline. Sylvia creates space for loss in all its forms — without rushing, minimizing, or judging the process.</p>
+    </div>
+    <div class="spec-card">
+      <div class="sc-icon">🔄</div>
+      <h4>Addiction & Recovery</h4>
+      <p>A harm reduction approach to addiction — meeting clients where they are, not where society thinks they should be. Recovery looks different for everyone.</p>
+    </div>
+    <div class="spec-card">
+      <div class="sc-icon">🚨</div>
+      <h4>Crisis Intervention</h4>
+      <p>Nearly 6 years on crisis and suicide hotlines gave Sylvia the ability to hold space for the most acute moments — with calm, competence, and care.</p>
+    </div>
+    <div class="spec-card">
+      <div class="sc-icon">💉</div>
+      <h4>Overdose Hotline & Harm Reduction</h4>
+      <p>Former volunteer responder for the Never Use Alone hotline. Sylvia understands the realities of substance use without judgment or shame.</p>
+    </div>
+    <div class="spec-card">
+      <div class="sc-icon">🤝</div>
+      <h4>Recovery Case Management</h4>
+      <p>Supporting clients through the practical and emotional work of long-term recovery — advocacy, resources, and steadfast presence every step of the way.</p>
+    </div>
+  </div>
+</section>
+
+<!-- BACKGROUND & CREDENTIALS -->
+<section class="background-section">
+  <div class="bg-col">
+    <h3>Her Approach</h3>
+    <p style="font-size:.95rem;font-weight:300;line-height:1.9;color:var(--warm-gray);margin-bottom:20px;">Sylvia uses <strong style="color:var(--charcoal);">brief intervention therapy techniques</strong> — focused, practical, and grounded in where you are right now. She's known for her authenticity: what you see is what you get, and she expects the same openness from the therapeutic relationship.</p>
+    <p style="font-size:.95rem;font-weight:300;line-height:1.9;color:var(--warm-gray);">Steadfast in her support and advocacy for clients, she believes in going the extra mile to provide appropriate and <em style="color:var(--charcoal);">effective</em> services — not just checking boxes.</p>
+  </div>
+  <div class="bg-col">
+    <h3>Education & Licensure</h3>
+    <ul>
+      <li><strong>Master of Social Work</strong> — Washington University in St. Louis</li>
+      <li><strong>Licensed Master of Social Work (LMSW)</strong> — Missouri, Arkansas, Illinois, Kansas</li>
+      <li>Crisis/Suicide Hotline Clinician — <strong>~6 years</strong></li>
+      <li>Recovery Case Management — <strong>2 years (current)</strong></li>
+      <li>Never Use Alone Hotline — Overdose Response Volunteer</li>
+    </ul>
+  </div>
+</section>
+
+<!-- LEAD CAPTURE -->
+<section class="lead-section" id="lead">
+  <div class="lead-inner">
+    <div class="lead-text">
+      <h2>Ready to Work<br>with <em>Sylvia?</em></h2>
+      <p>Fill out the form and Sylvia's team will reach out within one business day. If you opted in for SMS, expect a text — fast.</p>
+      <div class="phone"><span>Call Directly</span>636-896-5867</div>
+    </div>
+    <div class="lead-form" id="form-wrap">
+      <h3>Request a Session</h3>
+      <div class="fsub">Sylvia is accepting new clients in MO, AR, IL & KS.</div>
+      <div class="fg fg-row">
+        <div class="fg"><label>First Name</label><input type="text" id="fn" placeholder="First name"/></div>
+        <div class="fg"><label>Last Name</label><input type="text" placeholder="Last name"/></div>
+      </div>
+      <div class="fg"><label>Phone</label><input type="tel" id="ph" placeholder="(314) 000-0000"/></div>
+      <div class="fg"><label>Email</label><input type="email" id="em" placeholder="you@email.com"/></div>
+      <div class="fg">
+        <label>What brings you here?</label>
+        <select id="need">
+          <option value="">Select a focus area</option>
+          <option>Trauma or PTSD</option>
+          <option>Grief or loss</option>
+          <option>Addiction or recovery</option>
+          <option>Crisis support</option>
+          <option>Harm reduction</option>
+          <option>Not sure — I just need to talk to someone</option>
+        </select>
+      </div>
+      <div class="fg"><label>Anything else? (optional)</label><textarea placeholder="Share as much or as little as you're comfortable with…"></textarea></div>
+      <div class="sms-row">
+        <input type="checkbox" id="sms" checked/>
+        <label for="sms"><span><strong>📲 Text me back.</strong> Receive a response & reminders via SMS. Reply STOP anytime.</span></label>
+      </div>
+      <button class="btn-submit" onclick="submitForm()">Send My Request →</button>
+      <div class="form-note">We respond within 1 business day · Crisis: call or text 988</div>
+      <div class="form-success" id="fs">
+        <div class="si">🌿</div>
+        <h4>Request Received</h4>
+        <p>Sylvia's team will be in touch within one business day. You took the first step — we're glad you're here.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="ft-bottom">
+    <p>© 2026 A Nu Day Therapy · Sylvia Ogilvie, LMSW · All rights reserved. | <a href="https://goelev8.ai" target="_blank">Powered by GoElev8.ai</a></p>
+    <div class="ft-nav">
+      <a href="clinicians-index.html">← All Clinicians</a>
+      <a href="clinician-corine.html">Corine</a>
+      <a href="clinician-kim.html">Kimberly Myers</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+function submitForm(){
+  const req=[document.getElementById('fn'),document.getElementById('ph'),document.getElementById('em'),document.getElementById('need')];
+  let ok=true;req.forEach(f=>{if(!f.value.trim()){f.style.borderColor='#B85C42';ok=false;}else f.style.borderColor='';});
+  if(!ok)return;
+  document.querySelectorAll('#form-wrap .fg,#form-wrap .fg-row,#form-wrap .sms-row,.btn-submit,.form-note,#form-wrap h3,#form-wrap .fsub').forEach(el=>el.style.display='none');
+  document.getElementById('fs').style.display='block';
+}
+</script>
+</body>
+</html>

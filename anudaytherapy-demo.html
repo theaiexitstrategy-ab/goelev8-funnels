@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- © 2026 GoElev8.ai | Aaron Bryant. All rights reserved. Unauthorized use prohibited. -->
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>A Nu Day Therapy | Individual, Couples & Group Counseling</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+
+<style>
+:root {
+  --cream: #F6F2EC;
+  --warm-white: #FDFAF6;
+  --sage: #6B9478;
+  --deep-sage: #3E5E4A;
+  --darker-sage: #2B4335;
+  --terracotta: #B85C42;
+  --warm-gray: #857870;
+  --charcoal: #28231F;
+  --gold: #C4A05A;
+  --light-sage: #EAF0EB;
+  --border: rgba(0,0,0,0.09);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { font-family: 'Lato', sans-serif; background: var(--cream); color: var(--charcoal); overflow-x: hidden; }
+
+/* NAV */
+nav {
+  position: fixed; top: 0; left: 0; width: 100%; z-index: 999;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 56px;
+  height: 68px;
+  background: rgba(246, 242, 236, 0.96);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(107, 148, 120, 0.2);
+}
+
+.nav-wordmark {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.35rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--charcoal);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.nav-wordmark span { color: var(--deep-sage); }
+
+.nav-links { display: flex; align-items: center; gap: 38px; list-style: none; }
+
+.nav-links a {
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--warm-gray);
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.nav-links a:hover { color: var(--deep-sage); }
+
+.nav-btn {
+  background: var(--deep-sage) !important;
+  color: white !important;
+  padding: 10px 24px;
+  border-radius: 2px;
+  transition: background 0.2s !important;
+}
+
+.nav-btn:hover { background: var(--charcoal) !important; }
+
+/* PAGES */
+.page { display: none; padding-top: 68px; min-height: 100vh; }
+.page.active { display: block; }
+
+/* ── HOME HERO ── */
+.home-hero {
+  display: grid;
+  grid-template-columns: 55% 45%;
+  min-height: calc(100vh - 68px);
+}
+
+.hero-text {
+  padding: 96px 72px;
+  display: flex; flex-direction: column; justify-content: center;
+  background: var(--warm-white);
+  position: relative;
+}
+
+.hero-text::after {
+  content: '';
+  position: absolute; right: -40px; top: 0; bottom: 0;
+  width: 80px;
+  background: var(--warm-white);
+  clip-path: polygon(0 0, 0 100%, 100% 100%);
+  z-index: 2;
+}
+
+.eyebrow {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--sage);
+  margin-bottom: 22px;
+  display: flex; align-items: center; gap: 12px;
+}
+
+.eyebrow::before { content: ''; width: 28px; height: 1.5px; background: var(--sage); }
+
+.hero-text h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 4.4rem;
+  font-weight: 300;
+  line-height: 1.08;
+  color: var(--charcoal);
+  margin-bottom: 30px;
+}
+
+.hero-text h1 em { font-style: italic; color: var(--deep-sage); }
+
+.hero-text p {
+  font-size: 1.05rem;
+  font-weight: 300;
+  line-height: 1.85;
+  color: var(--warm-gray);
+  max-width: 460px;
+  margin-bottom: 48px;
+}
+
+.hero-actions { display: flex; gap: 14px; flex-wrap: wrap; }
+
+.btn {
+  display: inline-block;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 14px 30px;
+  border-radius: 2px;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+  transition: all 0.22s;
+}
+
+.btn-sage { background: var(--deep-sage); color: white; }
+.btn-sage:hover { background: var(--charcoal); }
+.btn-outline-sage { background: transparent; border: 1.5px solid var(--deep-sage); color: var(--deep-sage); }
+.btn-outline-sage:hover { background: var(--deep-sage); color: white; }
+.btn-terra { background: var(--terracotta); color: white; }
+.btn-terra:hover { background: var(--charcoal); }
+.btn-white { background: white; color: var(--deep-sage); }
+.btn-white:hover { background: var(--cream); }
+.btn-ghost-white { background: transparent; border: 1.5px solid rgba(255,255,255,0.45); color: white; }
+.btn-ghost-white:hover { background: rgba(255,255,255,0.1); }
+
+.hero-visual {
+  background: var(--darker-sage);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 80px 60px;
+  position: relative; overflow: hidden;
+  gap: 32px;
+}
+
+.hero-visual::before {
+  content: 'NU';
+  position: absolute;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 18rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.03);
+  line-height: 1;
+  pointer-events: none;
+}
+
+.hero-stat {
+  text-align: center; position: relative; z-index: 1;
+  padding: 28px 40px;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 4px;
+  width: 100%;
+  background: rgba(255,255,255,0.04);
+  backdrop-filter: blur(4px);
+  transition: background 0.25s;
+}
+
+.hero-stat:hover { background: rgba(255,255,255,0.08); }
+
+.hero-stat .stat-icon { font-size: 1.8rem; margin-bottom: 10px; }
+
+.hero-stat h4 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 6px;
+}
+
+.hero-stat p {
+  font-size: 0.8rem;
+  font-weight: 300;
+  color: rgba(255,255,255,0.55);
+  letter-spacing: 0.06em;
+}
+
+/* QUOTE BAND */
+.quote-band {
+  background: var(--charcoal);
+  padding: 72px 80px;
+  text-align: center;
+  position: relative; overflow: hidden;
+}
+
+.quote-band::before {
+  content: '"';
+  position: absolute;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22rem;
+  color: rgba(255,255,255,0.025);
+  top: -60px; left: 50%;
+  transform: translateX(-50%);
+  line-height: 1; pointer-events: none;
+}
+
+.quote-band blockquote {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem;
+  font-weight: 300;
+  font-style: italic;
+  color: white;
+  max-width: 820px;
+  margin: 0 auto 20px;
+  line-height: 1.65;
+  position: relative; z-index: 1;
+}
+
+.quote-band cite {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-style: normal;
+}
+
+/* SERVICES SECTION */
+.services-section { padding: 96px 80px; background: var(--warm-white); }
+
+.section-header { margin-bottom: 60px; }
+
+.section-header .eyebrow { margin-bottom: 14px; }
+
+.section-header h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 3rem;
+  font-weight: 300;
+  color: var(--charcoal);
+  line-height: 1.2;
+}
+
+.section-header h2 em { font-style: italic; color: var(--deep-sage); }
+
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+}
+
+.svc {
+  background: var(--warm-white);
+  padding: 44px 36px;
+  position: relative;
+  transition: background 0.2s;
+  overflow: hidden;
+}
+
+.svc:hover { background: white; }
+
+.svc::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 36px; right: 36px;
+  height: 2px;
+  background: var(--sage);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.35s ease;
+}
+
+.svc:hover::after { transform: scaleX(1); }
+
+.svc-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.8rem;
+  font-weight: 300;
+  color: rgba(107,148,120,0.2);
+  line-height: 1;
+  margin-bottom: 18px;
+}
+
+.svc h3 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--charcoal);
+  margin-bottom: 12px;
+}
+
+.svc p {
+  font-size: 0.9rem;
+  font-weight: 300;
+  line-height: 1.85;
+  color: var(--warm-gray);
+}
+
+/* MODALITIES */
+.modalities-section {
+  background: var(--deep-sage);
+  padding: 80px;
+  text-align: center;
+}
+
+.modalities-section h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.2rem;
+  font-weight: 300;
+  color: white;
+  margin-bottom: 12px;
+}
+
+.modalities-section > p {
+  font-size: 0.95rem;
+  font-weight: 300;
+  color: rgba(255,255,255,0.6);
+  margin-bottom: 44px;
+}
+
+.mod-cloud {
+  display: flex; flex-wrap: wrap; gap: 10px;
+  justify-content: center;
+  max-width: 820px;
+  margin: 0 auto;
+}
+
+.mod {
+  padding: 10px 22px;
+  border: 1px solid rgba(255,255,255,0.18);
+  color: rgba(255,255,255,0.78);
+  font-size: 0.82rem;
+  font-weight: 300;
+  letter-spacing: 0.06em;
+  border-radius: 2px;
+  transition: all 0.2s;
+}
+
+.mod:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.4); color: white; }
+
+/* MOVEMENT CALLOUT */
+.movement-callout {
+  background: var(--terracotta);
+  padding: 80px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 72px;
+  align-items: center;
+}
+
+.movement-callout h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.8rem;
+  font-weight: 300;
+  color: white;
+  line-height: 1.25;
+}
+
+.movement-callout h2 em { font-style: italic; }
+
+.movement-callout p {
+  font-size: 1rem;
+  font-weight: 300;
+  line-height: 1.9;
+  color: rgba(255,255,255,0.85);
+  margin-bottom: 28px;
+}
+
+/* CLINICIANS */
+.clinicians-section { padding: 96px 80px; background: var(--cream); }
+
+.clinicians-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+  margin-top: 56px;
+}
+
+.clinician-card {
+  background: white;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 2px 20px rgba(0,0,0,0.06);
+  transition: transform 0.25s, box-shadow 0.25s;
+}
+
+.clinician-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 36px rgba(0,0,0,0.1);
+}
+
+.clinician-photo {
+  height: 200px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 4rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.photo-1 { background: linear-gradient(135deg, #3E5E4A, #6B9478); }
+.photo-2 { background: linear-gradient(135deg, #5A3E35, #9E6B5A); }
+.photo-3 { background: linear-gradient(135deg, #2B3A4A, #4A6B8A); }
+
+.clinician-body { padding: 28px; }
+
+.clinician-body h4 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--charcoal);
+  margin-bottom: 4px;
+}
+
+.clinician-credential {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--sage);
+  margin-bottom: 14px;
+}
+
+.clinician-body p {
+  font-size: 0.88rem;
+  font-weight: 300;
+  line-height: 1.75;
+  color: var(--warm-gray);
+}
+
+/* CREDENTIALS */
+.creds-section { padding: 80px; background: var(--charcoal); }
+
+.creds-section h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.2rem;
+  font-weight: 300;
+  color: white;
+  margin-bottom: 48px;
+  text-align: center;
+}
+
+.creds-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.cred-item {
+  padding: 28px 24px;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 3px;
+  background: rgba(255,255,255,0.03);
+}
+
+.cred-item .ci-icon { font-size: 1.5rem; margin-bottom: 14px; }
+
+.cred-item h5 {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 10px;
+}
+
+.cred-item p {
+  font-size: 0.85rem;
+  font-weight: 300;
+  line-height: 1.75;
+  color: rgba(255,255,255,0.55);
+}
+
+/* SMS STRIP */
+.sms-strip {
+  background: linear-gradient(135deg, #1d2e24 0%, #2b4335 100%);
+  padding: 56px 80px;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 48px;
+}
+
+.sms-strip-text h3 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.8rem;
+  font-weight: 300;
+  color: white;
+  margin-bottom: 8px;
+}
+
+.sms-strip-text p { font-size: 0.88rem; font-weight: 300; color: rgba(255,255,255,0.5); }
+
+.sms-notifs { display: flex; flex-direction: column; gap: 8px; min-width: 360px; }
+
+.notif {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 8px;
+  padding: 12px 16px;
+  display: flex; align-items: center; gap: 12px;
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.72);
+  font-weight: 300;
+}
+
+.ndot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.ndot-green { background: #6eda8b; box-shadow: 0 0 8px #6eda8b; }
+.ndot-gold { background: var(--gold); box-shadow: 0 0 8px var(--gold); }
+.ndot-sage { background: #7fd4a0; box-shadow: 0 0 8px #7fd4a0; }
+
+/* CONTACT */
+.contact-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 80vh;
+}
+
+.contact-left {
+  background: var(--deep-sage);
+  padding: 80px 64px;
+  display: flex; flex-direction: column; justify-content: center;
+}
+
+.contact-left h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.8rem;
+  font-weight: 300;
+  color: white;
+  line-height: 1.2;
+  margin-bottom: 20px;
+}
+
+.contact-left h2 em { font-style: italic; color: #a8d4b8; }
+
+.contact-left > p {
+  font-size: 0.95rem;
+  font-weight: 300;
+  color: rgba(255,255,255,0.65);
+  line-height: 1.85;
+  margin-bottom: 48px;
+}
+
+.c-items { display: flex; flex-direction: column; gap: 24px; }
+
+.c-item { display: flex; align-items: flex-start; gap: 16px; }
+
+.c-icon {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.08);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.c-item-text h5 {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #a8d4b8;
+  margin-bottom: 3px;
+}
+
+.c-item-text p { font-size: 0.9rem; font-weight: 300; color: rgba(255,255,255,0.72); }
+
+.contact-right {
+  background: var(--warm-white);
+  padding: 80px 64px;
+  display: flex; flex-direction: column; justify-content: center;
+}
+
+.contact-right h3 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.7rem;
+  font-weight: 400;
+  color: var(--charcoal);
+  margin-bottom: 36px;
+}
+
+.fg { margin-bottom: 22px; }
+
+.fg label {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--warm-gray);
+  margin-bottom: 7px;
+}
+
+.fg input, .fg select, .fg textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1.5px solid rgba(0,0,0,0.11);
+  border-radius: 2px;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.92rem;
+  font-weight: 300;
+  color: var(--charcoal);
+  background: white;
+  outline: none;
+  appearance: none;
+  transition: border-color 0.2s;
+}
+
+.fg input:focus, .fg select:focus, .fg textarea:focus { border-color: var(--deep-sage); }
+.fg textarea { height: 110px; resize: none; }
+
+.fg-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+.sms-consent {
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: 14px;
+  background: rgba(107,148,120,0.07);
+  border: 1px solid rgba(107,148,120,0.22);
+  border-radius: 3px;
+  margin-bottom: 22px;
+}
+
+.sms-consent input { width: auto; margin-top: 2px; accent-color: var(--deep-sage); }
+.sms-consent span { font-size: 0.82rem; font-weight: 300; color: var(--warm-gray); line-height: 1.6; }
+.sms-consent strong { color: var(--deep-sage); font-weight: 700; }
+
+/* FOOTER */
+footer {
+  background: #1d2820;
+  padding: 56px 80px 28px;
+}
+
+.ft-top {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 1fr;
+  gap: 56px;
+  padding-bottom: 40px;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  margin-bottom: 24px;
+}
+
+.ft-brand .ft-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: white;
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+}
+
+.ft-brand .ft-sub {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 16px;
+}
+
+.ft-brand p {
+  font-size: 0.86rem;
+  font-weight: 300;
+  color: rgba(255,255,255,0.4);
+  line-height: 1.8;
+}
+
+.ft-col h6 {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.3);
+  margin-bottom: 16px;
+}
+
+.ft-col ul { list-style: none; display: flex; flex-direction: column; gap: 9px; }
+
+.ft-col ul li a {
+  font-size: 0.86rem;
+  font-weight: 300;
+  color: rgba(255,255,255,0.5);
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.ft-col ul li a:hover { color: var(--gold); }
+
+.ft-bottom {
+  display: flex; justify-content: space-between; align-items: center;
+}
+
+.ft-bottom p { font-size: 0.74rem; color: rgba(255,255,255,0.22); font-weight: 300; }
+
+.ft-bottom a {
+  font-size: 0.7rem;
+  color: rgba(196, 160, 90, 0.55);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.ft-bottom a:hover { color: var(--gold); }
+
+/* RESPONSIVE */
+@media (max-width: 960px) {
+  nav { padding: 0 24px; }
+  .nav-links { display: none; }
+  .home-hero, .movement-callout, .contact-section { grid-template-columns: 1fr; }
+  .hero-visual { min-height: 260px; flex-direction: row; flex-wrap: wrap; padding: 40px 24px; gap: 16px; }
+  .hero-stat { flex: 1; min-width: 140px; padding: 20px; }
+  .services-grid, .clinicians-grid, .creds-grid { grid-template-columns: 1fr; }
+  .services-section, .modalities-section, .movement-callout, .clinicians-section, .creds-section, .sms-strip { padding: 48px 24px; }
+  .quote-band { padding: 56px 24px; }
+  .hero-text { padding: 56px 28px; }
+  .hero-text::after { display: none; }
+  footer { padding: 48px 24px 24px; }
+  .ft-top { grid-template-columns: 1fr; gap: 32px; }
+  .sms-strip { flex-direction: column; }
+  .sms-notifs { min-width: unset; width: 100%; }
+  .contact-left, .contact-right { padding: 48px 28px; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <span class="nav-wordmark" onclick="showPage('home')">A <span>Nu</span> Day Therapy</span>
+  <ul class="nav-links">
+    <li><a onclick="showPage('home')">Home</a></li>
+    <li><a onclick="showPage('services')">Services</a></li>
+    <li><a onclick="showPage('clinicians')">Our Clinicians</a></li>
+    <li><a onclick="showPage('contact')" class="nav-btn">Get Started</a></li>
+  </ul>
+</nav>
+
+<!-- ══════════ HOME ══════════ -->
+<div id="page-home" class="page active">
+
+  <div class="home-hero">
+    <div class="hero-text">
+      <div class="eyebrow">St. Louis, Missouri</div>
+      <h1>Every Day<br>Can Be <em>A Nu Day</em></h1>
+      <p>Specialized counseling for people navigating suicidal thoughts, self-harm, crisis, and relational pain. You deserve a space where you're safe to tell the truth — and find your way to a life worth living.</p>
+      <div class="hero-actions">
+        <button class="btn btn-sage" onclick="showPage('contact')">Start Your Journey</button>
+        <button class="btn btn-outline-sage" onclick="showPage('services')">Our Services</button>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="hero-stat">
+        <div class="stat-icon">🌿</div>
+        <h4>Individual Therapy</h4>
+        <p>Person-centered · Strengths-based</p>
+      </div>
+      <div class="hero-stat">
+        <div class="stat-icon">💑</div>
+        <h4>Couples Counseling</h4>
+        <p>EFT · Reconnect & heal</p>
+      </div>
+      <div class="hero-stat">
+        <div class="stat-icon">🤝</div>
+        <h4>Group Therapy · DBT</h4>
+        <p>Build skills · Create connection</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quote -->
+  <div class="quote-band">
+    <blockquote>"Avoiding your triggers isn't healing. Healing happens when you're triggered and you're able to move through the pain, the pattern, and the story — and walk your way to a different ending."</blockquote>
+    <cite>Vienna Pharaon — A guiding philosophy at A Nu Day</cite>
+  </div>
+
+  <!-- Services preview -->
+  <div class="services-section">
+    <div class="section-header">
+      <div class="eyebrow">What We Offer</div>
+      <h2>Therapy That <em>Meets You</em> Where You Are</h2>
+    </div>
+    <div class="services-grid">
+      <div class="svc">
+        <div class="svc-num">01</div>
+        <h3>Individual Therapy</h3>
+        <p>For depression, anxiety, self-esteem, suicidal thoughts, and self-harm behaviors. We build on your strengths to help you find freedom from the darkness.</p>
+      </div>
+      <div class="svc">
+        <div class="svc-num">02</div>
+        <h3>Couples Counseling</h3>
+        <p>Using Emotionally Focused Therapy to help partners reconnect, repair ruptures, and build a relationship grounded in safety and trust.</p>
+      </div>
+      <div class="svc">
+        <div class="svc-num">03</div>
+        <h3>DBT Group Therapy</h3>
+        <p>Dialectical Behavior Therapy groups for people with suicidal ideation and self-harm — learning real skills to manage emotions and create a life worth living.</p>
+      </div>
+      <div class="svc">
+        <div class="svc-num">04</div>
+        <h3>Crisis Counseling</h3>
+        <p>Immediate, compassionate support for people in acute crisis. We're trained in Applied Suicide Intervention Skills — meeting you with no judgment, only care.</p>
+      </div>
+      <div class="svc">
+        <div class="svc-num">05</div>
+        <h3>Dance & Movement Therapy</h3>
+        <p>Your body holds stories your words can't always reach. Expressive arts and movement-based approaches can unlock healing that traditional talk therapy sometimes can't access alone.</p>
+      </div>
+      <div class="svc">
+        <div class="svc-num">06</div>
+        <h3>Parenting Classes</h3>
+        <p>Nurturing Parenting curricula for parents working toward family reunification — building connection, consistency, and confidence in the parenting role.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modalities -->
+  <div class="modalities-section">
+    <div class="eyebrow" style="justify-content:center; color:rgba(255,255,255,0.5); margin-bottom:16px;">Clinical Approaches</div>
+    <h2>Modalities We Use</h2>
+    <p>No cookie-cutter therapy here. We blend approaches to find what works for you.</p>
+    <div class="mod-cloud">
+      <div class="mod">Dialectical Behavior Therapy</div>
+      <div class="mod">Cognitive Behavioral Therapy</div>
+      <div class="mod">Emotionally Focused Therapy</div>
+      <div class="mod">Acceptance & Commitment Therapy</div>
+      <div class="mod">Motivational Interviewing</div>
+      <div class="mod">Dance / Movement Therapy</div>
+      <div class="mod">Expressive Arts Therapy</div>
+      <div class="mod">Person-Centered Therapy</div>
+      <div class="mod">Crisis Intervention</div>
+      <div class="mod">Applied Suicide Intervention</div>
+    </div>
+  </div>
+
+  <!-- Movement callout -->
+  <div class="movement-callout">
+    <div>
+      <h2>Where Clinical Care <em>Meets Movement</em></h2>
+    </div>
+    <div>
+      <p>Our background in creative and performing arts shapes everything we do. The body holds trauma, grief, and joy — and movement is one of the most powerful tools for processing and releasing them. We integrate expressive arts and dance/movement therapy into evidence-based clinical care.</p>
+      <button class="btn btn-white" onclick="showPage('services')">Explore All Services</button>
+    </div>
+  </div>
+
+  <!-- SMS strip -->
+  <div class="sms-strip">
+    <div class="sms-strip-text">
+      <h3>Respond to Every Inquiry. Miss Nothing.</h3>
+      <p>Automated SMS follow-ups, intake scheduling & appointment reminders — powered by GoElev8.ai</p>
+    </div>
+    <div class="sms-notifs">
+      <div class="notif"><div class="ndot ndot-green"></div>📲 New inquiry from D. Williams — Intake form sent automatically</div>
+      <div class="notif"><div class="ndot ndot-gold"></div>🗓️ Session reminder sent · Tomorrow 2:00 PM · Confirmed ✓</div>
+      <div class="notif"><div class="ndot ndot-sage"></div>💬 "Thank you, I'll be there" — replied via two-way SMS</div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="ft-top">
+      <div class="ft-brand">
+        <div class="ft-logo">A Nu Day Therapy</div>
+        <div class="ft-sub">St. Louis, Missouri</div>
+        <p>Specialized counseling for suicidal ideation, self-harm, BPD, crisis, and relational healing. A safe space to tell your story and find your way forward.</p>
+      </div>
+      <div class="ft-col">
+        <h6>Services</h6>
+        <ul>
+          <li><a onclick="showPage('services')">Individual Therapy</a></li>
+          <li><a onclick="showPage('services')">Couples Counseling</a></li>
+          <li><a onclick="showPage('services')">DBT Group Therapy</a></li>
+          <li><a onclick="showPage('services')">Crisis Counseling</a></li>
+          <li><a onclick="showPage('services')">Movement Therapy</a></li>
+        </ul>
+      </div>
+      <div class="ft-col">
+        <h6>Contact</h6>
+        <ul>
+          <li><a>📞 636-896-5867</a></li>
+          <li><a onclick="showPage('contact')">Book a Session</a></li>
+          <li><a>anudaytherapy.com</a></li>
+          <li><a>St. Louis, MO</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="ft-bottom">
+      <p>© 2026 A Nu Day Therapy · All rights reserved.</p>
+      <a href="https://goelev8.ai" target="_blank">Powered by GoElev8.ai</a>
+    </div>
+  </footer>
+
+</div>
+
+<!-- ══════════ SERVICES ══════════ -->
+<div id="page-services" class="page">
+
+  <div style="background: var(--deeper-sage, #2B4335); background: linear-gradient(160deg, #2B4335 0%, #3E5E4A 100%); padding: 100px 80px; text-align:center; position:relative; overflow:hidden;">
+    <div style="position:absolute; top:-40px; right:40px; font-family:'Cormorant Garamond',serif; font-size:14rem; font-weight:700; color:rgba(255,255,255,0.03); pointer-events:none; line-height:1;">HEAL</div>
+    <div class="eyebrow" style="justify-content:center; color:rgba(255,255,255,0.5); margin-bottom:16px;">What We Offer</div>
+    <h1 style="font-family:'Cormorant Garamond',serif; font-size:3.8rem; font-weight:300; color:white; margin-bottom:20px; position:relative; z-index:1;">Services Built Around <em style="font-style:italic; color:#a8d4b8;">You</em></h1>
+    <p style="font-size:1.05rem; font-weight:300; color:rgba(255,255,255,0.65); max-width:580px; margin:0 auto 44px; line-height:1.85; position:relative; z-index:1;">No two people heal the same way. That's why we blend clinical rigor with creative flexibility to find the approach that actually works for you.</p>
+    <button class="btn btn-ghost-white" onclick="showPage('contact')">Schedule a Consultation</button>
+  </div>
+
+  <div class="services-section" style="background:var(--cream);">
+    <div class="services-grid">
+      <div class="svc" style="background:var(--cream);">
+        <div class="svc-num">01</div>
+        <h3>Individual Therapy</h3>
+        <p>Person-centered, strengths-based sessions for depression, anxiety, self-esteem, suicidal thoughts, and self-harm. We build on your strengths and empower you to heal from pain on your own terms.</p>
+      </div>
+      <div class="svc" style="background:var(--cream);">
+        <div class="svc-num">02</div>
+        <h3>Couples Counseling</h3>
+        <p>Drawing from Emotionally Focused Therapy and Motivational Interviewing to help couples reconnect, repair ruptures, and build patterns of real safety and intimacy.</p>
+      </div>
+      <div class="svc" style="background:var(--cream);">
+        <div class="svc-num">03</div>
+        <h3>DBT Group Therapy</h3>
+        <p>Dialectical Behavior Therapy groups for suicidal ideation and self-harm — building practical skills to manage emotions, tolerate distress, and create a life genuinely worth living.</p>
+      </div>
+      <div class="svc" style="background:var(--cream);">
+        <div class="svc-num">04</div>
+        <h3>Crisis Counseling</h3>
+        <p>Immediate support for people in acute crisis. Our clinicians are trained in Applied Suicide Intervention Skills — meeting you exactly where you are with no judgment, only care and competence.</p>
+      </div>
+      <div class="svc" style="background:var(--cream);">
+        <div class="svc-num">05</div>
+        <h3>Dance & Movement Therapy</h3>
+        <p>Your body knows things your words can't always reach. Movement and expressive arts techniques help clients access healing pathways beyond traditional talk therapy.</p>
+      </div>
+      <div class="svc" style="background:var(--cream);">
+        <div class="svc-num">06</div>
+        <h3>Parenting Classes</h3>
+        <p>Nurturing Parenting curricula for parents working toward family reunification goals — building connection, confidence, and consistency in the parenting role.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Professional training -->
+  <div style="background:white; padding:80px; text-align:center; border-top: 1px solid var(--border);">
+    <div class="eyebrow" style="justify-content:center; margin-bottom:14px;">For Mental Health Professionals</div>
+    <h2 style="font-family:'Cormorant Garamond',serif; font-size:2.4rem; font-weight:300; margin-bottom:16px;">Training & Consultation</h2>
+    <p style="max-width:600px; margin:0 auto 40px; font-size:1rem; font-weight:300; color:var(--warm-gray); line-height:1.9;">We offer specialized training for clinicians in Suicide Awareness & Prevention, Applied Suicide Intervention Skills (ASIST), Crisis Intervention, and other psychoeducational approaches. Equip your team with tools that save lives.</p>
+    <div style="display:flex; gap:14px; justify-content:center; flex-wrap:wrap;">
+      <button class="btn btn-sage" onclick="showPage('contact')">Inquire About Training</button>
+      <button class="btn btn-outline-sage" onclick="showPage('contact')">Book a Consultation</button>
+    </div>
+  </div>
+
+  <div class="modalities-section">
+    <div class="eyebrow" style="justify-content:center; color:rgba(255,255,255,0.4); margin-bottom:16px;">Our Toolkit</div>
+    <h2>Therapeutic Modalities</h2>
+    <p>We integrate multiple evidence-based approaches — never just one box.</p>
+    <div class="mod-cloud" style="margin-top:36px;">
+      <div class="mod">Dialectical Behavior Therapy</div>
+      <div class="mod">Cognitive Behavioral Therapy</div>
+      <div class="mod">Emotionally Focused Therapy</div>
+      <div class="mod">Acceptance & Commitment Therapy</div>
+      <div class="mod">Motivational Interviewing</div>
+      <div class="mod">Dance / Movement Therapy</div>
+      <div class="mod">Expressive Arts Therapy</div>
+      <div class="mod">Person-Centered Therapy</div>
+      <div class="mod">Crisis Intervention</div>
+      <div class="mod">Applied Suicide Intervention</div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="ft-top">
+      <div class="ft-brand">
+        <div class="ft-logo">A Nu Day Therapy</div>
+        <div class="ft-sub">St. Louis, Missouri</div>
+        <p>Specialized counseling for suicidal ideation, self-harm, DBT, crisis, and relational healing.</p>
+      </div>
+      <div class="ft-col">
+        <h6>Navigate</h6>
+        <ul>
+          <li><a onclick="showPage('home')">Home</a></li>
+          <li><a onclick="showPage('clinicians')">Our Clinicians</a></li>
+          <li><a onclick="showPage('contact')">Contact</a></li>
+        </ul>
+      </div>
+      <div class="ft-col">
+        <h6>Contact</h6>
+        <ul>
+          <li><a>📞 636-896-5867</a></li>
+          <li><a onclick="showPage('contact')">Book a Session</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="ft-bottom">
+      <p>© 2026 A Nu Day Therapy · All rights reserved.</p>
+      <a href="https://goelev8.ai" target="_blank">Powered by GoElev8.ai</a>
+    </div>
+  </footer>
+
+</div>
+
+<!-- ══════════ CLINICIANS ══════════ -->
+<div id="page-clinicians" class="page">
+
+  <div style="background:var(--warm-white); padding:96px 80px;">
+    <div class="eyebrow" style="margin-bottom:14px;">The Team</div>
+    <h1 style="font-family:'Cormorant Garamond',serif; font-size:3.6rem; font-weight:300; margin-bottom:16px;">Meet <em style="font-style:italic; color:var(--deep-sage);">The Clinicians</em></h1>
+    <p style="font-size:1.05rem; font-weight:300; color:var(--warm-gray); max-width:560px; line-height:1.85;">A team of compassionate, credentialed therapists — each bringing their own specialties to the work of helping people find freedom and healing.</p>
+
+    <div class="clinicians-grid" style="margin-top:60px;">
+      <div class="clinician-card">
+        <div class="clinician-photo photo-1">👩🏽</div>
+        <div class="clinician-body">
+          <h4>Sylvia Ogilvie</h4>
+          <div class="clinician-credential">MA, MSW, LMSW</div>
+          <p>Providing compassionate, evidence-based care across a range of mental health concerns — bringing warmth, expertise, and a genuine commitment to client growth.</p>
+        </div>
+      </div>
+      <div class="clinician-card">
+        <div class="clinician-photo photo-2">👩🏾</div>
+        <div class="clinician-body">
+          <h4>Corine</h4>
+          <div class="clinician-credential">Licensed Clinician</div>
+          <p>Supporting clients through life's most difficult transitions with a person-centered approach that honors each individual's unique story and path to healing.</p>
+        </div>
+      </div>
+      <div class="clinician-card">
+        <div class="clinician-photo photo-3">👩🏻</div>
+        <div class="clinician-body">
+          <h4>Kimberly Myers</h4>
+          <div class="clinician-credential">LPC</div>
+          <p>A licensed professional counselor bringing specialized skills to therapy — helping clients navigate emotional challenges and build the life they envision for themselves.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="creds-section">
+    <h2>Credentials & Training</h2>
+    <div class="creds-grid">
+      <div class="cred-item">
+        <div class="ci-icon">🎓</div>
+        <h5>Education</h5>
+        <p>Master of Social Work — Washington University in St. Louis. Clinical Specialization in evidence-based practice.</p>
+      </div>
+      <div class="cred-item">
+        <div class="ci-icon">🧠</div>
+        <h5>Crisis Training</h5>
+        <p>Applied Suicide Intervention Skills Training Facilitator. Advanced Crisis Intervention certification.</p>
+      </div>
+      <div class="cred-item">
+        <div class="ci-icon">🌀</div>
+        <h5>Movement & Arts</h5>
+        <p>Dance/Movement Therapy. Expressive Arts & Integrative Therapies. Advanced body-based healing approaches.</p>
+      </div>
+      <div class="cred-item">
+        <div class="ci-icon">🏛️</div>
+        <h5>Affiliations</h5>
+        <p>American Association of Suicidology. American Dance Therapy Association. Nurturing Parenting Facilitator.</p>
+      </div>
+    </div>
+  </div>
+
+  <div style="background:var(--cream); padding:80px; text-align:center;">
+    <div class="eyebrow" style="justify-content:center; margin-bottom:14px;">Ready to Begin?</div>
+    <h2 style="font-family:'Cormorant Garamond',serif; font-size:2.4rem; font-weight:300; margin-bottom:16px;">Find the Right Fit <em style="font-style:italic; color:var(--deep-sage);">for You</em></h2>
+    <p style="max-width:520px; margin:0 auto 36px; font-size:0.98rem; font-weight:300; color:var(--warm-gray); line-height:1.9;">The therapeutic relationship matters. We'll help match you with the clinician whose style and specialties align with what you're looking for.</p>
+    <button class="btn btn-sage" onclick="showPage('contact')">Get Started Today</button>
+  </div>
+
+  <footer>
+    <div class="ft-top">
+      <div class="ft-brand">
+        <div class="ft-logo">A Nu Day Therapy</div>
+        <div class="ft-sub">St. Louis, Missouri</div>
+        <p>A team of compassionate, credentialed therapists serving individuals, couples, and groups.</p>
+      </div>
+      <div class="ft-col">
+        <h6>Navigate</h6>
+        <ul>
+          <li><a onclick="showPage('home')">Home</a></li>
+          <li><a onclick="showPage('services')">Services</a></li>
+          <li><a onclick="showPage('contact')">Contact</a></li>
+        </ul>
+      </div>
+      <div class="ft-col">
+        <h6>Contact</h6>
+        <ul>
+          <li><a>📞 636-896-5867</a></li>
+          <li><a onclick="showPage('contact')">Book a Session</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="ft-bottom">
+      <p>© 2026 A Nu Day Therapy · All rights reserved.</p>
+      <a href="https://goelev8.ai" target="_blank">Powered by GoElev8.ai</a>
+    </div>
+  </footer>
+
+</div>
+
+<!-- ══════════ CONTACT ══════════ -->
+<div id="page-contact" class="page">
+
+  <div class="contact-section">
+    <div class="contact-left">
+      <div class="eyebrow" style="color:#a8d4b8; margin-bottom:16px;">Reach Out</div>
+      <h2>Ready to Start <em>Your Nu Day?</em></h2>
+      <p>Taking the first step is the hardest part. Fill out the form and we'll reach out within one business day to connect you with the right clinician.</p>
+      <div class="c-items">
+        <div class="c-item">
+          <div class="c-icon">📞</div>
+          <div class="c-item-text"><h5>Phone</h5><p>636-896-5867</p></div>
+        </div>
+        <div class="c-item">
+          <div class="c-icon">📱</div>
+          <div class="c-item-text"><h5>SMS Response</h5><p>Text us — automated reply within minutes, GoElev8.ai powered</p></div>
+        </div>
+        <div class="c-item">
+          <div class="c-icon">📍</div>
+          <div class="c-item-text"><h5>Location</h5><p>St. Louis, MO · Telehealth available</p></div>
+        </div>
+        <div class="c-item">
+          <div class="c-icon">🌐</div>
+          <div class="c-item-text"><h5>Website</h5><p>anudaytherapy.com</p></div>
+        </div>
+      </div>
+    </div>
+    <div class="contact-right">
+      <h3>Send Us a Message</h3>
+      <div class="fg fg-row">
+        <div class="fg"><label>First Name</label><input type="text" placeholder="First name" /></div>
+        <div class="fg"><label>Last Name</label><input type="text" placeholder="Last name" /></div>
+      </div>
+      <div class="fg"><label>Email</label><input type="email" placeholder="you@email.com" /></div>
+      <div class="fg"><label>Phone Number</label><input type="tel" placeholder="(314) 000-0000" /></div>
+      <div class="fg">
+        <label>I'm looking for…</label>
+        <select>
+          <option value="">Select a service</option>
+          <option>Individual Therapy</option>
+          <option>Couples Counseling</option>
+          <option>DBT Group Therapy</option>
+          <option>Crisis Support</option>
+          <option>Dance / Movement Therapy</option>
+          <option>Parenting Classes</option>
+          <option>Clinician Training</option>
+          <option>General Inquiry</option>
+        </select>
+      </div>
+      <div class="fg"><label>Message</label><textarea placeholder="Tell us what you're looking for or what's been on your mind…"></textarea></div>
+      <div class="sms-consent">
+        <input type="checkbox" id="sms" checked />
+        <label for="sms"><span><strong>📲 Text me back!</strong> I'd like to receive scheduling updates and reminders via SMS. Reply STOP anytime to opt out.</span></label>
+      </div>
+      <button class="btn btn-sage" style="width:100%;">Send Message</button>
+    </div>
+  </div>
+
+  <footer>
+    <div class="ft-top">
+      <div class="ft-brand">
+        <div class="ft-logo">A Nu Day Therapy</div>
+        <div class="ft-sub">St. Louis, Missouri</div>
+        <p>Specialized counseling for suicidal ideation, self-harm, crisis, couples, and expressive arts healing.</p>
+      </div>
+      <div class="ft-col">
+        <h6>Navigate</h6>
+        <ul>
+          <li><a onclick="showPage('home')">Home</a></li>
+          <li><a onclick="showPage('services')">Services</a></li>
+          <li><a onclick="showPage('clinicians')">Clinicians</a></li>
+        </ul>
+      </div>
+      <div class="ft-col">
+        <h6>Contact</h6>
+        <ul>
+          <li><a>📞 636-896-5867</a></li>
+          <li><a>anudaytherapy.com</a></li>
+          <li><a>St. Louis, MO</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="ft-bottom">
+      <p>© 2026 A Nu Day Therapy · All rights reserved.</p>
+      <a href="https://goelev8.ai" target="_blank">Powered by GoElev8.ai</a>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+  function showPage(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-' + id).classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+</body>
+</html>

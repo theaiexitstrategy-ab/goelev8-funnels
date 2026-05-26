@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- © 2026 GoElev8.ai | Aaron Bryant. All rights reserved. Unauthorized use prohibited. -->
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>About Adrianne Martin | LCSW · Pole Dance Instructor · St. Louis, MO</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+<style>
+:root {
+  --black: #100D0A;
+  --near-black: #171210;
+  --warm-dark: #201810;
+  --mid: #2E2318;
+  --cream: #F7F2EA;
+  --warm-white: #FDFAF4;
+  --sage: #6B9B78;
+  --deep-sage: #3E5E4A;
+  --terra: #C06040;
+  --pole-orange: #D4834A;
+  --gold: #C8A05C;
+  --muted-light: rgba(255,255,255,0.48);
+  --muted-dark: #9A8F84;
+  --border: rgba(255,255,255,0.07);
+  --border-light: rgba(0,0,0,0.09);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--black);
+  color: white;
+  overflow-x: hidden;
+}
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; width: 100%;
+  z-index: 999;
+  height: 66px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 52px;
+  background: rgba(16, 13, 10, 0.93);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+}
+
+.nav-left {
+  display: flex; align-items: center; gap: 14px;
+}
+
+.nav-dot-therapy {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--sage);
+  box-shadow: 0 0 8px var(--sage);
+}
+
+.nav-dot-pole {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--pole-orange);
+  box-shadow: 0 0 8px var(--pole-orange);
+}
+
+.nav-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: white;
+}
+
+.nav-right { display: flex; gap: 28px; align-items: center; }
+
+.nav-link {
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted-light);
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.nav-link:hover { color: white; }
+
+.nav-cta {
+  background: var(--terra);
+  color: white;
+  padding: 10px 22px;
+  border-radius: 2px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  transition: background 0.2s;
+  font-family: 'Outfit', sans-serif;
+}
+
+.nav-cta:hover { background: white; color: var(--black); }
+
+/* ── HERO ── */
+.hero {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding-top: 66px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* left – dark, warm, therapy side */
+.hero-left {
+  background: var(--near-black);
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 96px 72px;
+  position: relative; overflow: hidden;
+}
+
+.hero-left::before {
+  content: 'HEAL';
+  position: absolute;
+  bottom: -30px; left: -10px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 14rem;
+  font-weight: 700;
+  color: rgba(107,155,120,0.05);
+  line-height: 1;
+  pointer-events: none;
+  letter-spacing: -0.04em;
+}
+
+.role-pill {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 7px 16px;
+  border-radius: 20px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  margin-bottom: 36px;
+  width: fit-content;
+}
+
+.pill-therapy {
+  background: rgba(107,155,120,0.12);
+  border: 1px solid rgba(107,155,120,0.3);
+  color: #92c4a2;
+}
+
+.pill-therapy::before {
+  content: '';
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--sage);
+  box-shadow: 0 0 6px var(--sage);
+}
+
+.hero-left h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 3.8rem;
+  font-weight: 300;
+  line-height: 1.1;
+  color: white;
+  margin-bottom: 28px;
+}
+
+.hero-left h1 em {
+  font-style: italic;
+  color: #92c4a2;
+}
+
+.hero-left p {
+  font-size: 1rem;
+  font-weight: 300;
+  line-height: 1.9;
+  color: var(--muted-light);
+  max-width: 440px;
+}
+
+.hero-divider {
+  position: absolute;
+  right: 0; top: 0; bottom: 0;
+  width: 1px;
+  background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.12) 30%, rgba(255,255,255,0.12) 70%, transparent);
+  z-index: 2;
+}
+
+/* right – pole side, warmer darker */
+.hero-right {
+  background: var(--warm-dark);
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 96px 72px;
+  position: relative; overflow: hidden;
+}
+
+.hero-right::before {
+  content: 'FLOW';
+  position: absolute;
+  bottom: -30px; right: -10px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 14rem;
+  font-weight: 700;
+  color: rgba(212,131,74,0.05);
+  line-height: 1;
+  pointer-events: none;
+  letter-spacing: -0.04em;
+}
+
+.pill-pole {
+  background: rgba(212,131,74,0.1);
+  border: 1px solid rgba(212,131,74,0.28);
+  color: #e8a870;
+}
+
+.pill-pole::before {
+  content: '';
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--pole-orange);
+  box-shadow: 0 0 6px var(--pole-orange);
+}
+
+.hero-right h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 3.8rem;
+  font-weight: 300;
+  line-height: 1.1;
+  color: white;
+  margin-bottom: 28px;
+}
+
+.hero-right h2 em {
+  font-style: italic;
+  color: #e8a870;
+}
+
+.hero-right p {
+  font-size: 1rem;
+  font-weight: 300;
+  line-height: 1.9;
+  color: var(--muted-light);
+  max-width: 440px;
+}
+
+/* ── BRIDGE ── */
+.bridge {
+  background: var(--cream);
+  padding: 96px 80px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+
+.bridge-quote-col {
+  position: relative;
+}
+
+.bridge-quote-col::before {
+  content: '"';
+  position: absolute;
+  top: -60px; left: -20px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 16rem;
+  color: rgba(0,0,0,0.05);
+  line-height: 1;
+  pointer-events: none;
+}
+
+.bridge-quote-col blockquote {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.1rem;
+  font-weight: 300;
+  font-style: italic;
+  color: var(--black);
+  line-height: 1.55;
+  position: relative; z-index: 1;
+  margin-bottom: 20px;
+}
+
+.bridge-quote-col cite {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--terra);
+  font-style: normal;
+}
+
+.bridge-text-col { display: flex; flex-direction: column; gap: 20px; }
+
+.bridge-text-col p {
+  font-size: 1.02rem;
+  font-weight: 300;
+  line-height: 1.9;
+  color: #5A4E46;
+}
+
+.bridge-text-col p strong {
+  color: var(--black);
+  font-weight: 600;
+}
+
+/* ── STORY SECTION ── */
+.story-section {
+  background: var(--near-black);
+  padding: 0;
+}
+
+.story-block {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 520px;
+}
+
+.story-block.reverse { direction: rtl; }
+.story-block.reverse > * { direction: ltr; }
+
+.story-visual {
+  display: flex; align-items: center; justify-content: center;
+  padding: 80px 60px;
+  position: relative; overflow: hidden;
+}
+
+.story-visual-therapy {
+  background: linear-gradient(145deg, #1d2e22, #2e4a38);
+}
+
+.story-visual-pole {
+  background: linear-gradient(145deg, #2e1a0a, #4a2c10);
+}
+
+.story-visual-dual {
+  background: linear-gradient(145deg, #1a1c2e, #2e2a1a);
+}
+
+.story-visual-inner {
+  text-align: center;
+  position: relative; z-index: 1;
+}
+
+.sv-icon {
+  font-size: 5rem;
+  display: block;
+  margin-bottom: 20px;
+  filter: drop-shadow(0 0 24px rgba(255,255,255,0.1));
+}
+
+.sv-label {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.6rem;
+  font-weight: 400;
+  color: white;
+  margin-bottom: 8px;
+}
+
+.sv-sub {
+  font-size: 0.75rem;
+  font-weight: 300;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.4);
+}
+
+.story-text-block {
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 80px 72px;
+}
+
+.story-eyebrow {
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  margin-bottom: 18px;
+  display: flex; align-items: center; gap: 10px;
+}
+
+.story-eyebrow::before { content: ''; width: 22px; height: 1.5px; }
+
+.ey-sage { color: #92c4a2; }
+.ey-sage::before { background: #92c4a2; }
+.ey-orange { color: #e8a870; }
+.ey-orange::before { background: #e8a870; }
+.ey-gold { color: var(--gold); }
+.ey-gold::before { background: var(--gold); }
+
+.story-text-block h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.6rem;
+  font-weight: 300;
+  line-height: 1.2;
+  color: white;
+  margin-bottom: 24px;
+}
+
+.story-text-block h2 em { font-style: italic; }
+.em-sage { color: #92c4a2; }
+.em-orange { color: #e8a870; }
+.em-gold { color: var(--gold); }
+
+.story-text-block p {
+  font-size: 0.97rem;
+  font-weight: 300;
+  line-height: 1.9;
+  color: var(--muted-light);
+  margin-bottom: 16px;
+}
+
+.story-text-block p:last-child { margin-bottom: 0; }
+
+/* ── THE BRIDGE PHILOSOPHY ── */
+.philosophy {
+  background: var(--black);
+  padding: 96px 80px;
+  text-align: center;
+  position: relative; overflow: hidden;
+}
+
+.philosophy::before {
+  content: '✦';
+  position: absolute; top: 40px; left: 50%;
+  transform: translateX(-50%);
+  font-size: 8rem;
+  color: rgba(255,255,255,0.02);
+  pointer-events: none;
+}
+
+.philosophy h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.8rem;
+  font-weight: 300;
+  color: white;
+  margin-bottom: 24px;
+  line-height: 1.2;
+  position: relative; z-index: 1;
+}
+
+.philosophy h2 em { font-style: italic; color: var(--gold); }
+
+.philosophy > p {
+  font-size: 1.05rem;
+  font-weight: 300;
+  line-height: 1.9;
+  color: var(--muted-light);
+  max-width: 700px;
+  margin: 0 auto 60px;
+  position: relative; z-index: 1;
+}
+
+.philosophy-pillars {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.pillar {
+  background: var(--black);
+  padding: 48px 36px;
+  text-align: left;
+  position: relative;
+  overflow: hidden;
+  transition: background 0.2s;
+}
+
+.pillar:hover { background: rgba(255,255,255,0.02); }
+
+.pillar::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  transition: opacity 0.2s;
+}
+
+.pillar-1::after { background: var(--sage); }
+.pillar-2::after { background: var(--pole-orange); }
+.pillar-3::after { background: var(--gold); }
+
+.pillar-icon { font-size: 2rem; margin-bottom: 18px; }
+
+.pillar h4 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 14px;
+}
+
+.pillar p {
+  font-size: 0.9rem;
+  font-weight: 300;
+  line-height: 1.85;
+  color: var(--muted-light);
+}
+
+/* ── SERVICES OFFERED ── */
+.services-band {
+  background: var(--warm-dark);
+  padding: 96px 80px;
+}
+
+.sb-header { margin-bottom: 60px; }
+
+.sb-header h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.8rem;
+  font-weight: 300;
+  color: white;
+  margin-top: 12px;
+  line-height: 1.15;
+}
+
+.sb-header h2 em { font-style: italic; color: var(--pole-orange); }
+
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.svc-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 36px 28px;
+  transition: background 0.2s, border-color 0.2s;
+  cursor: default;
+  position: relative;
+  overflow: hidden;
+}
+
+.svc-card::before {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0;
+  width: 0; height: 2px;
+  transition: width 0.35s ease;
+}
+
+.svc-card:hover { background: rgba(255,255,255,0.05); }
+.svc-card:hover::before { width: 100%; }
+
+.sc-therapy::before { background: var(--sage); }
+.sc-therapy:hover { border-color: rgba(107,155,120,0.3); }
+
+.sc-pole::before { background: var(--pole-orange); }
+.sc-pole:hover { border-color: rgba(212,131,74,0.3); }
+
+.sc-train::before { background: var(--gold); }
+.sc-train:hover { border-color: rgba(200,160,92,0.3); }
+
+.svc-icon { font-size: 1.6rem; margin-bottom: 16px; }
+
+.svc-card h4 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 10px;
+}
+
+.svc-card p {
+  font-size: 0.88rem;
+  font-weight: 300;
+  line-height: 1.8;
+  color: var(--muted-light);
+}
+
+/* ── CREDENTIALS STRIP ── */
+.creds-strip {
+  background: var(--mid);
+  padding: 72px 80px;
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+  gap: 72px;
+  align-items: center;
+}
+
+.creds-strip h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.4rem;
+  font-weight: 300;
+  color: white;
+  line-height: 1.2;
+}
+
+.creds-strip h2 em { font-style: italic; color: var(--gold); }
+
+.creds-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+}
+
+.cred-group h5 {
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 12px;
+}
+
+.cred-group ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+
+.cred-group ul li {
+  font-size: 0.88rem;
+  font-weight: 300;
+  color: var(--muted-light);
+  padding-left: 16px;
+  position: relative;
+  line-height: 1.5;
+}
+
+.cred-group ul li::before {
+  content: '–';
+  position: absolute; left: 0;
+  color: var(--pole-orange);
+}
+
+/* ── CTA FINAL ── */
+.final-cta {
+  background: var(--cream);
+  padding: 96px 80px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+
+.fca-left h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 3.2rem;
+  font-weight: 300;
+  line-height: 1.15;
+  color: var(--black);
+  margin-bottom: 20px;
+}
+
+.fca-left h2 em { font-style: italic; color: var(--terra); }
+
+.fca-left p {
+  font-size: 1rem;
+  font-weight: 300;
+  line-height: 1.9;
+  color: #5A4E46;
+  margin-bottom: 36px;
+}
+
+.cta-btns { display: flex; gap: 14px; flex-wrap: wrap; }
+
+.btn {
+  display: inline-block;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 14px 28px;
+  border-radius: 2px;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+  transition: all 0.22s;
+}
+
+.btn-terra { background: var(--terra); color: white; }
+.btn-terra:hover { background: var(--black); }
+.btn-outline-dark { background: transparent; border: 1.5px solid rgba(0,0,0,0.25); color: var(--black); }
+.btn-outline-dark:hover { border-color: var(--black); background: var(--black); color: white; }
+
+.fca-right {
+  display: flex; flex-direction: column; gap: 16px;
+}
+
+.contact-card {
+  background: white;
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 4px;
+  padding: 24px 28px;
+  display: flex; align-items: flex-start; gap: 16px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+  transition: box-shadow 0.2s;
+}
+
+.contact-card:hover { box-shadow: 0 4px 24px rgba(0,0,0,0.1); }
+
+.cc-icon {
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.cc-icon-therapy { background: rgba(107,155,120,0.12); }
+.cc-icon-pole { background: rgba(212,131,74,0.1); }
+.cc-icon-sms { background: rgba(200,160,92,0.1); }
+
+.cc-body h5 {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted-dark);
+  margin-bottom: 4px;
+}
+
+.cc-body p { font-size: 0.9rem; font-weight: 400; color: var(--black); }
+
+.cc-body span { font-size: 0.8rem; font-weight: 300; color: var(--muted-dark); }
+
+/* ── FORM SECTION ── */
+.form-section {
+  background: var(--near-black);
+  padding: 80px;
+}
+
+.form-section h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.2rem;
+  font-weight: 300;
+  color: white;
+  margin-bottom: 48px;
+  text-align: center;
+}
+
+.form-wrap {
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+.fg { margin-bottom: 20px; }
+
+.fg label {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted-light);
+  margin-bottom: 7px;
+}
+
+.fg input, .fg select, .fg textarea {
+  width: 100%;
+  padding: 13px 15px;
+  border: 1.5px solid rgba(255,255,255,0.1);
+  border-radius: 2px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.92rem;
+  font-weight: 300;
+  color: white;
+  background: rgba(255,255,255,0.04);
+  outline: none;
+  appearance: none;
+  transition: border-color 0.2s;
+}
+
+.fg input:focus, .fg select:focus, .fg textarea:focus { border-color: var(--terra); }
+.fg textarea { height: 110px; resize: none; }
+.fg select option { background: #1a1209; }
+
+.fg-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+.sms-opt {
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: 14px;
+  background: rgba(192,96,64,0.07);
+  border: 1px solid rgba(192,96,64,0.2);
+  border-radius: 3px;
+  margin-bottom: 22px;
+}
+
+.sms-opt input { width: auto; accent-color: var(--terra); margin-top: 2px; }
+.sms-opt span { font-size: 0.8rem; font-weight: 300; color: var(--muted-light); line-height: 1.65; }
+.sms-opt strong { color: #e08060; font-weight: 500; }
+
+.btn-terra-full {
+  width: 100%;
+  background: var(--terra);
+  color: white;
+  padding: 15px;
+  border-radius: 2px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border: none;
+  transition: background 0.2s;
+}
+
+.btn-terra-full:hover { background: white; color: var(--black); }
+
+/* ── FOOTER ── */
+footer {
+  background: #09070504;
+  background: #070503;
+  padding: 48px 80px 24px;
+  border-top: 1px solid var(--border);
+}
+
+.ft-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.ft-brand {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: white;
+  letter-spacing: 0.06em;
+}
+
+.ft-dots { display: flex; gap: 8px; align-items: center; margin-top: 4px; }
+
+.ft-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+}
+
+.ft-dot-sage { background: var(--sage); }
+.ft-dot-orange { background: var(--pole-orange); }
+
+.ft-tagline {
+  font-size: 0.7rem;
+  font-weight: 300;
+  letter-spacing: 0.14em;
+  color: rgba(255,255,255,0.3);
+  margin-top: 2px;
+}
+
+.ft-links { display: flex; gap: 28px; }
+
+.ft-links a {
+  font-size: 0.74rem;
+  font-weight: 300;
+  color: rgba(255,255,255,0.35);
+  text-decoration: none;
+  transition: color 0.2s;
+  cursor: pointer;
+}
+
+.ft-links a:hover { color: var(--gold); }
+
+.ft-copy {
+  width: 100%;
+  font-size: 0.72rem;
+  font-weight: 300;
+  color: rgba(255,255,255,0.18);
+  padding-top: 20px;
+  margin-top: 20px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ft-copy a {
+  color: rgba(200,160,92,0.45);
+  text-decoration: none;
+  font-size: 0.68rem;
+  transition: color 0.2s;
+}
+
+.ft-copy a:hover { color: var(--gold); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 960px) {
+  nav { padding: 0 24px; }
+  .nav-right .nav-link { display: none; }
+  .hero, .bridge, .final-cta { grid-template-columns: 1fr; }
+  .story-block { grid-template-columns: 1fr; }
+  .story-block.reverse { direction: ltr; }
+  .story-visual { min-height: 220px; }
+  .philosophy-pillars { grid-template-columns: 1fr; }
+  .services-grid { grid-template-columns: 1fr; }
+  .creds-strip { grid-template-columns: 1fr; }
+  .creds-list { grid-template-columns: 1fr; }
+  .hero-left, .hero-right { padding: 60px 28px; }
+  .bridge { padding: 56px 28px; gap: 40px; }
+  .story-text-block { padding: 56px 28px; }
+  .philosophy { padding: 56px 28px; }
+  .services-band { padding: 56px 28px; }
+  .creds-strip { padding: 56px 28px; }
+  .final-cta { padding: 56px 28px; gap: 40px; }
+  .form-section { padding: 56px 28px; }
+  footer { padding: 40px 24px 20px; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-left">
+    <div class="nav-dot-therapy"></div>
+    <div class="nav-dot-pole"></div>
+    <span class="nav-name">Adrianne Martin</span>
+  </div>
+  <div class="nav-right">
+    <a class="nav-link" href="https://anudaytherapy.com" target="_blank">Therapy</a>
+    <a class="nav-link" href="https://www.freeflowfitnessstl.com" target="_blank">Free Flow Fitness</a>
+    <button class="nav-cta" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">Get in Touch</button>
+  </div>
+</nav>
+
+<!-- ══════ HERO SPLIT ══════ -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="role-pill pill-therapy">Licensed Clinical Social Worker</div>
+    <h1>She Helps You<br><em>Heal the Mind.</em></h1>
+    <p>As an LCSW in private practice, Adrianne specializes in suicidal ideation, self-harm, crisis counseling, and relational healing — using evidence-based care and deep, genuine compassion to help clients build lives worth living.</p>
+  </div>
+
+  <div class="hero-divider"></div>
+
+  <div class="hero-right">
+    <div class="role-pill pill-pole">Pole Dance & Fitness Instructor</div>
+    <h2>She Helps You<br><em>Free the Body.</em></h2>
+    <p>As the founder of Free Flow Fitness in Bridgeton, MO, Adrianne teaches pole dancing, twerk, burlesque, and movement — creating a space where women of every background discover physical strength and unapologetic confidence.</p>
+  </div>
+</section>
+
+<!-- ══════ BRIDGE ══════ -->
+<section class="bridge">
+  <div class="bridge-quote-col">
+    <blockquote>"Avoiding your triggers isn't healing. Healing happens when you're triggered and you're able to move through the pain, the pattern, and the story — and walk your way to a different ending."</blockquote>
+    <cite>Vienna Pharaon — A guiding philosophy at A Nu Day</cite>
+  </div>
+  <div class="bridge-text-col">
+    <p>To most people, <strong>"licensed therapist"</strong> and <strong>"pole dance instructor"</strong> don't belong in the same sentence. Adrianne has spent her career proving otherwise.</p>
+    <p>The truth is, both worlds are rooted in the same belief: <strong>that people have the right to heal on their own terms, in their own bodies, in their own way.</strong> Mental health work and movement aren't opposites — they're partners.</p>
+    <p>Adrianne's background in the creative and performing arts shaped her long before she became a clinician. She knows what it means to use a body as a vehicle for expression, release, and transformation. That knowledge lives in every therapy session and every class she teaches.</p>
+  </div>
+</section>
+
+<!-- ══════ STORY BLOCKS ══════ -->
+<section class="story-section">
+
+  <!-- Block 1: The Therapist -->
+  <div class="story-block">
+    <div class="story-visual story-visual-therapy">
+      <div class="story-visual-inner">
+        <span class="sv-icon">🌿</span>
+        <div class="sv-label">A Nu Day Therapy</div>
+        <div class="sv-sub">MSW · LCSW · Washington University</div>
+      </div>
+    </div>
+    <div class="story-text-block">
+      <div class="story-eyebrow ey-sage">The Therapist</div>
+      <h2>Trained to Hold<br><em class="em-sage">the Hardest Stories</em></h2>
+      <p>Adrianne earned her Master of Social Work from Washington University in St. Louis — one of the top social work programs in the country. She built her clinical career working in crisis care facilities, psychiatric units, residential settings, and suicide prevention hotlines.</p>
+      <p>She specializes in people who are navigating thoughts of suicide and self-harm — a population many clinicians find difficult to serve. For Adrianne, it's a calling. She uses Dialectical Behavior Therapy groups, individual counseling, couples therapy, and expressive arts techniques to meet clients where they are and help them build skills to stay.</p>
+      <p>She also trains other professionals — teaching Applied Suicide Intervention Skills, crisis response, and trauma-informed care to teams and organizations who want to be better equipped for the hardest moments.</p>
+    </div>
+  </div>
+
+  <!-- Block 2: The Instructor -->
+  <div class="story-block reverse">
+    <div class="story-visual story-visual-pole">
+      <div class="story-visual-inner">
+        <span class="sv-icon">✨</span>
+        <div class="sv-label">Free Flow Fitness</div>
+        <div class="sv-sub">Pole · Dance · Body Confidence · Bridgeton, MO</div>
+      </div>
+    </div>
+    <div class="story-text-block">
+      <div class="story-eyebrow ey-orange">The Instructor</div>
+      <h2>Reclaiming Power<br><em class="em-orange">Through Movement</em></h2>
+      <p>Free Flow Fitness isn't just a studio — it's a philosophy made physical. Adrianne built it as a space where women of every shape, size, background, and athletic ability can walk in uncertain and leave transformed.</p>
+      <p>She teaches pole dancing, twerk fitness, burlesque, heels and exotic flow, Pilates, and movement therapy classes — all rooted in the idea that <em>your body is not a problem to be fixed, it's a power to be claimed.</em></p>
+      <p>The transparency matters to her. She is openly, proudly a pole dance instructor and an LCSW. She doesn't separate them because they aren't separate. The same belief in bodily autonomy and personal freedom that makes her a great fitness instructor makes her a great therapist — and vice versa.</p>
+    </div>
+  </div>
+
+  <!-- Block 3: The Bridge -->
+  <div class="story-block">
+    <div class="story-visual story-visual-dual">
+      <div class="story-visual-inner">
+        <span class="sv-icon">💫</span>
+        <div class="sv-label">Where They Meet</div>
+        <div class="sv-sub">Dance/Movement Therapy · Expressive Arts · Body-Based Healing</div>
+      </div>
+    </div>
+    <div class="story-text-block">
+      <div class="story-eyebrow ey-gold">The Intersection</div>
+      <h2>Why the <em class="em-gold">Body Matters</em><br>in the Healing Room</h2>
+      <p>Adrianne holds advanced training in Dance/Movement Therapy and Expressive Arts & Integrative Therapies — certifications that formalize what she already knew intuitively: <strong>the body holds what the mind can't always say out loud.</strong></p>
+      <p>Trauma lives in the nervous system. Shame lives in posture. Grief lives in breath. And sometimes the most direct path to healing is through movement — not around it. That's why Adrianne integrates body-based techniques directly into her clinical practice, not as an add-on, but as a core modality.</p>
+      <p>She is a member of both the <strong>American Association of Suicidology</strong> and the <strong>American Dance Therapy Association</strong> — two professional worlds that rarely overlap, held together by one person who refuses to choose between them.</p>
+    </div>
+  </div>
+
+</section>
+
+<!-- ══════ PHILOSOPHY ══════ -->
+<section class="philosophy">
+  <div class="story-eyebrow ey-gold" style="justify-content:center; margin-bottom:20px;">Her Approach</div>
+  <h2>The Belief Behind<br><em>All of It</em></h2>
+  <p>Adrianne's work — in the therapy room and in the studio — is built on a single conviction: that every person has the right to define their own healing and inhabit their own body, fully and on their own terms. She calls this "Nu" — the statistical symbol for degrees of freedom.</p>
+
+  <div class="philosophy-pillars">
+    <div class="pillar pillar-1">
+      <div class="pillar-icon">🧠</div>
+      <h4>No Cookie-Cutter Therapy</h4>
+      <p>There is no one-size-fits-all approach to mental health. Adrianne blends DBT, CBT, Emotionally Focused Therapy, ACT, Motivational Interviewing, and expressive arts to find the combination that works for each individual — not a formula, but a conversation.</p>
+    </div>
+    <div class="pillar pillar-2">
+      <div class="pillar-icon">💃</div>
+      <h4>The Body Is Not Separate</h4>
+      <p>Western mental health has long tried to treat the mind as if it floats above the body. Adrianne rejects that. She teaches her clients to re-enter their bodies as acts of healing — and she teaches her studio students to re-enter their bodies as acts of power. Both are medicine.</p>
+    </div>
+    <div class="pillar pillar-3">
+      <div class="pillar-icon">✦</div>
+      <h4>Transparency Is Strength</h4>
+      <p>Adrianne is transparent about who she is — publicly and unapologetically. She is an LCSW and a pole dance instructor. She believes hiding parts of yourself is the opposite of what she teaches clients to do. The full picture of who she is makes her more effective, not less credible.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ SERVICES ══════ -->
+<section class="services-band">
+  <div class="sb-header">
+    <div class="story-eyebrow ey-orange">What She Offers</div>
+    <h2>Two Worlds.<br><em>One Point of Contact.</em></h2>
+  </div>
+
+  <div class="services-grid">
+    <div class="svc-card sc-therapy">
+      <div class="svc-icon">🧠</div>
+      <h4>Individual Therapy</h4>
+      <p>Person-centered, strengths-based sessions for depression, anxiety, self-esteem, suicidal thoughts, and self-harm behaviors. Specializing in youth, adolescents, and adult women.</p>
+    </div>
+    <div class="svc-card sc-therapy">
+      <div class="svc-icon">💑</div>
+      <h4>Couples Counseling</h4>
+      <p>Using Emotionally Focused Therapy and Motivational Interviewing to help couples repair ruptures and build lasting connection grounded in real safety.</p>
+    </div>
+    <div class="svc-card sc-therapy">
+      <div class="svc-icon">🤝</div>
+      <h4>DBT Groups & Crisis Support</h4>
+      <p>Co-facilitating Dialectical Behavior Therapy groups for suicidal ideation and self-harm. Teaching practical skills to manage emotions and create a life worth living.</p>
+    </div>
+    <div class="svc-card sc-pole">
+      <div class="svc-icon">🎡</div>
+      <h4>Pole & Dance Fitness Classes</h4>
+      <p>Pole dancing, twerk, burlesque, heels, Pilates, and movement therapy classes at Free Flow Fitness — Bridgeton, MO. All levels. All bodies. Always welcome.</p>
+    </div>
+    <div class="svc-card sc-pole">
+      <div class="svc-icon">🎂</div>
+      <h4>Private Studio Events</h4>
+      <p>Bachelorettes, birthday parties, bridal showers, girls' nights, and team events at the Free Flow Fitness studio. An experience that's empowering, not just entertaining.</p>
+    </div>
+    <div class="svc-card sc-train">
+      <div class="svc-icon">🏛️</div>
+      <h4>Professional Training & Consultation</h4>
+      <p>Suicide Awareness & Prevention, ASIST training, Crisis Intervention, Career Coaching, and Trauma-Informed Care Business Consultation for organizations and clinical teams.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ CREDENTIALS ══════ -->
+<section class="creds-strip">
+  <h2>Credentials<br>&amp; <em>Affiliations</em></h2>
+  <div class="creds-list">
+    <div class="cred-group">
+      <h5>Clinical Education</h5>
+      <ul>
+        <li>Master of Social Work — Washington University in St. Louis</li>
+        <li>Clinical Specialization</li>
+        <li>Licensed Clinical Social Worker (LCSW)</li>
+        <li>Applied Suicide Intervention Skills Training Facilitator</li>
+        <li>Nurturing Parenting Facilitator</li>
+      </ul>
+    </div>
+    <div class="cred-group">
+      <h5>Advanced Training</h5>
+      <ul>
+        <li>Crisis Intervention</li>
+        <li>Dialectical Behavioral Therapy</li>
+        <li>Dance Movement Therapy</li>
+        <li>Expressive Arts and Integrative Therapies</li>
+        <li>Acceptance and Commitment Therapy</li>
+        <li>Emotionally Focused Therapy</li>
+      </ul>
+    </div>
+    <div class="cred-group">
+      <h5>Professional Affiliations</h5>
+      <ul>
+        <li>American Association of Suicidology</li>
+        <li>American Dance Therapy Association</li>
+      </ul>
+    </div>
+    <div class="cred-group">
+      <h5>Studio & Movement</h5>
+      <ul>
+        <li>Pole Dance & Fitness Instructor Certification</li>
+        <li>Founder — Free Flow Fitness, Bridgeton, MO</li>
+        <li>Background in Creative & Performing Arts</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ CTA ══════ -->
+<section class="final-cta" id="contact">
+  <div class="fca-left">
+    <h2>Ready to Take<br>Your <em>Nu Day?</em></h2>
+    <p>Whether you're looking for therapy, career coaching for your clinical practice, a trauma-informed consultation for your organization, or want to book a class or party at Free Flow Fitness — Adrianne's work starts with a conversation.</p>
+    <div class="cta-btns">
+      <a href="https://anudaytherapy.com/get-in-touch" target="_blank" class="btn btn-terra">Book a Therapy Session</a>
+      <a href="https://www.freeflowfitnessstl.com" target="_blank" class="btn btn-outline-dark">Visit Free Flow Fitness</a>
+    </div>
+  </div>
+  <div class="fca-right">
+    <div class="contact-card">
+      <div class="cc-icon cc-icon-therapy">🌿</div>
+      <div class="cc-body">
+        <h5>A Nu Day Therapy</h5>
+        <p>636-896-5867</p>
+        <span>Individual · Couples · Group · Crisis · Training</span>
+      </div>
+    </div>
+    <div class="contact-card">
+      <div class="cc-icon cc-icon-pole">💃</div>
+      <div class="cc-body">
+        <h5>Free Flow Fitness</h5>
+        <p>314-625-2323</p>
+        <span>11726 St. Charles Rock Rd, Ste A · Bridgeton, MO 63044</span>
+      </div>
+    </div>
+    <div class="contact-card">
+      <div class="cc-icon cc-icon-sms">📱</div>
+      <div class="cc-body">
+        <h5>SMS Auto-Response</h5>
+        <p>Text either number</p>
+        <span>Replies within minutes · Powered by GoElev8.ai</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ FORM ══════ -->
+<section class="form-section">
+  <h2>Send a Message Directly</h2>
+  <div class="form-wrap">
+    <div class="fg fg-row">
+      <div class="fg"><label>First Name</label><input type="text" placeholder="First name" /></div>
+      <div class="fg"><label>Last Name</label><input type="text" placeholder="Last name" /></div>
+    </div>
+    <div class="fg"><label>Email</label><input type="email" placeholder="you@email.com" /></div>
+    <div class="fg"><label>Phone Number</label><input type="tel" placeholder="(314) 000-0000" /></div>
+    <div class="fg">
+      <label>I'm reaching out about…</label>
+      <select>
+        <option value="">Select an option</option>
+        <optgroup label="Therapy Services">
+          <option>Individual Therapy</option>
+          <option>Couples Counseling</option>
+          <option>DBT Group / Crisis Support</option>
+          <option>Career Coaching</option>
+          <option>Mental Health Training for My Team</option>
+          <option>Trauma-Informed Care Consultation</option>
+          <option>Clinical Consultation (Challenging Client)</option>
+        </optgroup>
+        <optgroup label="Free Flow Fitness">
+          <option>Pole or Dance Classes</option>
+          <option>Private Party Booking</option>
+          <option>General Studio Question</option>
+        </optgroup>
+      </select>
+    </div>
+    <div class="fg"><label>Message</label><textarea placeholder="Tell me what you're looking for…"></textarea></div>
+    <div class="sms-opt">
+      <input type="checkbox" id="sms" checked />
+      <label for="sms"><span><strong>📲 Text me back.</strong> I'd like to receive responses and reminders via SMS. Reply STOP anytime.</span></label>
+    </div>
+    <button class="btn-terra-full">Send Message</button>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="ft-inner">
+    <div>
+      <div class="ft-brand">Adrianne Martin</div>
+      <div class="ft-dots">
+        <div class="ft-dot ft-dot-sage"></div>
+        <div class="ft-dot ft-dot-orange"></div>
+      </div>
+      <div class="ft-tagline">LCSW · Pole Instructor · St. Louis, MO</div>
+    </div>
+    <div class="ft-links">
+      <a href="https://anudaytherapy.com" target="_blank">A Nu Day Therapy</a>
+      <a href="https://www.freeflowfitnessstl.com" target="_blank">Free Flow Fitness</a>
+      <a onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">Contact</a>
+    </div>
+  </div>
+  <div class="ft-copy">
+    <span>© 2026 Adrianne Martin · A Nu Day Therapy · Free Flow Fitness · All rights reserved.</span>
+    <a href="https://goelev8.ai" target="_blank">Powered by GoElev8.ai</a>
+  </div>
+</footer>
+
+</body>
+</html>

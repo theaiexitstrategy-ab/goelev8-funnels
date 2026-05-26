@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- © 2026 GoElev8.ai | Aaron Bryant. All rights reserved. Unauthorized use prohibited. -->
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Corine | A Nu Day Therapy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+<style>
+:root{--cream:#F6F2EC;--warm-white:#FDFAF6;--sage:#6B9478;--deep-sage:#3E5E4A;--terra:#B85C42;--gold:#C4A05A;--charcoal:#28231F;--warm-gray:#857870;--border:rgba(0,0,0,0.09);--accent:#9E7A6B;--accent-dark:#5E3E28;--accent-bg:rgba(158,122,107,0.09);}
+*{margin:0;padding:0;box-sizing:border-box;}html{scroll-behavior:smooth;}
+body{font-family:'Lato',sans-serif;background:var(--cream);color:var(--charcoal);overflow-x:hidden;}
+nav{position:fixed;top:0;left:0;width:100%;z-index:999;height:66px;display:flex;align-items:center;justify-content:space-between;padding:0 52px;background:rgba(246,242,236,0.96);backdrop-filter:blur(12px);border-bottom:1px solid rgba(107,148,120,0.2);}
+.nav-logo{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:600;letter-spacing:.07em;color:var(--charcoal);text-decoration:none;}
+.nav-logo span{color:var(--deep-sage);}
+.nav-links{display:flex;align-items:center;gap:32px;list-style:none;}
+.nav-links a{font-size:.73rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--warm-gray);text-decoration:none;cursor:pointer;transition:color .2s;}
+.nav-links a:hover{color:var(--deep-sage);}
+.nav-back::before{content:'← ';}
+.nav-cta{background:var(--accent-dark);color:white!important;padding:10px 22px;border-radius:2px;}
+.nav-cta:hover{background:var(--charcoal)!important;}
+
+.profile-hero{display:grid;grid-template-columns:480px 1fr;min-height:calc(100vh - 66px);margin-top:66px;}
+.hero-visual{background:linear-gradient(160deg,#3E2418,#5E3E28 50%,#8A6048);display:flex;flex-direction:column;justify-content:flex-end;padding:64px 52px;position:relative;overflow:hidden;}
+.hero-visual::before{content:'C';position:absolute;top:-30px;right:-20px;font-family:'Cormorant Garamond',serif;font-size:22rem;font-weight:700;color:rgba(255,255,255,.04);line-height:1;pointer-events:none;}
+.hero-avatar{font-size:7rem;margin-bottom:28px;filter:drop-shadow(0 8px 24px rgba(0,0,0,.3));position:relative;z-index:1;}
+.hero-visual h1{font-family:'Cormorant Garamond',serif;font-size:2.6rem;font-weight:600;color:white;margin-bottom:6px;position:relative;z-index:1;line-height:1.1;}
+.hero-cred{font-size:.7rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:22px;position:relative;z-index:1;}
+.hero-tags{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:28px;position:relative;z-index:1;}
+.htag{padding:5px 13px;border-radius:20px;font-size:.66rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;border:1px solid rgba(255,255,255,.22);color:rgba(255,255,255,.7);background:rgba(255,255,255,.06);}
+.avail-strip{display:flex;align-items:center;gap:8px;font-size:.78rem;font-weight:300;color:rgba(255,255,255,.65);position:relative;z-index:1;}
+.avail-strip .dot{width:8px;height:8px;border-radius:50%;background:#6eda8b;box-shadow:0 0 8px #6eda8b;flex-shrink:0;}
+
+.hero-content{background:var(--warm-white);padding:80px 72px;display:flex;flex-direction:column;justify-content:center;}
+.eyebrow{font-size:.66rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);display:flex;align-items:center;gap:10px;margin-bottom:18px;}
+.eyebrow::before{content:'';width:22px;height:1.5px;background:var(--accent);}
+.hero-content h2{font-family:'Cormorant Garamond',serif;font-size:2.8rem;font-weight:300;color:var(--charcoal);line-height:1.2;margin-bottom:24px;}
+.hero-content h2 em{font-style:italic;color:var(--accent);}
+.hero-content p{font-size:1rem;font-weight:300;line-height:1.9;color:var(--warm-gray);margin-bottom:16px;}
+.hero-content p strong{color:var(--charcoal);font-weight:700;}
+.hero-content p em{font-style:italic;}
+.highlight-box{background:rgba(158,122,107,.09);border:1px solid rgba(158,122,107,.22);border-radius:3px;padding:20px 24px;margin-top:24px;}
+.highlight-box p{font-size:.95rem;font-weight:400;color:var(--charcoal);line-height:1.75;margin:0;}
+.highlight-box strong{color:var(--accent-dark);}
+
+.pull-quote{border-left:3px solid var(--accent);padding:20px 24px;background:var(--accent-bg);border-radius:0 3px 3px 0;margin:28px 0;}
+.pq-label{font-size:.62rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--warm-gray);margin-bottom:8px;}
+.pull-quote p{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-style:italic;color:var(--charcoal);line-height:1.7;font-weight:400;}
+
+.specialties-section{background:white;padding:72px 80px;}
+.section-title{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;color:var(--charcoal);margin-bottom:40px;}
+.section-title em{font-style:italic;color:var(--accent);}
+.spec-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);}
+.spec-card{background:white;padding:32px 28px;transition:background .2s;position:relative;overflow:hidden;}
+.spec-card:hover{background:var(--warm-white);}
+.spec-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .3s;}
+.spec-card:hover::after{transform:scaleX(1);}
+.sc-icon{font-size:1.6rem;margin-bottom:12px;}
+.spec-card h4{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:600;color:var(--charcoal);margin-bottom:8px;}
+.spec-card p{font-size:.86rem;font-weight:300;line-height:1.8;color:var(--warm-gray);}
+
+.background-section{background:var(--cream);padding:72px 80px;display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:start;}
+.bg-col h3{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:400;color:var(--charcoal);margin-bottom:20px;}
+.bg-col p{font-size:.95rem;font-weight:300;line-height:1.9;color:var(--warm-gray);margin-bottom:14px;}
+.bg-col p strong{color:var(--charcoal);font-weight:700;}
+.modalities-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;}
+.mod-pill{padding:6px 14px;border:1px solid rgba(158,122,107,.28);border-radius:20px;font-size:.75rem;font-weight:700;letter-spacing:.08em;color:var(--accent);}
+
+.lead-section{background:linear-gradient(160deg,#3E2418,#5E3E28);padding:80px;}
+.lead-inner{display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center;max-width:1100px;margin:0 auto;}
+.lead-text h2{font-family:'Cormorant Garamond',serif;font-size:2.6rem;font-weight:300;color:white;line-height:1.2;margin-bottom:14px;}
+.lead-text h2 em{font-style:italic;color:#e8c4a8;}
+.lead-text p{font-size:.97rem;font-weight:300;color:rgba(255,255,255,.62);line-height:1.85;margin-bottom:28px;}
+.lead-text .phone{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:400;color:white;}
+.lead-text .phone span{font-size:.68rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.4);display:block;margin-bottom:4px;}
+.lead-form{background:var(--warm-white);border-radius:4px;padding:40px 36px;}
+.lead-form h3{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:400;color:var(--charcoal);margin-bottom:5px;}
+.lead-form .fsub{font-size:.82rem;font-weight:300;color:var(--warm-gray);margin-bottom:24px;}
+.fg{margin-bottom:16px;}
+.fg label{display:block;font-size:.66rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--warm-gray);margin-bottom:6px;}
+.fg input,.fg select,.fg textarea{width:100%;padding:11px 13px;border:1.5px solid rgba(0,0,0,.11);border-radius:2px;font-family:'Lato',sans-serif;font-size:.9rem;font-weight:300;color:var(--charcoal);background:white;outline:none;appearance:none;transition:border-color .2s;}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--accent-dark);}
+.fg textarea{height:88px;resize:none;}
+.fg-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.sms-row{display:flex;gap:10px;align-items:flex-start;padding:12px;background:rgba(158,122,107,.08);border:1px solid rgba(158,122,107,.22);border-radius:3px;margin-bottom:16px;}
+.sms-row input{width:auto;accent-color:var(--accent-dark);margin-top:3px;flex-shrink:0;}
+.sms-row span{font-size:.78rem;font-weight:300;color:var(--warm-gray);line-height:1.6;}
+.sms-row strong{color:var(--accent-dark);font-weight:700;}
+.btn-submit{width:100%;background:var(--accent-dark);color:white;padding:13px;border-radius:2px;font-family:'Lato',sans-serif;font-size:.76rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;border:none;transition:background .2s;}
+.btn-submit:hover{background:var(--charcoal);}
+.form-note{text-align:center;font-size:.72rem;font-weight:300;color:var(--warm-gray);margin-top:10px;}
+.form-success{display:none;text-align:center;padding:20px 0;}
+.form-success .si{font-size:2.5rem;margin-bottom:12px;}
+.form-success h4{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:400;color:var(--charcoal);margin-bottom:8px;}
+.form-success p{font-size:.86rem;font-weight:300;color:var(--warm-gray);line-height:1.7;}
+
+footer{background:#1d2820;padding:40px 80px 20px;}
+.ft-bottom{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;}
+.ft-bottom p{font-size:.72rem;color:rgba(255,255,255,.2);font-weight:300;}
+.ft-bottom a{font-size:.68rem;color:rgba(196,160,90,.5);text-decoration:none;transition:color .2s;}
+.ft-bottom a:hover{color:var(--gold);}
+.ft-nav{display:flex;gap:24px;}
+.ft-nav a{font-size:.76rem;font-weight:300;color:rgba(255,255,255,.4);text-decoration:none;cursor:pointer;transition:color .2s;}
+.ft-nav a:hover{color:var(--gold);}
+
+@media(max-width:960px){
+  nav{padding:0 20px;}.nav-links{display:none;}
+  .profile-hero{grid-template-columns:1fr;}.hero-visual{min-height:340px;}
+  .hero-content{padding:48px 24px;}
+  .specialties-section,.background-section{padding:48px 24px;}
+  .spec-grid{grid-template-columns:1fr;}.background-section{grid-template-columns:1fr;gap:36px;}
+  .lead-section{padding:48px 24px;}.lead-inner{grid-template-columns:1fr;gap:36px;}
+  footer{padding:32px 20px 16px;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="clinicians-index.html">A <span>Nu</span> Day Therapy</a>
+  <ul class="nav-links">
+    <li><a href="clinicians-index.html" class="nav-back">Meet the Team</a></li>
+    <li><a href="clinician-sylvia.html">Sylvia Ogilvie</a></li>
+    <li><a href="clinician-kim.html">Kimberly Myers</a></li>
+    <li><a href="#lead" class="nav-cta">Book with Corine</a></li>
+  </ul>
+</nav>
+
+<div class="profile-hero">
+  <div class="hero-visual">
+    <div class="hero-avatar">👩🏾</div>
+    <h1>Corine</h1>
+    <div class="hero-cred">Licensed Clinician</div>
+    <div class="hero-tags">
+      <span class="htag">Life Transitions</span>
+      <span class="htag">Anxiety</span>
+      <span class="htag">Depression</span>
+      <span class="htag">Teens & Young Adults</span>
+    </div>
+    <div class="avail-strip"><div class="dot"></div>Accepting new clients</div>
+  </div>
+
+  <div class="hero-content">
+    <div class="eyebrow">Life Transitions Specialist</div>
+    <h2>Meeting You <em>Where You Are</em><br>in the Journey</h2>
+    <p>Throughout our lives we experience many ups and downs, changes, and transitions. When we experience these alongside trauma, anxiety, or depression, the challenges can feel especially overwhelming. Corine believes the <strong>support, guidance, and tools we gather along the way</strong> are what carry us through.</p>
+    <p>Her goal as a therapist is to support her clients in finding what works for <em>them</em> when navigating these difficult moments. She uses a <strong>client-centered approach</strong> — meeting you exactly where you are — while incorporating Cognitive Behavioral Therapy and Motivational Interviewing to support the work.</p>
+
+    <div class="highlight-box">
+      <p><strong>Especially for teens & young adults:</strong> If you're experiencing anxiety, looking for help with boundary setting, or building confidence through life transitions, Corine is passionate about building a therapeutic relationship that gives you real tools to move forward — with confidence and strength.</p>
+    </div>
+
+    <div class="pull-quote" style="margin-top:28px;">
+      <div class="pq-label">In Corine's Words</div>
+      <p>"Healing is often not linear and can be challenging — but I hope to provide you with the tools and support you need to tackle these challenges with confidence and strength. You are not alone in this process."</p>
+    </div>
+  </div>
+</div>
+
+<section class="specialties-section">
+  <div class="eyebrow" style="margin-bottom:14px;">Areas of Focus</div>
+  <div class="section-title">Where Corine Does <em>Her Best Work</em></div>
+  <div class="spec-grid">
+    <div class="spec-card">
+      <div class="sc-icon">🔄</div>
+      <h4>Life Transitions</h4>
+      <p>Starting college, changing careers, ending relationships, becoming a parent — transitions are hard. Corine helps clients find footing and confidence when the ground shifts beneath them.</p>
+    </div>
+    <div class="spec-card">
+      <div class="sc-icon">😤</div>
+      <h4>Anxiety</h4>
+      <p>Using CBT and Motivational Interviewing to help clients understand their anxiety patterns, challenge unhelpful thoughts, and build practical coping tools that actually work in real life.</p>
+    </div>
+    <div class="spec-card">
+      <div class="sc-icon">🌧️</div>
+      <h4>Depression</h4>
+      <p>Client-centered, compassionate support for people moving through depression — with no judgment about how you got here and full focus on where you want to go.</p>
+    </div>
+    <div class="spec-card">
+      <div class="sc-icon">🧑</div>
+      <h4>Teens & Young Adults</h4>
+      <p>A specialty in supporting teens and young adults navigating anxiety, identity, confidence, and growing up. Corine builds real therapeutic relationships with young people — not just talking at them.</p>
+    </div>
+    <div class="spec-card">
+      <div class="sc-icon">🚧</div>
+      <h4>Boundary Setting</h4>
+      <p>Teaching clients how to identify, communicate, and hold boundaries — in relationships, at work, and with family — without guilt or shame.</p>
+    </div>
+    <div class="spec-card">
+      <div class="sc-icon">💪</div>
+      <h4>Building Confidence</h4>
+      <p>Helping clients discover and strengthen their sense of self — especially those who have been taught to doubt their own instincts, worth, or capabilities.</p>
+    </div>
+  </div>
+</section>
+
+<section class="background-section">
+  <div class="bg-col">
+    <h3>Her Therapeutic Approach</h3>
+    <p>Corine's style is <strong>client-centered</strong> at its core — she follows your lead, respects your pace, and adapts the work to what you actually need rather than a preset formula.</p>
+    <p>She integrates <strong>Cognitive Behavioral Therapy</strong> to help identify and shift unhelpful thinking patterns, and <strong>Motivational Interviewing</strong> to help clients tap into their own reasons for change. The combination gives her flexibility to meet a wide range of needs without rigidity.</p>
+    <p>Most importantly: she believes reaching out — even when it feels overwhelming — is always worth it. Healing isn't easy, but you don't have to do it alone.</p>
+  </div>
+  <div class="bg-col">
+    <h3>Modalities & Approaches</h3>
+    <p>Corine draws from a range of evidence-based approaches to match the right tools to each client's unique situation:</p>
+    <div class="modalities-list">
+      <span class="mod-pill">Client-Centered Therapy</span>
+      <span class="mod-pill">Cognitive Behavioral Therapy</span>
+      <span class="mod-pill">Motivational Interviewing</span>
+      <span class="mod-pill">Strengths-Based</span>
+      <span class="mod-pill">Psychoeducation</span>
+      <span class="mod-pill">Goal-Oriented</span>
+    </div>
+  </div>
+</section>
+
+<section class="lead-section" id="lead">
+  <div class="lead-inner">
+    <div class="lead-text">
+      <h2>Ready to Work<br>with <em>Corine?</em></h2>
+      <p>Fill out the form and Corine's team will reach out within one business day — via SMS if you opted in.</p>
+      <div class="phone"><span>Call Directly</span>636-896-5867</div>
+    </div>
+    <div class="lead-form" id="form-wrap">
+      <h3>Request a Session</h3>
+      <div class="fsub">Especially welcoming teens, young adults, and those navigating life transitions.</div>
+      <div class="fg fg-row">
+        <div class="fg"><label>First Name</label><input type="text" id="fn" placeholder="First name"/></div>
+        <div class="fg"><label>Last Name</label><input type="text" placeholder="Last name"/></div>
+      </div>
+      <div class="fg"><label>Phone</label><input type="tel" id="ph" placeholder="(314) 000-0000"/></div>
+      <div class="fg"><label>Email</label><input type="email" id="em" placeholder="you@email.com"/></div>
+      <div class="fg">
+        <label>What brings you here?</label>
+        <select id="need">
+          <option value="">Select a focus area</option>
+          <option>Life transitions</option>
+          <option>Anxiety</option>
+          <option>Depression</option>
+          <option>Support for my teenager</option>
+          <option>Boundary setting</option>
+          <option>Building confidence</option>
+          <option>Not sure — I just need to talk to someone</option>
+        </select>
+      </div>
+      <div class="fg"><label>Anything else? (optional)</label><textarea placeholder="Share as much or as little as you're comfortable with…"></textarea></div>
+      <div class="sms-row">
+        <input type="checkbox" id="sms" checked/>
+        <label for="sms"><span><strong>📲 Text me back.</strong> Receive a response & reminders via SMS. Reply STOP anytime.</span></label>
+      </div>
+      <button class="btn-submit" onclick="submitForm()">Send My Request →</button>
+      <div class="form-note">We respond within 1 business day · Crisis: call or text 988</div>
+      <div class="form-success" id="fs">
+        <div class="si">🌿</div>
+        <h4>Request Received</h4>
+        <p>Corine's team will be in touch within one business day. You took the first step — and that matters.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="ft-bottom">
+    <p>© 2026 A Nu Day Therapy · Corine · All rights reserved. | <a href="https://goelev8.ai" target="_blank">Powered by GoElev8.ai</a></p>
+    <div class="ft-nav">
+      <a href="clinicians-index.html">← All Clinicians</a>
+      <a href="clinician-sylvia.html">Sylvia Ogilvie</a>
+      <a href="clinician-kim.html">Kimberly Myers</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+function submitForm(){
+  const req=[document.getElementById('fn'),document.getElementById('ph'),document.getElementById('em'),document.getElementById('need')];
+  let ok=true;req.forEach(f=>{if(!f.value.trim()){f.style.borderColor='#B85C42';ok=false;}else f.style.borderColor='';});
+  if(!ok)return;
+  document.querySelectorAll('#form-wrap .fg,#form-wrap .fg-row,#form-wrap .sms-row,.btn-submit,.form-note,#form-wrap h3,#form-wrap .fsub').forEach(el=>el.style.display='none');
+  document.getElementById('fs').style.display='block';
+}
+</script>
+</body>
+</html>
