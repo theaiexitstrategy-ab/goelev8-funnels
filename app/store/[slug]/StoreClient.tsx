@@ -1,7 +1,7 @@
 // (c) 2026 GoElev8.ai | Aaron Bryant. All rights reserved.
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 export type MerchProduct = {
   id: string;
@@ -19,6 +19,7 @@ export type StoreClientInfo = {
   name: string;
   accentColor: string;
   logoUrl: string | null;
+  hasConnect: boolean;
 };
 
 function dollars(cents: number): string {
@@ -33,12 +34,51 @@ export default function StoreClient({
   products: MerchProduct[];
 }) {
   const hasProducts = products.length > 0;
+  const [buying, setBuying] = useState<string | null>(null);
+  const [buyError, setBuyError] = useState('');
 
-  // CSS var fallback so we never depend on dynamic Tailwind class generation
-  // for the seller's brand color.
   const cssVars = useMemo(() => ({
     ['--accent' as any]: client.accentColor,
   }), [client.accentColor]);
+
+  const onBuy = async (product: MerchProduct) => {
+    // Prefer native checkout when the seller has Stripe Connect set up.
+    if (client.hasConnect) {
+      setBuying(product.id);
+      setBuyError('');
+      try {
+        const res = await fetch('/api/merch/checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ product_id: product.id, quantity: 1 }),
+        });
+        const data = await res.json();
+        if (res.ok && data.url) {
+          window.location.href = data.url;
+          return;
+        }
+        // Connect not set up after all, or other failure → fall back to payment link.
+        if (product.paymentLink) {
+          window.location.href = product.paymentLink;
+          return;
+        }
+        setBuyError(data.error || 'Checkout could not start. Try again in a moment.');
+      } catch {
+        if (product.paymentLink) {
+          window.location.href = product.paymentLink;
+          return;
+        }
+        setBuyError('Network error. Try again.');
+      } finally {
+        setBuying(null);
+      }
+      return;
+    }
+    // No Connect on this seller: direct to payment_link (Phase 1 behavior).
+    if (product.paymentLink) {
+      window.location.href = product.paymentLink;
+    }
+  };
 
   return (
     <div style={{ ...cssVars, minHeight: '100vh', background: '#FAFAFA', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>
@@ -55,6 +95,12 @@ export default function StoreClient({
       </header>
 
       <main style={{ maxWidth: 960, margin: '0 auto', padding: '32px 16px 60px' }}>
+        {buyError ? (
+          <div style={{ background: '#FEF2F2', color: '#991B1B', padding: '10px 14px', borderRadius: 8, marginBottom: 16, fontSize: 13 }}>
+            {buyError}
+          </div>
+        ) : null}
+
         {!hasProducts ? (
           <div style={{ textAlign: 'center', padding: '80px 16px', color: '#9CA3AF' }}>
             <p style={{ fontSize: 20, fontWeight: 600, marginBottom: 8 }}>Coming soon</p>
@@ -62,7 +108,16 @@ export default function StoreClient({
           </div>
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 18 }}>
-            {products.map((p) => <ProductCard key={p.id} product={p} accent={client.accentColor} />)}
+            {products.map((p) => (
+              <ProductCard
+                key={p.id}
+                product={p}
+                accent={client.accentColor}
+                hasConnect={client.hasConnect}
+                buying={buying === p.id}
+                onBuy={() => onBuy(p)}
+              />
+            ))}
           </div>
         )}
       </main>
@@ -77,10 +132,19 @@ export default function StoreClient({
   );
 }
 
-function ProductCard({ product, accent }: { product: MerchProduct; accent: string }) {
+function ProductCard({
+  product, accent, hasConnect, buying, onBuy,
+}: {
+  product: MerchProduct;
+  accent: string;
+  hasConnect: boolean;
+  buying: boolean;
+  onBuy: () => void;
+}) {
   const showCompareAt =
     product.compareAtCents != null && product.compareAtCents > product.priceCents;
-  const canBuy = !!product.paymentLink;
+  // Native checkout when seller has Connect; payment_link fallback otherwise.
+  const canBuy = hasConnect || !!product.paymentLink;
 
   return (
     <div style={{
@@ -123,20 +187,23 @@ function ProductCard({ product, accent }: { product: MerchProduct; accent: strin
 
         <div style={{ marginTop: 'auto', paddingTop: 6 }}>
           {canBuy ? (
-            <a
-              href={product.paymentLink!}
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              type="button"
+              onClick={onBuy}
+              disabled={buying}
               aria-label={`Buy ${product.name}`}
               style={{
-                display: 'block', textAlign: 'center',
+                width: '100%',
                 background: accent, color: '#fff',
+                border: 'none',
                 padding: '11px 22px', borderRadius: 8,
-                textDecoration: 'none', fontWeight: 600, fontSize: 14,
+                fontWeight: 600, fontSize: 14,
+                cursor: buying ? 'wait' : 'pointer',
+                opacity: buying ? 0.7 : 1,
               }}
             >
-              Buy Now →
-            </a>
+              {buying ? 'Loading…' : 'Buy Now →'}
+            </button>
           ) : (
             <button
               type="button"

@@ -32,11 +32,12 @@ export default async function StorePage({ params }: Props) {
 
   const { data: client } = await supabase
     .from('clients')
-    .select('id, slug, name, business_name, brand_color, logo_url')
+    .select('id, slug, name, business_name, brand_color, logo_url, stripe_connected_account_id')
     .eq('slug', slug)
     .single();
 
   if (!client) notFound();
+  const hasConnect = !!client.stripe_connected_account_id;
 
   const { data: rows } = await supabase
     .from('merch_products')
@@ -62,6 +63,7 @@ export default async function StorePage({ params }: Props) {
     name: client.business_name || client.name || client.slug,
     accentColor: client.brand_color || '#00CFFF',
     logoUrl: client.logo_url,
+    hasConnect,
   };
 
   return <StoreClient client={info} products={products} />;
