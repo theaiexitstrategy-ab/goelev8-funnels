@@ -177,7 +177,7 @@ async function handleInbound(from: string, text: string, isTwilio: boolean) {
 
   // ── DEMO keyword: start (or restart) the 4-msg sequence ──
   if (isDemoKeyword(text)) {
-    const msg1 = withOptOutNotice(DEMO_MSG.one('your gym'));
+    const msg1 = withOptOutNotice(DEMO_MSG.one);
     if (supabase) {
       try { await startNewSession(supabase, from); }
       catch (err) { console.error('[demo-webhook] startNewSession failed:', err); }

@@ -11,8 +11,8 @@ export const DELAY_TO_MSG_3_MS = 60 * 1000;
 export const DELAY_TO_MSG_4_MS = 60 * 1000;
 
 export const DEMO_MSG = {
-  one: (gymName: string) =>
-    `👋 Hey! Thanks for reaching out to ${gymName} — we just got your message and we're already on it. This is your automated follow-up. We'll get you squared away in seconds. Reply YES to learn more about getting started.`,
+  one:
+    `👋 Hey! Thanks for reaching out to GoElev8.ai — imagine this demo being for your business. We just got your message and we're already on it. This is your automated follow-up. Reply YES to learn more about getting started.`,
   two:
     `💡 Quick note — you just experienced GoElev8.ai in action. That instant response? That was automation. Your real leads get this same experience 24/7, even when you're coaching, sleeping, or off the floor. No manual work. No leads slipping through.`,
   three:
