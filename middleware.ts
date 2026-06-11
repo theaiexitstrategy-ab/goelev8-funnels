@@ -19,6 +19,7 @@ function isPublicRoute(pathname: string): boolean {
   if (PUBLIC_ROUTES.has(pathname)) return true;
   if (pathname.startsWith('/f/')) return true;
   if (pathname.startsWith('/book/')) return true;
+  if (pathname.startsWith('/store/')) return true;
   if (pathname.startsWith('/api/')) return true;
   if (pathname.startsWith('/_next/')) return true;
   if (pathname.startsWith('/images/')) return true;
