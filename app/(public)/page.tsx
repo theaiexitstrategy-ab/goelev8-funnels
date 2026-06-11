@@ -273,6 +273,7 @@ export default function HomePage() {
           <li><a href="#who" onClick={(e) => { e.preventDefault(); scrollTo('who'); }}>Who It&apos;s For</a></li>
           <li><a href="#pricing" onClick={(e) => { e.preventDefault(); scrollTo('pricing'); }}>Pricing</a></li>
           <li><a href="#results" onClick={(e) => { e.preventDefault(); scrollTo('results'); }}>Results</a></li>
+          <li><a href="#booking" onClick={(e) => { e.preventDefault(); scrollTo('booking'); }}>Booking</a></li>
         </ul>
         <div className={s['nav-actions']}>
           <button className={s['nav-demo']} onClick={() => scrollTo('vapi-strip')}>See Demo</button>
@@ -644,6 +645,71 @@ export default function HomePage() {
           <p className={s['results-serving']}>Serving businesses in St. Louis, MO and Tulsa, OK — and growing.</p>
           <a href="https://book.goelev8.ai/go" target="_blank" rel="noopener noreferrer" className={s['btn-primary']}>Apply for Early Access →</a>
         </div>
+      </section>
+
+
+      {/* BOOKING — included in every plan */}
+      <section className={s.section} id="booking" aria-labelledby="booking-h">
+        <div className={s.sl} aria-hidden="true">Included in every plan · Zero setup · Your link in 48 hours</div>
+        <h2 className={`${s.sh} ${s.rev}`} id="booking-h">YOUR CLIENTS BOOK<br/><span style={{color:'var(--cyan)'}}>THEMSELVES.</span></h2>
+        <p className={`${s.ssub} ${s.rev}`}>
+          Every GoElev8.ai plan includes a fully branded booking calendar at <strong style={{color:'var(--wh)'}}>book.goelev8.ai/yourbusiness</strong> — no third-party tools, no monthly fees, no friction. Clients pick a time, you get the confirmation. That&apos;s it.
+        </p>
+
+        <div className={s.rev} style={{
+          display:'grid',
+          gridTemplateColumns:'repeat(auto-fit, minmax(280px, 1fr))',
+          gap:'18px',
+          maxWidth: 1000,
+          margin: '40px auto 36px',
+        }}>
+          {[
+            { ico:'🔗', t:'Your Custom Link',                 d:'Your booking page lives at book.goelev8.ai/yourbusiness — branded, shareable, and ready in 48 hours. Put it in your bio, your texts, your emails. Clients land on it, pick a time, done.' },
+            { ico:'📅', t:'Two Service Types, Ready to Go',  d:'Strategy calls and setup sessions are pre-configured out of the box. Add your own service types from your portal — no code, no plugins, no monthly Calendly bill.' },
+            { ico:'⚡', t:'Synced to Your AI System',         d:'Every booking flows into your GoElev8.ai dashboard. Missed a call? The system texts them back and drops a link to your booking page automatically.' },
+          ].map(card => (
+            <div key={card.t} style={{
+              background:'#0a0a0a',
+              border:'1px solid #1e1e1e',
+              borderRadius:4,
+              padding:'22px 20px',
+            }}>
+              <div style={{fontSize:26, marginBottom:12}}>{card.ico}</div>
+              <div style={{fontFamily:'var(--fd)', fontSize:18, color:'var(--wh)', marginBottom:10, letterSpacing:1}}>{card.t}</div>
+              <div style={{color:'#888', fontSize:13, lineHeight:1.65}}>{card.d}</div>
+            </div>
+          ))}
+        </div>
+
+        <div className={s.rev} style={{textAlign:'center', marginTop:32, marginBottom:32}}>
+          <a href="https://book.goelev8.ai/go" target="_blank" rel="noopener noreferrer" className={s['btn-primary']}>
+            Book a Call — See It Live →
+          </a>
+          <p style={{color:'#666', fontSize:12, marginTop:14, fontFamily:'var(--fm)', letterSpacing:'.5px'}}>
+            Already a client? Access your booking calendar at portal.goelev8.ai/go
+          </p>
+        </div>
+
+        <div className={s.rev} style={{
+          width:'100%',
+          maxWidth: 860,
+          margin: '0 auto',
+          background:'#080808',
+          border:'1px solid #1e1e1e',
+          borderRadius:12,
+          boxShadow:'0 0 0 1px rgba(0,229,255,0.1), 0 8px 40px rgba(0,229,255,0.05)',
+          overflow:'hidden',
+        }}>
+          <iframe
+            src="https://book.goelev8.ai/go"
+            title="GoElev8.ai booking calendar"
+            loading="lazy"
+            style={{width:'100%', height:680, border:'none', display:'block', background:'#080808'}}
+          />
+        </div>
+        <p className={s.rev} style={{textAlign:'center', color:'#555', fontSize:11, marginTop:12, fontFamily:'var(--fm)'}}>
+          Calendar not loading? → <a href="https://book.goelev8.ai/go" target="_blank" rel="noopener noreferrer" style={{color:'var(--cyan)', textDecoration:'none'}}>book.goelev8.ai/go</a>
+        </p>
       </section>
 
 
