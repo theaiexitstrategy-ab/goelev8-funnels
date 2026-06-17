@@ -88,24 +88,33 @@ async function findActiveSession(supabase: SupabaseClient, phone: string) {
 async function startNewSession(supabase: SupabaseClient, phone: string): Promise<void> {
   // Supersede any prior in-progress sequence for this phone, then insert fresh.
   const nowIso = new Date().toISOString();
-  await supabase
+  const { error: updErr } = await supabase
     .from('demo_leads')
     .update({ superseded_at: nowIso })
     .eq('phone_number', phone)
     .eq('source', 'demo-keyword')
     .is('completed_at', null)
     .is('superseded_at', null);
+  if (updErr) console.error('[demo-webhook] startNewSession supersede update failed:', updErr.message);
 
   const next = new Date(Date.now() + DELAY_TO_MSG_2_MS).toISOString();
-  await supabase.from('demo_leads').insert({
-    phone_number: phone,
-    source: 'demo-keyword',
-    keyword: 'DEMO',
-    sms_sent: true,           // MSG 1 just went out via TwiML
-    sms_sent_at: nowIso,
-    step_completed: 1,
-    next_msg_due_at: next,
-  });
+  const { data: inserted, error: insErr } = await supabase
+    .from('demo_leads')
+    .insert({
+      phone_number: phone,
+      source: 'demo-keyword',
+      keyword: 'DEMO',
+      sms_sent: true,           // MSG 1 just went out via TwiML
+      sms_sent_at: nowIso,
+      step_completed: 1,
+      next_msg_due_at: next,
+    })
+    .select('id');
+  if (insErr) {
+    console.error('[demo-webhook] startNewSession insert failed:', insErr.message, JSON.stringify(insErr));
+  } else {
+    console.log('[demo-webhook] startNewSession ok:', inserted?.[0]?.id, 'phone=', phone);
+  }
 }
 
 // CAS-update: only advance step if it's still at expected. Returns true on win.
@@ -185,23 +194,83 @@ async function handleInbound(from: string, text: string, isTwilio: boolean) {
     return isTwilio ? twiml(msg1) : NextResponse.json({ reply: msg1 });
   }
 
-  // ── YES (only if there's an active session waiting on YES) ──
-  if (isYesKeyword(text) && supabase) {
-    const session = await findActiveSession(supabase, from);
-    if (session && session.step_completed === 1) {
-      const advanced = await advanceStep(
-        supabase, session.id, 1, 2,
-        Date.now() + DELAY_TO_MSG_3_MS,
-        { yes_received_at: new Date().toISOString() },
-      );
-      if (advanced) {
-        const msg2 = withOptOutNotice(DEMO_MSG.two);
-        return isTwilio ? twiml(msg2) : NextResponse.json({ reply: msg2 });
+  // ── YES → close with the Founding Client Stripe checkout link ──
+  // We respond regardless of session state so a YES always triggers the link
+  // (the user has explicitly opted in by replying YES). If there IS an active
+  // sequence we mark it completed so the cron stops sending further nudges.
+  if (isYesKeyword(text)) {
+    if (supabase) {
+      try {
+        const { error } = await supabase
+          .from('demo_leads')
+          .update({
+            completed_at: new Date().toISOString(),
+            yes_received_at: new Date().toISOString(),
+          })
+          .eq('phone_number', from)
+          .eq('source', 'demo-keyword')
+          .is('completed_at', null)
+          .is('superseded_at', null);
+        if (error) console.error('[demo-webhook] mark-completed on YES failed:', error.message);
+      } catch (err) {
+        console.error('[demo-webhook] mark-completed on YES threw:', err);
       }
-      // Race: cron already sent MSG 2. Fall through to no-op.
     }
+
+    const url = await createFoundingCheckoutUrl();
+    const replyText = url
+      ? `🚀 Let's get you started with GoElev8.ai today — $200 Founding Client setup + $99/mo (normally $400, save 50%): ${url}\n\nGo live in 48 hours.`
+      : `🚀 Let's get you started with GoElev8.ai today! Aaron will walk you through everything: https://goelev8.ai/#pricing`;
+    return isTwilio ? twiml(withOptOutNotice(replyText)) : NextResponse.json({ reply: withOptOutNotice(replyText) });
   }
 
   // ── Anything else → no auto-reply (per spec) ──
   return isTwilio ? twiml(null) : NextResponse.json({ reply: '' });
+}
+
+// Create a fresh Stripe Checkout Session for the Founding Client offer
+// ($200 setup + $99/mo Growth Plan, FOUNDING coupon applied) and return its
+// hosted URL. Mirrors the logic in /api/create-checkout — same lookup_keys,
+// same coupon — so the link customers receive over SMS lands them in the
+// identical experience as the "Get Started" button on the homepage.
+async function createFoundingCheckoutUrl(): Promise<string | null> {
+  const apiKey = process.env.STRIPE_SECRET_KEY;
+  if (!apiKey) {
+    console.error('[demo-webhook] STRIPE_SECRET_KEY not configured');
+    return null;
+  }
+  try {
+    const Stripe = (await import('stripe')).default;
+    const stripe = new Stripe(apiKey);
+    const origin = process.env.NEXT_PUBLIC_APP_URL || 'https://www.goelev8.ai';
+
+    const [setupList, growthList] = await Promise.all([
+      stripe.prices.list({ lookup_keys: ['goelev8_onboarding_setup_400'], active: true, limit: 1 }),
+      stripe.prices.list({ lookup_keys: ['goelev8_growth_plan_99_monthly'], active: true, limit: 1 }),
+    ]);
+    const setupPrice = setupList.data[0];
+    const growthPrice = growthList.data[0];
+    if (!setupPrice || !growthPrice) {
+      console.error('[demo-webhook] Stripe prices missing — run scripts/setup-stripe-onboarding.ts');
+      return null;
+    }
+
+    const session = await stripe.checkout.sessions.create({
+      mode: 'subscription',
+      payment_method_collection: 'always',
+      line_items: [
+        { price: setupPrice.id, quantity: 1 },
+        { price: growthPrice.id, quantity: 1 },
+      ],
+      discounts: [{ coupon: 'FOUNDING' }],
+      success_url: `${origin}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${origin}/#pricing`,
+      billing_address_collection: 'auto',
+      metadata: { source: 'demo-webhook-yes' },
+    });
+    return session.url ?? null;
+  } catch (err: any) {
+    console.error('[demo-webhook] Stripe session creation failed:', err?.message ?? err);
+    return null;
+  }
 }
