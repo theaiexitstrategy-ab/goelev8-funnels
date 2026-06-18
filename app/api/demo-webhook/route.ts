@@ -223,7 +223,7 @@ async function handleInbound(from: string, text: string, isTwilio: boolean) {
     const url =
       process.env.STRIPE_FOUNDING_PAYMENT_LINK ||
       'https://buy.stripe.com/00w8wP86w5f8cBP08P8IU01';
-    const replyText = `🚀 Let's get you started with GoElev8.ai today — $200 Founding Client setup + $99/mo (normally $400, save 50%): ${url}\n\nGo live in 48 hours.`;
+    const replyText = `🚀 Let's get you started with GoElev8.ai today — $400 setup + $99/mo (50% off the monthly rate): ${url}\n\nGo live in 48 hours.`;
     return isTwilio ? twiml(withOptOutNotice(replyText)) : NextResponse.json({ reply: withOptOutNotice(replyText) });
   }
 
