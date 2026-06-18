@@ -217,60 +217,16 @@ async function handleInbound(from: string, text: string, isTwilio: boolean) {
       }
     }
 
-    const url = await createFoundingCheckoutUrl();
-    const replyText = url
-      ? `🚀 Let's get you started with GoElev8.ai today — $200 Founding Client setup + $99/mo (normally $400, save 50%): ${url}\n\nGo live in 48 hours.`
-      : `🚀 Let's get you started with GoElev8.ai today! Aaron will walk you through everything: https://goelev8.ai/#pricing`;
+    // Stable Founding Client Payment Link. Already wired in Stripe with the
+    // $400→$200 FOUNDING coupon on the setup line + $99/mo subscription.
+    // Override via env if you ever regenerate the link.
+    const url =
+      process.env.STRIPE_FOUNDING_PAYMENT_LINK ||
+      'https://buy.stripe.com/00w8wP86w5f8cBP08P8IU01';
+    const replyText = `🚀 Let's get you started with GoElev8.ai today — $200 Founding Client setup + $99/mo (normally $400, save 50%): ${url}\n\nGo live in 48 hours.`;
     return isTwilio ? twiml(withOptOutNotice(replyText)) : NextResponse.json({ reply: withOptOutNotice(replyText) });
   }
 
   // ── Anything else → no auto-reply (per spec) ──
   return isTwilio ? twiml(null) : NextResponse.json({ reply: '' });
-}
-
-// Create a fresh Stripe Checkout Session for the Founding Client offer
-// ($200 setup + $99/mo Growth Plan, FOUNDING coupon applied) and return its
-// hosted URL. Mirrors the logic in /api/create-checkout — same lookup_keys,
-// same coupon — so the link customers receive over SMS lands them in the
-// identical experience as the "Get Started" button on the homepage.
-async function createFoundingCheckoutUrl(): Promise<string | null> {
-  const apiKey = process.env.STRIPE_SECRET_KEY;
-  if (!apiKey) {
-    console.error('[demo-webhook] STRIPE_SECRET_KEY not configured');
-    return null;
-  }
-  try {
-    const Stripe = (await import('stripe')).default;
-    const stripe = new Stripe(apiKey);
-    const origin = process.env.NEXT_PUBLIC_APP_URL || 'https://www.goelev8.ai';
-
-    const [setupList, growthList] = await Promise.all([
-      stripe.prices.list({ lookup_keys: ['goelev8_onboarding_setup_400'], active: true, limit: 1 }),
-      stripe.prices.list({ lookup_keys: ['goelev8_growth_plan_99_monthly'], active: true, limit: 1 }),
-    ]);
-    const setupPrice = setupList.data[0];
-    const growthPrice = growthList.data[0];
-    if (!setupPrice || !growthPrice) {
-      console.error('[demo-webhook] Stripe prices missing — run scripts/setup-stripe-onboarding.ts');
-      return null;
-    }
-
-    const session = await stripe.checkout.sessions.create({
-      mode: 'subscription',
-      payment_method_collection: 'always',
-      line_items: [
-        { price: setupPrice.id, quantity: 1 },
-        { price: growthPrice.id, quantity: 1 },
-      ],
-      discounts: [{ coupon: 'FOUNDING' }],
-      success_url: `${origin}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${origin}/#pricing`,
-      billing_address_collection: 'auto',
-      metadata: { source: 'demo-webhook-yes' },
-    });
-    return session.url ?? null;
-  } catch (err: any) {
-    console.error('[demo-webhook] Stripe session creation failed:', err?.message ?? err);
-    return null;
-  }
 }
