@@ -13,7 +13,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 import { getOptedOutSet, withOptOutNotice } from '@/lib/sms-opt-outs';
-import { DEMO_MSG, DELAY_TO_MSG_3_MS as LIB_DELAY_3, DELAY_TO_MSG_4_MS as LIB_DELAY_4 } from '@/lib/demo-sequence';
+import { DEMO_MSG, DELAY_TO_MSG_3_MS as LIB_DELAY_3, DELAY_TO_MSG_4_MS as LIB_DELAY_4, FOUNDING_PAYMENT_LINK } from '@/lib/demo-sequence';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || '';
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY || '';
@@ -81,7 +81,10 @@ async function advanceStep(
 function bodyForNextStep(currentStep: number): string {
   if (currentStep === 1) return DEMO_MSG.two;
   if (currentStep === 2) return DEMO_MSG.three;
-  if (currentStep === 3) return DEMO_MSG.four;
+  if (currentStep === 3) {
+    const url = process.env.STRIPE_FOUNDING_PAYMENT_LINK || FOUNDING_PAYMENT_LINK;
+    return DEMO_MSG.four(url);
+  }
   return '';
 }
 

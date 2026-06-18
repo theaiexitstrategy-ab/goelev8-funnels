@@ -1,18 +1,20 @@
 // (c) 2026 GoElev8.ai | Aaron Bryant. All rights reserved.
 //
-// Twilio Messaging webhook for the DEMO keyword 4-message sequence.
+// Twilio Messaging webhook for the DEMO 4-message sequence. The sequence is
+// purely keyword-driven now — every message is triggered by the recipient
+// replying with the next keyword. The time-based cron path (which used to
+// auto-send MSG 2/3/4 if they didn't reply) is intentionally idle because we
+// no longer stamp next_msg_due_at.
 //
 // Flow:
-//   1. User texts "DEMO" → we mark any prior in-progress sequence for this
-//      phone as superseded, insert a fresh demo_leads row, reply with MSG 1
-//      via TwiML, and schedule MSG 2 to fire in ~30s via the cron.
-//   2. User texts "YES" → we look up the active sequence, reply with MSG 2
-//      via TwiML, and schedule MSG 3 for ~60s. If they don't reply YES, the
-//      cron sends MSG 2 on its own when the 30s timer matures.
-//   3. STOP / HELP keywords are honored before everything else (compliance).
-//   4. Any other text is a no-op (no auto-reply).
+//   DEMO  → MSG 1 (intro: "you just triggered our automated follow-up")
+//   YES   → MSG 2 (here's what just happened in 60s)
+//   READY → MSG 3 (social proof — Flex, iSlay, WillPower)
+//   GO    → MSG 4 (Founding Client offer + stable Stripe Payment Link)
 //
-// MSG 3 and MSG 4 are always sent by the cron at /api/cron/demo-sequence.
+// Compliance keywords (STOP / UNSUBSCRIBE / HELP / START) run BEFORE any
+// keyword detection, so they always win. Any other inbound text returns
+// empty TwiML — no auto-reply per spec.
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
@@ -27,7 +29,7 @@ import {
   START_CONFIRMATION,
   HELP_RESPONSE,
 } from '@/lib/sms-opt-outs';
-import { DEMO_MSG, DELAY_TO_MSG_2_MS, DELAY_TO_MSG_3_MS } from '@/lib/demo-sequence';
+import { DEMO_MSG, FOUNDING_PAYMENT_LINK } from '@/lib/demo-sequence';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || '';
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY || '';
@@ -55,6 +57,18 @@ function isYesKeyword(text: string): boolean {
   return tokenCount(text) <= 3;
 }
 
+function isReadyKeyword(text: string): boolean {
+  if (!text) return false;
+  if (firstWord(text) !== 'ready') return false;
+  return tokenCount(text) <= 3;
+}
+
+function isGoKeyword(text: string): boolean {
+  if (!text) return false;
+  if (firstWord(text) !== 'go') return false;
+  return tokenCount(text) <= 3;
+}
+
 // ─── TwiML ───────────────────────────────────────────────────────
 
 function escapeXml(s: string): string {
@@ -71,22 +85,10 @@ function twiml(body: string | null) {
 
 // ─── DB helpers ──────────────────────────────────────────────────
 
-async function findActiveSession(supabase: SupabaseClient, phone: string) {
-  const { data } = await supabase
-    .from('demo_leads')
-    .select('id, step_completed, next_msg_due_at, yes_received_at')
-    .eq('phone_number', phone)
-    .eq('source', 'demo-keyword')
-    .is('completed_at', null)
-    .is('superseded_at', null)
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .maybeSingle();
-  return data as { id: string; step_completed: number; next_msg_due_at: string | null; yes_received_at: string | null } | null;
-}
-
 async function startNewSession(supabase: SupabaseClient, phone: string): Promise<void> {
   // Supersede any prior in-progress sequence for this phone, then insert fresh.
+  // Sequence is now keyword-driven (DEMO → YES → READY → GO), so next_msg_due_at
+  // is intentionally left null — the cron path stays in place but stops firing.
   const nowIso = new Date().toISOString();
   const { error: updErr } = await supabase
     .from('demo_leads')
@@ -97,7 +99,6 @@ async function startNewSession(supabase: SupabaseClient, phone: string): Promise
     .is('superseded_at', null);
   if (updErr) console.error('[demo-webhook] startNewSession supersede update failed:', updErr.message);
 
-  const next = new Date(Date.now() + DELAY_TO_MSG_2_MS).toISOString();
   const { data: inserted, error: insErr } = await supabase
     .from('demo_leads')
     .insert({
@@ -107,7 +108,6 @@ async function startNewSession(supabase: SupabaseClient, phone: string): Promise
       sms_sent: true,           // MSG 1 just went out via TwiML
       sms_sent_at: nowIso,
       step_completed: 1,
-      next_msg_due_at: next,
     })
     .select('id');
   if (insErr) {
@@ -117,28 +117,29 @@ async function startNewSession(supabase: SupabaseClient, phone: string): Promise
   }
 }
 
-// CAS-update: only advance step if it's still at expected. Returns true on win.
-async function advanceStep(
+// Best-effort advance: update step_completed for the active session for this
+// phone. Doesn't block the SMS reply if the update fails — the customer still
+// gets the message, this just tracks where they are in the funnel.
+async function advanceActiveSession(
   supabase: SupabaseClient,
-  id: string,
-  fromStep: number,
+  phone: string,
   toStep: number,
-  nextDueAtMs: number | null,
   extra: Record<string, unknown> = {},
-): Promise<boolean> {
-  const patch: Record<string, unknown> = {
-    step_completed: toStep,
-    next_msg_due_at: nextDueAtMs == null ? null : new Date(nextDueAtMs).toISOString(),
-    ...extra,
-  };
-  if (toStep >= 4) patch.completed_at = new Date().toISOString();
-  const { data } = await supabase
-    .from('demo_leads')
-    .update(patch)
-    .eq('id', id)
-    .eq('step_completed', fromStep)
-    .select('id');
-  return Array.isArray(data) && data.length > 0;
+): Promise<void> {
+  try {
+    const patch: Record<string, unknown> = { step_completed: toStep, ...extra };
+    if (toStep >= 4) patch.completed_at = new Date().toISOString();
+    const { error } = await supabase
+      .from('demo_leads')
+      .update(patch)
+      .eq('phone_number', phone)
+      .eq('source', 'demo-keyword')
+      .is('completed_at', null)
+      .is('superseded_at', null);
+    if (error) console.error(`[demo-webhook] advance to step ${toStep} failed:`, error.message);
+  } catch (err) {
+    console.error(`[demo-webhook] advance to step ${toStep} threw:`, err);
+  }
 }
 
 // ─── Main handler ────────────────────────────────────────────────
@@ -194,37 +195,26 @@ async function handleInbound(from: string, text: string, isTwilio: boolean) {
     return isTwilio ? twiml(msg1) : NextResponse.json({ reply: msg1 });
   }
 
-  // ── YES → close with the Founding Client Stripe checkout link ──
-  // We respond regardless of session state so a YES always triggers the link
-  // (the user has explicitly opted in by replying YES). If there IS an active
-  // sequence we mark it completed so the cron stops sending further nudges.
+  // ── YES → MSG 2 ("here's what just happened") ──
   if (isYesKeyword(text)) {
-    if (supabase) {
-      try {
-        const { error } = await supabase
-          .from('demo_leads')
-          .update({
-            completed_at: new Date().toISOString(),
-            yes_received_at: new Date().toISOString(),
-          })
-          .eq('phone_number', from)
-          .eq('source', 'demo-keyword')
-          .is('completed_at', null)
-          .is('superseded_at', null);
-        if (error) console.error('[demo-webhook] mark-completed on YES failed:', error.message);
-      } catch (err) {
-        console.error('[demo-webhook] mark-completed on YES threw:', err);
-      }
-    }
+    if (supabase) await advanceActiveSession(supabase, from, 2, { yes_received_at: new Date().toISOString() });
+    const reply = withOptOutNotice(DEMO_MSG.two);
+    return isTwilio ? twiml(reply) : NextResponse.json({ reply });
+  }
 
-    // Stable Founding Client Payment Link. Already wired in Stripe with the
-    // $400→$200 FOUNDING coupon on the setup line + $99/mo subscription.
-    // Override via env if you ever regenerate the link.
-    const url =
-      process.env.STRIPE_FOUNDING_PAYMENT_LINK ||
-      'https://buy.stripe.com/00w8wP86w5f8cBP08P8IU01';
-    const replyText = `🚀 Let's get you started with GoElev8.ai today — $400 setup + $99/mo (50% off the monthly rate): ${url}\n\nGo live in 48 hours.`;
-    return isTwilio ? twiml(withOptOutNotice(replyText)) : NextResponse.json({ reply: withOptOutNotice(replyText) });
+  // ── READY → MSG 3 (social proof) ──
+  if (isReadyKeyword(text)) {
+    if (supabase) await advanceActiveSession(supabase, from, 3);
+    const reply = withOptOutNotice(DEMO_MSG.three);
+    return isTwilio ? twiml(reply) : NextResponse.json({ reply });
+  }
+
+  // ── GO → MSG 4 (Founding Client offer + Stripe Payment Link) ──
+  if (isGoKeyword(text)) {
+    if (supabase) await advanceActiveSession(supabase, from, 4);
+    const url = process.env.STRIPE_FOUNDING_PAYMENT_LINK || FOUNDING_PAYMENT_LINK;
+    const reply = withOptOutNotice(DEMO_MSG.four(url));
+    return isTwilio ? twiml(reply) : NextResponse.json({ reply });
   }
 
   // ── Anything else → no auto-reply (per spec) ──
