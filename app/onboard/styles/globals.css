@@ -1,0 +1,9 @@
+/* (c) 2026 GoElev8.ai | Aaron Bryant. All rights reserved.
+   Onboarding flow stylesheet. Imported only from app/onboard/layout.tsx
+   so Tailwind preflight does not bleed into other route groups (the
+   homepage, /pricing, etc. use CSS Modules and would break under
+   global preflight). */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

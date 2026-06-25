@@ -1,9 +1,13 @@
 // (c) 2026 GoElev8.ai | Aaron Bryant. All rights reserved.
 //
-// Tailwind is scoped to the Hush PWA only. Existing GoElev8.ai pages use
-// CSS Modules and are untouched. The generated stylesheet is imported
-// solely from app/hush/app/layout.tsx, so utilities never bleed into
-// other route groups.
+// Tailwind is scoped to specific route groups. Existing GoElev8.ai pages use
+// CSS Modules and are intentionally NOT in the content paths so Tailwind
+// utilities never bleed into them.
+//
+// Active scopes:
+//   /hush       — Hush PWA. Stylesheet imported from app/hush/app/layout.tsx.
+//   /onboard    — Client onboarding flow. Stylesheet imported from
+//                 app/onboard/layout.tsx.
 //
 // Color, font, animation, and gradient values mirror the canonical Hush
 // reference files in reference/hush/. See memory/reference_hush_tokens.md
@@ -16,6 +20,8 @@ const config: Config = {
     './app/hush/app/**/*.{ts,tsx}',
     './components/hush/**/*.{ts,tsx}',
     './lib/hush/**/*.{ts,tsx}',
+    './app/onboard/**/*.{ts,tsx}',
+    './lib/onboarding-*.{ts,tsx}',
   ],
   theme: {
     extend: {
