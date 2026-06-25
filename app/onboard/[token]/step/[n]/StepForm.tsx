@@ -16,9 +16,11 @@ type Asset = {
   uploaded_at: string;
 };
 
+const CYAN = '#00CFFF';
+const BODY_FONT = '"DM Sans", system-ui, sans-serif';
 const inputCls =
-  'w-full bg-black/40 border border-white/10 focus:border-white/30 rounded px-3 py-2.5 text-sm text-white placeholder-white/30 outline-none transition';
-const labelCls = 'block text-xs uppercase tracking-widest text-white/50 mb-1.5';
+  'w-full bg-black/40 border border-white/10 focus:border-[#00CFFF]/60 rounded-sm px-3 py-2.5 text-sm text-white placeholder-white/30 outline-none transition';
+const labelCls = 'block text-[11px] uppercase tracking-[2px] text-white/50 mb-1.5';
 
 function Field({
   label, children,
@@ -123,7 +125,15 @@ function ButtonsRow({
         type="button"
         onClick={onNext}
         disabled={saving || disabled}
-        className="bg-white/90 hover:bg-white disabled:opacity-50 text-black px-6 py-3 rounded font-medium uppercase tracking-widest text-xs transition"
+        className="hover:brightness-110 disabled:opacity-50 text-black px-6 py-3 rounded-sm transition"
+        style={{
+          background: CYAN,
+          fontFamily: BODY_FONT,
+          fontWeight: 600,
+          letterSpacing: '1.5px',
+          fontSize: 12,
+          textTransform: 'uppercase',
+        }}
       >
         {saving ? 'Saving…' : nextLabel}
       </button>
@@ -291,7 +301,18 @@ function Step3({ token, accent, initialAssets, prevHref, nextHref, onSkip }: {
 
       <div className="flex items-center justify-between mt-8">
         {prevHref ? <a href={prevHref} className="text-xs uppercase tracking-widest text-white/50 hover:text-white">← Back</a> : <span />}
-        <a href={nextHref} className="bg-white/90 hover:bg-white text-black px-6 py-3 rounded font-medium uppercase tracking-widest text-xs">
+        <a
+          href={nextHref}
+          className="hover:brightness-110 text-black px-6 py-3 rounded-sm transition"
+          style={{
+            background: CYAN,
+            fontFamily: BODY_FONT,
+            fontWeight: 600,
+            letterSpacing: '1.5px',
+            fontSize: 12,
+            textTransform: 'uppercase',
+          }}
+        >
           {assets.length === 0 ? 'Skip for now →' : 'Continue →'}
         </a>
       </div>

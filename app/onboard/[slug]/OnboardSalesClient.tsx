@@ -4,6 +4,15 @@
 import { useState } from 'react';
 import type { OnboardingConfig } from '@/lib/onboarding-configs';
 
+// Theme matches goelev8.ai — black background, cyan #00CFFF accent,
+// Bebas Neue display + DM Sans body (loaded globally in app/layout.tsx).
+// Per-client accentColor from CLIENT_CONFIG is intentionally NOT used as the
+// page accent — the buyer is on goelev8.ai, so the page reads as goelev8.ai.
+
+const CYAN = '#00CFFF';
+const BODY_FONT = '"DM Sans", system-ui, sans-serif';
+const DISPLAY_FONT = '"Bebas Neue", sans-serif';
+
 export default function OnboardSalesClient({ cfg }: { cfg: OnboardingConfig }) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -28,48 +37,81 @@ export default function OnboardSalesClient({ cfg }: { cfg: OnboardingConfig }) {
     }
   }
 
-  const accent = cfg.accentColor;
   const setupFmt = `$${(cfg.setupFeeCents / 100).toFixed(0)}`;
   const monthlyFmt = `$${(cfg.monthlyPriceCents / 100).toFixed(0)}`;
 
   return (
     <div
       className="min-h-screen bg-black text-white"
-      style={{ ['--accent' as any]: accent }}
+      style={{ fontFamily: BODY_FONT, fontWeight: 300 }}
     >
+      {/* Cyan scanline overlay — same as homepage */}
+      <div
+        aria-hidden="true"
+        className="fixed inset-0 pointer-events-none z-0"
+        style={{
+          background:
+            'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,207,255,0.009) 2px, rgba(0,207,255,0.009) 4px)',
+        }}
+      />
+
       {/* Top bar */}
-      <header className="flex items-center justify-between px-6 py-5 max-w-5xl mx-auto">
-        <a href="/" className="flex items-center gap-2 text-sm tracking-widest uppercase text-white/80 hover:text-white">
-          <span className="font-bold" style={{ color: accent }}>GO</span>
-          <span className="font-extralight">ELEV8.AI</span>
+      <header className="relative z-10 flex items-center justify-between px-6 py-4 max-w-6xl mx-auto">
+        <a href="/" className="inline-flex items-center" aria-label="GoElev8.ai home">
+          <img
+            src="/images/goelev8-full-logo.png"
+            alt="GoElev8.ai — Infinite Possibilities"
+            width={60}
+            height={60}
+            style={{ display: 'block' }}
+          />
         </a>
-        <a href="/" className="text-xs text-white/40 hover:text-white/70 uppercase tracking-widest">
+        <a
+          href="/"
+          className="text-[11px] uppercase tracking-[2px] text-white/40 hover:text-white/70 transition"
+          style={{ fontFamily: BODY_FONT }}
+        >
           ← Home
         </a>
       </header>
 
-      <main className="max-w-3xl mx-auto px-6 pt-10 pb-24">
+      <main className="relative z-10 max-w-3xl mx-auto px-6 pt-10 pb-24">
         <p
-          className="text-xs uppercase tracking-[0.3em] mb-5"
-          style={{ color: accent }}
+          className="mb-5 text-[11px] uppercase"
+          style={{ color: CYAN, letterSpacing: '2.5px', fontFamily: BODY_FONT, fontWeight: 500 }}
         >
           For {cfg.businessName}
         </p>
-        <h1 className="text-4xl md:text-5xl font-light leading-tight mb-6">
-          {cfg.headline ?? 'Your digital presence, built for you.'}
+
+        <h1
+          className="mb-6 leading-[0.95] uppercase"
+          style={{
+            fontFamily: DISPLAY_FONT,
+            fontSize: 'clamp(44px, 6.2vw, 86px)',
+            letterSpacing: '1.5px',
+            fontWeight: 400,
+          }}
+        >
+          Your digital presence,
+          <br />
+          <span style={{ color: CYAN }}>built for you.</span>
         </h1>
-        <p className="text-lg text-white/70 mb-12 max-w-2xl">
+
+        <p
+          className="max-w-2xl mb-12 text-white/65"
+          style={{ fontSize: 17, lineHeight: 1.6, fontFamily: BODY_FONT, fontWeight: 300 }}
+        >
           {cfg.subhead ??
             'Everything you need to get found, look professional, and book more clients — hands-free.'}
         </p>
 
         {/* Pricing card */}
         <div
-          className="rounded-lg p-8 md:p-10 border"
+          className="rounded-sm p-8 md:p-10 border"
           style={{
             borderColor: 'rgba(255,255,255,0.08)',
-            background: 'linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01))',
-            boxShadow: `0 0 0 1px ${accent}1A, 0 12px 50px rgba(0,0,0,0.6)`,
+            background: 'linear-gradient(180deg, rgba(0,207,255,0.025), rgba(255,255,255,0.01))',
+            boxShadow: `0 0 0 1px rgba(0,207,255,0.14), 0 8px 50px rgba(0,207,255,0.06)`,
           }}
         >
           {cfg.normalPriceLabel ? (
@@ -78,16 +120,38 @@ export default function OnboardSalesClient({ cfg }: { cfg: OnboardingConfig }) {
               <span className="line-through">{cfg.normalPriceLabel}</span>
             </p>
           ) : null}
-          <p className="text-xs uppercase tracking-widest mb-3" style={{ color: accent }}>
+          <p
+            className="text-[10px] uppercase mb-3"
+            style={{ color: CYAN, letterSpacing: '3px', fontFamily: BODY_FONT, fontWeight: 600 }}
+          >
             Your price
           </p>
-          <div className="flex items-baseline flex-wrap gap-x-3 mb-2">
-            <span className="text-4xl font-light" style={{ color: accent }}>
+          <div className="flex items-baseline flex-wrap gap-x-3 mb-1">
+            <span
+              style={{
+                color: CYAN,
+                fontFamily: DISPLAY_FONT,
+                fontSize: 56,
+                letterSpacing: '1px',
+                lineHeight: 1,
+                fontWeight: 400,
+              }}
+            >
               {setupFmt}
             </span>
             <span className="text-sm text-white/60">today</span>
             <span className="text-2xl text-white/40 mx-2">+</span>
-            <span className="text-2xl font-light text-white">{monthlyFmt}</span>
+            <span
+              className="text-white"
+              style={{
+                fontFamily: DISPLAY_FONT,
+                fontSize: 36,
+                letterSpacing: '1px',
+                fontWeight: 400,
+              }}
+            >
+              {monthlyFmt}
+            </span>
             <span className="text-sm text-white/60">/mo</span>
           </div>
 
@@ -95,10 +159,10 @@ export default function OnboardSalesClient({ cfg }: { cfg: OnboardingConfig }) {
             {cfg.features.map((f) => (
               <li key={f} className="flex items-start gap-3 text-white/85 text-sm">
                 <span
-                  className="mt-1 inline-block w-1.5 h-1.5 rounded-full flex-shrink-0"
-                  style={{ background: accent }}
+                  className="mt-[7px] inline-block w-1.5 h-1.5 rounded-full flex-shrink-0"
+                  style={{ background: CYAN }}
                 />
-                <span>{f}</span>
+                <span style={{ fontFamily: BODY_FONT, lineHeight: 1.55 }}>{f}</span>
               </li>
             ))}
           </ul>
@@ -108,8 +172,15 @@ export default function OnboardSalesClient({ cfg }: { cfg: OnboardingConfig }) {
             onClick={goToCheckout}
             disabled={submitting}
             aria-label="Start checkout"
-            className="w-full py-4 px-6 rounded font-medium text-black uppercase tracking-widest text-sm transition-all disabled:opacity-60 disabled:cursor-not-allowed hover:brightness-110"
-            style={{ background: accent }}
+            className="w-full py-4 px-6 rounded-sm transition-all disabled:opacity-60 disabled:cursor-not-allowed hover:brightness-110 text-black"
+            style={{
+              background: CYAN,
+              fontFamily: BODY_FONT,
+              fontWeight: 600,
+              letterSpacing: '1.5px',
+              fontSize: 14,
+              textTransform: 'uppercase',
+            }}
           >
             {submitting ? 'Loading…' : `Get Started — ${setupFmt} Today`}
           </button>
@@ -133,7 +204,7 @@ export default function OnboardSalesClient({ cfg }: { cfg: OnboardingConfig }) {
         </p>
       </main>
 
-      <footer className="text-center text-xs text-white/40 pb-10">
+      <footer className="relative z-10 text-center text-xs text-white/40 pb-10">
         &copy; 2026{' '}
         <a href="https://goelev8.ai" className="hover:text-white/70">
           GoElev8.ai

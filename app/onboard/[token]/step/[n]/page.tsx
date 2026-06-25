@@ -28,7 +28,7 @@ export default async function OnboardStepPage({ params }: Props) {
   }
 
   const intro = STEP_INTROS[n - 1];
-  const accent = client.brand_color || '#D4AF7A';
+  const CYAN = '#00CFFF';
   const firstName = (client.name || '').split(' ')[0] || '';
 
   const { data: info } = await supabase
@@ -46,17 +46,32 @@ export default async function OnboardStepPage({ params }: Props) {
 
   return (
     <div>
-      <p className="text-xs uppercase tracking-[0.3em] mb-3" style={{ color: accent }}>
+      <p
+        className="mb-3 text-[11px] uppercase"
+        style={{ color: CYAN, letterSpacing: '2.5px', fontFamily: '"DM Sans", sans-serif', fontWeight: 600 }}
+      >
         {intro.title}
       </p>
-      <p className="text-white/85 text-lg mb-8 leading-relaxed">
+      <h2
+        className="mb-4 uppercase"
+        style={{
+          fontFamily: '"Bebas Neue", sans-serif',
+          fontSize: 'clamp(28px, 4vw, 42px)',
+          letterSpacing: '1.5px',
+          lineHeight: 1,
+          fontWeight: 400,
+        }}
+      >
+        {intro.title}
+      </h2>
+      <p className="text-white/75 text-lg mb-8 leading-relaxed">
         {intro.agentSays(firstName)}
       </p>
 
       <StepForm
         n={n as 1 | 2 | 3 | 4 | 5 | 6}
         token={token}
-        accent={accent}
+        accent={CYAN}
         info={info ?? null}
         assets={(assets ?? []) as any[]}
       />
