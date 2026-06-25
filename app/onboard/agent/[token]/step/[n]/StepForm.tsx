@@ -70,10 +70,10 @@ export default function StepForm({
   }
 
   function nextHref(): string {
-    return n < TOTAL_STEPS ? `/onboard/${token}/step/${n + 1}` : `/onboard/${token}/complete`;
+    return n < TOTAL_STEPS ? `/onboard/agent/${token}/step/${n + 1}` : `/onboard/agent/${token}/complete`;
   }
   function prevHref(): string | null {
-    return n > 1 ? `/onboard/${token}/step/${n - 1}` : null;
+    return n > 1 ? `/onboard/agent/${token}/step/${n - 1}` : null;
   }
 
   // Branch by step.
@@ -96,7 +96,7 @@ export default function StepForm({
         setError(body.error || 'Could not finalize onboarding.');
         return;
       }
-      router.push(`/onboard/${token}/complete`);
+      router.push(`/onboard/agent/${token}/complete`);
     } catch {
       setError('Network error finalizing.');
     }

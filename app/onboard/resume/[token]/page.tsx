@@ -25,9 +25,9 @@ export default async function OnboardResumePage({ params }: Props) {
   if (!client) notFound();
 
   if (client.onboarding_status === 'complete') {
-    redirect(`/onboard/${token}/complete`);
+    redirect(`/onboard/agent/${token}/complete`);
   }
 
   const next = Math.max(1, Math.min(TOTAL_STEPS, (client.onboarding_step ?? 0) + 1));
-  redirect(`/onboard/${token}/step/${next}`);
+  redirect(`/onboard/agent/${token}/step/${next}`);
 }

@@ -24,7 +24,7 @@ export default async function OnboardStepPage({ params }: Props) {
     .maybeSingle();
   if (!client) notFound();
   if (client.onboarding_status === 'complete') {
-    redirect(`/onboard/${token}/complete`);
+    redirect(`/onboard/agent/${token}/complete`);
   }
 
   const intro = STEP_INTROS[n - 1];
