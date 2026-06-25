@@ -80,6 +80,11 @@ export async function POST(req: Request) {
         plan: cfg.plan,
       },
       subscription_data: {
+        // 30-day trial on the recurring portion so the buyer pays ONLY the
+        // setup fee today ($400). The $99/mo charge kicks in 30 days from
+        // the checkout date. Matches the "$X today + $Y/mo" framing on the
+        // sales page.
+        trial_period_days: 30,
         metadata: {
           onboarding_slug: cfg.slug,
           plan: cfg.plan,
