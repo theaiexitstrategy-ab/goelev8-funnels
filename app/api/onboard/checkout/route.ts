@@ -66,8 +66,10 @@ export async function POST(req: Request) {
       mode: 'subscription',
       payment_method_collection: 'always',
       line_items: lineItems,
-      // Capture buyer's email + name for the receipt + client record.
-      customer_creation: 'always',
+      // Note: subscription mode auto-creates a Customer (it's required for
+      // subscriptions), so customer_creation here is illegal. Stripe will
+      // still surface the buyer's email + shipping/name via the session,
+      // which is all we use in the webhook.
       billing_address_collection: 'auto',
       // Stripe replaces {CHECKOUT_SESSION_ID} with the session id on redirect.
       success_url: `${APP_URL}/onboard/start/{CHECKOUT_SESSION_ID}`,
