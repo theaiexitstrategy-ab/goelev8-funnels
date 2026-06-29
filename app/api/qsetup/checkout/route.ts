@@ -46,6 +46,12 @@ export async function POST() {
       success_url: `${APP_URL}/onboarding/roqbody?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${APP_URL}/qsetup`,
       metadata: {
+        // New canonical metadata keys read by /api/webhooks/stripe.
+        slug: CLIENT.slug,
+        config_slug: CLIENT.slug,
+        owner_phone: '',
+        // Legacy keys kept around so the older /api/onboard/webhook still
+        // functions if Stripe ever fires both endpoints during cutover.
         client: CLIENT.slug,
         owner: CLIENT.owner,
         tier: CLIENT.tier,
