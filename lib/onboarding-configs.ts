@@ -19,9 +19,17 @@ export type OnboardingFeatureFlags = {
 
 export type OnboardingKnownInfo = {
   website?: string;
+  phone?: string;
   location?: string;
   industry?: string;
   services?: string[];
+  // ── HVAC / Jobber clients ──
+  service_area?: string[];
+  licensed_insured_bonded?: boolean;
+  existing_jobber_booking_url?: string;
+  emergency_transfer?: boolean;
+  financing_available?: boolean;
+  financing_url?: string;
 };
 
 export type OnboardingConfig = {
@@ -144,20 +152,18 @@ export const ONBOARDING_CONFIGS: Record<string, OnboardingConfig> = {
   },
 
   afff: {
-    // Placeholder — A Family's Future Heating & Cooling.
-    // Real owner details fill in at sales-page time.
     slug: 'afff',
-    clientName: '',
-    ownerName: '',
-    businessName: "A Family's Future Heating & Cooling",
-    accentColor: '#C8102E',
+    clientName: 'Kevin',
+    ownerName: 'Kevin',
+    businessName: "A Family's Future Heating & Cooling LLC",
+    accentColor: '#F5B800',
     plan: 'presence',
     tier: 'presence',
     setupFeeCents: 40000,
     monthlyPriceCents: 9900,
     platformFeePct: 0,
-    transactionFeeFlatCents: 1000, // $10 per booked appointment via Jobber
-    transactionFeeLabel: '$10 per booked appointment via Jobber',
+    transactionFeeFlatCents: 1000, // $10 per appointment booked by voice agent
+    transactionFeeLabel: '$10 per appointment booked by voice agent',
     smsCreditsIncluded: 500,
     flags: {
       has_lead_agent: false,
@@ -166,14 +172,40 @@ export const ONBOARDING_CONFIGS: Record<string, OnboardingConfig> = {
       jobber_integration: true,
     },
     knownInfo: {
-      industry: 'hvac',
+      website: 'affheatingandcooling.com',
+      phone: '3145039944',
       location: 'St. Louis, MO',
+      industry: 'hvac',
+      service_area: ['St. Louis City', 'St. Louis County', 'St. Charles County'],
+      licensed_insured_bonded: true,
+      existing_jobber_booking_url:
+        'https://clienthub.getjobber.com/booking/99b16dd8-883c-4d9e-b67c-3a84b4bdd873',
+      emergency_transfer: true,
+      financing_available: true,
+      financing_url: 'https://www.ftl.finance/C216548',
+      services: [
+        'Furnace Service & Repair',
+        'Furnace Tune-Up',
+        'Furnace Installation',
+        'AC Service & Repair',
+        'AC Tune-Up',
+        'AC Installation',
+        'Filter Replacement',
+        'Thermostat Installation',
+        'Preventive Maintenance',
+        'Indoor Air Humidification',
+        'Indoor Air Dehumidification',
+        'Air Cleaners & Purifiers',
+        'UV Light Installation',
+        'Ductless Mini-Split Systems',
+        'Emergency HVAC Service',
+      ],
     },
     headline: "A Family's Future × GoElev8.ai",
     features: [
-      'Voice answering agent (Vapi)',
-      'Branded SMS follow-up',
-      'Jobber integration',
+      '24/7 AI voice agent (Vapi)',
+      'Jobber booking integration',
+      'SMS confirmation + reminders',
       'Client dashboard',
       'Ongoing management',
     ],
