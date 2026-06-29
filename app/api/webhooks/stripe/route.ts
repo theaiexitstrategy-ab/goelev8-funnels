@@ -23,6 +23,7 @@
 import Stripe from 'stripe';
 import { createServiceClient } from '@/lib/db/supabase-service';
 import { getConfig, getFlags } from '@/lib/onboarding-configs';
+import { getPack, totalCreditsForPack } from '@/lib/sms-packs';
 import {
   ensureInitialSmsCredits,
   notifyAdminEmail,
@@ -65,6 +66,15 @@ export async function POST(req: Request) {
 
 async function handleCheckoutCompleted(sessionLite: Stripe.Checkout.Session) {
   const md = sessionLite.metadata ?? {};
+
+  // Branch by purchase type. SMS pack purchases go through their own path;
+  // anything else falls back to the client-signup flow (new client paying
+  // the setup fee on /qsetup, /affsetup, /onboard etc.).
+  if (md.type === 'sms_pack') {
+    await handleSmsPackPurchase(sessionLite);
+    return;
+  }
+
   const configSlug =
     md.config_slug ?? md.onboarding_slug ?? md.client ?? null;
   const requestedSlug = md.slug ?? md.client ?? configSlug ?? null;
@@ -198,6 +208,178 @@ async function handleCheckoutCompleted(sessionLite: Stripe.Checkout.Session) {
       flagsSummary: summarizeFlags(flags),
     }),
   });
+}
+
+// ── SMS PACK PURCHASE HANDLER ────────────────────────────────────────────
+
+async function handleSmsPackPurchase(sessionLite: Stripe.Checkout.Session) {
+  const md = sessionLite.metadata ?? {};
+  const packId = md.pack_id ?? '';
+  const pack = getPack(packId);
+  if (!pack) {
+    console.error('[webhooks/stripe:sms_pack] unknown pack_id:', packId);
+    await notifyAdminSMS(`⚠️ SMS pack purchase failed — unknown pack_id "${packId}" on session ${sessionLite.id}`);
+    return;
+  }
+
+  const supabase = createServiceClient();
+
+  // Idempotency — credit_ledger.ref_id stores the session id so a Stripe
+  // retry never double-credits.
+  const { data: existingLedger } = await supabase
+    .from('credit_ledger')
+    .select('id')
+    .eq('ref_id', sessionLite.id)
+    .maybeSingle();
+  if (existingLedger) {
+    console.log('[webhooks/stripe:sms_pack] session already credited:', sessionLite.id);
+    return;
+  }
+
+  const session = await stripe.checkout.sessions.retrieve(sessionLite.id, {
+    expand: ['customer', 'customer_details'],
+  });
+
+  const email =
+    session.customer_details?.email ??
+    (session.customer && typeof session.customer !== 'string' && 'email' in session.customer
+      ? (session.customer as any).email
+      : null) ??
+    null;
+  const name = session.customer_details?.name ?? null;
+  const totalCredits = totalCreditsForPack(pack);
+
+  // Match to a clients row:
+  //   1) explicit client_slug in metadata wins
+  //   2) otherwise the most recent paid client with this email
+  //   3) otherwise: notify Aaron, manual application
+  let matchedClient: { id: string; slug: string; business_name: string | null } | null = null;
+  const explicitSlug = md.client_slug?.trim();
+  if (explicitSlug) {
+    const { data } = await supabase
+      .from('clients')
+      .select('id, slug, business_name')
+      .or(`slug.eq.${explicitSlug},onboarding_config_slug.eq.${explicitSlug}`)
+      .order('paid_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    matchedClient = data ?? null;
+  }
+  if (!matchedClient && email) {
+    const { data } = await supabase
+      .from('clients')
+      .select('id, slug, business_name')
+      .eq('email', email)
+      .order('paid_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    matchedClient = data ?? null;
+  }
+
+  if (matchedClient) {
+    // Credit + ledger entry.
+    const { data: smsRow } = await supabase
+      .from('sms_credits')
+      .select('client_id, balance')
+      .eq('client_id', matchedClient.slug)
+      .maybeSingle();
+    const newBalance = (smsRow?.balance ?? 0) + totalCredits;
+    if (smsRow) {
+      await supabase
+        .from('sms_credits')
+        .update({ balance: newBalance })
+        .eq('client_id', matchedClient.slug);
+    } else {
+      await supabase.from('sms_credits').insert({
+        client_id: matchedClient.slug,
+        balance: newBalance,
+      });
+    }
+    await supabase.from('credit_ledger').insert({
+      client_id: matchedClient.id,
+      delta: totalCredits,
+      reason: 'pack_purchase',
+      ref_id: sessionLite.id,
+      pack: pack.id,
+      amount_cents: pack.priceCents,
+    });
+    console.log(
+      `[webhooks/stripe:sms_pack] +${totalCredits} credits → ${matchedClient.slug} (new balance ${newBalance})`,
+    );
+    await notifyAdminSMS(
+      `💰 SMS pack purchased: ${pack.name} ($${(pack.priceCents / 100).toFixed(0)}) — ${totalCredits} credits credited to ${matchedClient.business_name ?? matchedClient.slug}. New balance: ${newBalance}.`,
+    );
+    await notifyAdminEmail({
+      subject: `SMS credits added: ${matchedClient.business_name ?? matchedClient.slug}`,
+      htmlBody: smsPackEmail({
+        title: 'Credits applied automatically',
+        pack,
+        totalCredits,
+        email: email ?? '(no email)',
+        name,
+        clientSlug: matchedClient.slug,
+        clientBusiness: matchedClient.business_name,
+        newBalance,
+        sessionId: sessionLite.id,
+        appliedManually: false,
+      }),
+    });
+    return;
+  }
+
+  // No match — ledger entry tagged unattributed, manual application required.
+  console.warn('[webhooks/stripe:sms_pack] no client match for email:', email);
+  await notifyAdminSMS(
+    `⚠️ SMS pack purchased BUT no client match. ${pack.name} pack — ${totalCredits} credits — buyer: ${email ?? 'no email'}. Apply manually.`,
+  );
+  await notifyAdminEmail({
+    subject: `SMS pack purchased — needs manual application (${email ?? 'no email'})`,
+    htmlBody: smsPackEmail({
+      title: 'Manual application required',
+      pack,
+      totalCredits,
+      email: email ?? '(no email on session)',
+      name,
+      clientSlug: explicitSlug || '(not provided)',
+      clientBusiness: null,
+      newBalance: null,
+      sessionId: sessionLite.id,
+      appliedManually: true,
+    }),
+  });
+}
+
+function smsPackEmail(args: {
+  title: string;
+  pack: ReturnType<typeof getPack>;
+  totalCredits: number;
+  email: string;
+  name: string | null;
+  clientSlug: string;
+  clientBusiness: string | null;
+  newBalance: number | null;
+  sessionId: string;
+  appliedManually: boolean;
+}): string {
+  const pack = args.pack!;
+  return `<!doctype html><html><body style="margin:0;background:#000;color:#fff;font-family:Helvetica,Arial,sans-serif;">
+  <div style="max-width:560px;margin:0 auto;padding:32px 24px;">
+    <p style="margin:0 0 6px;letter-spacing:3px;text-transform:uppercase;font-size:11px;color:${args.appliedManually ? '#C8102E' : '#F5B800'};">${esc(args.title)}</p>
+    <h1 style="margin:0 0 18px;font-size:24px;font-weight:300;">${esc(pack.name)} Pack — ${args.totalCredits.toLocaleString()} credits</h1>
+    <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#0a0a0a;border:1px solid #1a1a1a;border-radius:6px;">
+      <tr><td style="padding:10px 14px;color:#888;font-size:12px;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid #1a1a1a;">Buyer email</td><td style="padding:10px 14px;color:#fff;font-size:13px;border-bottom:1px solid #1a1a1a;">${esc(args.email)}</td></tr>
+      ${args.name ? `<tr><td style="padding:10px 14px;color:#888;font-size:12px;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid #1a1a1a;">Buyer name</td><td style="padding:10px 14px;color:#fff;font-size:13px;border-bottom:1px solid #1a1a1a;">${esc(args.name)}</td></tr>` : ''}
+      <tr><td style="padding:10px 14px;color:#888;font-size:12px;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid #1a1a1a;">Pack</td><td style="padding:10px 14px;color:#fff;font-size:13px;border-bottom:1px solid #1a1a1a;">${esc(pack.name)} ($${(pack.priceCents / 100).toFixed(0)})</td></tr>
+      <tr><td style="padding:10px 14px;color:#888;font-size:12px;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid #1a1a1a;">Credits</td><td style="padding:10px 14px;color:#fff;font-size:13px;border-bottom:1px solid #1a1a1a;">${args.totalCredits.toLocaleString()}</td></tr>
+      <tr><td style="padding:10px 14px;color:#888;font-size:12px;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid #1a1a1a;">Client slug</td><td style="padding:10px 14px;color:#fff;font-size:13px;border-bottom:1px solid #1a1a1a;">${esc(args.clientSlug)}</td></tr>
+      ${args.clientBusiness ? `<tr><td style="padding:10px 14px;color:#888;font-size:12px;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid #1a1a1a;">Client</td><td style="padding:10px 14px;color:#fff;font-size:13px;border-bottom:1px solid #1a1a1a;">${esc(args.clientBusiness)}</td></tr>` : ''}
+      ${args.newBalance !== null ? `<tr><td style="padding:10px 14px;color:#888;font-size:12px;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid #1a1a1a;">New balance</td><td style="padding:10px 14px;color:#22c55e;font-size:13px;border-bottom:1px solid #1a1a1a;font-weight:700;">${args.newBalance.toLocaleString()} credits</td></tr>` : ''}
+      <tr><td style="padding:10px 14px;color:#888;font-size:12px;text-transform:uppercase;letter-spacing:1px;">Session</td><td style="padding:10px 14px;color:#fff;font-size:12px;font-family:monospace;">${esc(args.sessionId)}</td></tr>
+    </table>
+    ${args.appliedManually ? `<p style="margin:18px 0 0;color:#C8102E;font-size:13px;line-height:1.6;border-left:3px solid #C8102E;padding-left:12px;">⚠️ No client row matched this purchase. Manually find the right account and apply ${args.totalCredits.toLocaleString()} credits via Supabase, then add a credit_ledger entry referencing session ${esc(args.sessionId)}.</p>` : ''}
+    <p style="margin:18px 0 0;color:#666;font-size:11px;border-top:1px solid #1a1a1a;padding-top:14px;">GoElev8.ai · /smscalc purchase webhook · ${esc(new Date().toISOString())}</p>
+  </div>
+</body></html>`;
 }
 
 function summarizeFlags(f: ReturnType<typeof getFlags>): string {

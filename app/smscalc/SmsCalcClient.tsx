@@ -204,6 +204,31 @@ export default function App() {
   const [selectedPack, setSelectedPack] = useState('growth');
   const [activePreset, setActivePreset] = useState<number | null>(1);
   const [view, setView] = useState<'calculator' | 'packs' | 'explainer'>('calculator');
+  const [clientSlug, setClientSlug] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [buyError, setBuyError] = useState<string | null>(null);
+
+  async function startPackCheckout(packId: string) {
+    setSubmitting(true);
+    setBuyError(null);
+    try {
+      const res = await fetch('/api/smscalc/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pack_id: packId, client_slug: clientSlug.trim() || undefined }),
+      });
+      const data = await res.json();
+      if (res.ok && data.url) {
+        window.location.href = data.url;
+        return;
+      }
+      setBuyError(data.error || 'Checkout could not start. Try again.');
+    } catch {
+      setBuyError('Network error. Try again.');
+    } finally {
+      setSubmitting(false);
+    }
+  }
 
   useEffect(() => {
     const style = document.createElement('style');
@@ -613,15 +638,56 @@ export default function App() {
                     </div>
                   ))}
                 </div>
-                <button style={{
-                  width: '100%', background: selectedPackData.color,
-                  color: selectedPackData.id === 'growth' ? '#0A0A0A' : '#fff',
-                  border: 'none', borderRadius: 25, padding: '14px',
-                  fontSize: 15, fontWeight: 700, cursor: 'pointer',
-                  fontFamily: "'Inter', sans-serif", letterSpacing: 0.5,
-                }}>
-                  Add {selectedPackData.name} Pack to My Account — ${selectedPackData.price}
+
+                {/* Optional: tell us which client account this is for */}
+                <div style={{ marginBottom: 12 }}>
+                  <label style={{
+                    display: 'block', fontSize: 11, color: '#666', letterSpacing: 1,
+                    textTransform: 'uppercase', marginBottom: 6, fontWeight: 600,
+                  }}>
+                    Existing client? Enter your account slug (optional)
+                  </label>
+                  <input
+                    type="text"
+                    value={clientSlug}
+                    onChange={e => setClientSlug(e.target.value)}
+                    placeholder="e.g. roqbody, locs-and-wellness"
+                    disabled={submitting}
+                    style={{
+                      width: '100%', padding: '10px 12px',
+                      background: '#1A1A1A', border: '1px solid #2A2A2A',
+                      borderRadius: 8, color: '#F0F0F0',
+                      fontSize: 13, fontFamily: "'Inter', sans-serif",
+                      outline: 'none',
+                    }}
+                  />
+                  <div style={{ fontSize: 11, color: '#444', marginTop: 6, lineHeight: 1.5 }}>
+                    Skip this if you&apos;re new — we&apos;ll match by checkout email. Aaron applies credits within 1 business day.
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => startPackCheckout(selectedPackData.id)}
+                  disabled={submitting}
+                  style={{
+                    width: '100%', background: selectedPackData.color,
+                    color: selectedPackData.id === 'growth' ? '#0A0A0A' : '#fff',
+                    border: 'none', borderRadius: 25, padding: '14px',
+                    fontSize: 15, fontWeight: 700,
+                    cursor: submitting ? 'wait' : 'pointer',
+                    opacity: submitting ? 0.6 : 1,
+                    fontFamily: "'Inter', sans-serif", letterSpacing: 0.5,
+                    transition: 'opacity 0.15s ease',
+                  }}>
+                  {submitting
+                    ? 'Loading…'
+                    : `Buy ${selectedPackData.name} Pack — $${selectedPackData.price}`}
                 </button>
+                {buyError ? (
+                  <p style={{ marginTop: 10, color: '#ff6b6b', fontSize: 12, textAlign: 'center' }} role="alert">
+                    {buyError}
+                  </p>
+                ) : null}
               </div>
             )}
 
