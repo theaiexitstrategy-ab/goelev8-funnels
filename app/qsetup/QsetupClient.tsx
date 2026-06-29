@@ -55,10 +55,22 @@ const FEATURE_GROUPS = [
     ],
   },
   {
+    icon: '🔁',
+    title: 'Wix → GoElev8.ai Migration',
+    items: [
+      'We move roqbody.com from Wix to the GoElev8.ai platform',
+      'All 6 revenue streams rebuilt and ready inside one site',
+      'Submission forms migrated — Google Sheets, Jotform, anything you have',
+      'Lead capture routes into your portal automatically (no more checking 4 inboxes)',
+      'You manage everything in one place at portal.goelev8.ai',
+    ],
+  },
+  {
     icon: '⚙️',
     title: 'Ongoing Management',
     items: [
       'Aaron Bryant manages and optimizes your agent monthly',
+      'Page change requests: 24–72 hour turnaround on any updates you ask for',
       'You focus on training — we handle the tech',
     ],
   },
