@@ -13,7 +13,8 @@
 //   GO    → MSG 4 (Founding Client offer + stable Stripe Payment Link)
 //
 // Client-specific demo keywords:
-//   LAW   → Tariyha McClain traffic-ticket intake agent preview
+//   LAW   → McClain Law traffic-ticket intake assistant preview
+//           (Attorney: Tarihya McClain)
 //           (triggered from the sms:+18883020649?&body=LAW link on
 //            goelev8.ai/mcclain/demo)
 //   BOOK  → Follow-up confirmation for anyone who tapped "Reply BOOK"
@@ -91,7 +92,7 @@ function isBookKeyword(text: string): boolean {
 // ─── McClain intake demo messages ────────────────────────────────
 
 const MCCLAIN_LAW_MSG =
-  "Thanks for testing Tariyha McClain's intake agent 👋\n\n" +
+  "Thanks for testing McClain Law's intake assistant 👋\n\n" +
   'In under 60 seconds, a real lead texting this number would get:\n' +
   '1. Instant reply\n' +
   '2. Ticket type + county + court date confirmed\n' +

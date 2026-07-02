@@ -1,6 +1,6 @@
 // © 2026 GoElev8.ai | Aaron Bryant. All rights reserved. Unauthorized use prohibited.
 //
-// Client demo page for Tariyha McClain's traffic ticket practice.
+// Client demo page for Tarihya McClain's traffic ticket practice.
 // Verbatim port of tariyha-intake-agent.html into a Next.js App Router
 // page, with only these adaptations:
 //   - CSS split out to demo.css (scoped under .mcclain-demo)
@@ -20,7 +20,7 @@ const STRIPE_PLACEHOLDER = 'PASTE_STRIPE_PAYMENT_LINK_HERE';
 
 const OG_TITLE = 'Intake & Distribution Agent — GoElev8.ai';
 const OG_DESCRIPTION =
-  "An intake system built for Tariyha McClain's traffic ticket practice — every lead gets a case number in under 60 seconds, routed to the right attorney and booked on the calendar automatically.";
+  "An intake system built for Tarihya McClain's traffic ticket practice — every lead gets a case number in under 60 seconds, routed to the right attorney and booked on the calendar automatically.";
 
 export const metadata = {
   title: OG_TITLE,
@@ -45,7 +45,7 @@ export default function McclainDemoPage() {
       {/* HERO */}
       <div className="hero">
         <div className="wrap">
-          <div className="eyebrow mono">Prepared for Tariyha McClain</div>
+          <div className="eyebrow mono">Prepared for Tarihya McClain</div>
           <h1>
             Every lead gets a case number
             <br />
