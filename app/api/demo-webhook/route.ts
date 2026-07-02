@@ -12,6 +12,13 @@
 //   READY → MSG 3 (social proof — Flex, iSlay, WillPower)
 //   GO    → MSG 4 (Founding Client offer + stable Stripe Payment Link)
 //
+// Client-specific demo keywords:
+//   LAW   → Tariyha McClain traffic-ticket intake agent preview
+//           (triggered from the sms:+18883020649?&body=LAW link on
+//            goelev8.ai/mcclain/demo)
+//   BOOK  → Follow-up confirmation for anyone who tapped "Reply BOOK"
+//           in the LAW response
+//
 // Compliance keywords (STOP / UNSUBSCRIBE / HELP / START) run BEFORE any
 // keyword detection, so they always win. Any other inbound text returns
 // empty TwiML — no auto-reply per spec.
@@ -68,6 +75,34 @@ function isGoKeyword(text: string): boolean {
   if (firstWord(text) !== 'go') return false;
   return tokenCount(text) <= 3;
 }
+
+function isLawKeyword(text: string): boolean {
+  if (!text) return false;
+  if (firstWord(text) !== 'law') return false;
+  return tokenCount(text) <= 3;
+}
+
+function isBookKeyword(text: string): boolean {
+  if (!text) return false;
+  if (firstWord(text) !== 'book') return false;
+  return tokenCount(text) <= 3;
+}
+
+// ─── McClain intake demo messages ────────────────────────────────
+
+const MCCLAIN_LAW_MSG =
+  "Thanks for testing Tariyha McClain's intake agent 👋\n\n" +
+  'In under 60 seconds, a real lead texting this number would get:\n' +
+  '1. Instant reply\n' +
+  '2. Ticket type + county + court date confirmed\n' +
+  '3. Auto-routed to the right attorney\n' +
+  '4. Consult booked by text — on the calendar\n\n' +
+  "That's what your firm's leads would experience.\n\n" +
+  'Want a live walkthrough? Reply BOOK.';
+
+const MCCLAIN_BOOK_MSG =
+  "Perfect. Aaron @ GoElev8.ai will text this number within 1 business day to set up your walkthrough.\n\n" +
+  'Need it sooner? Email ab@goelev8.ai or reply here with a good time.';
 
 // ─── TwiML ───────────────────────────────────────────────────────
 
@@ -214,6 +249,50 @@ async function handleInbound(from: string, text: string, isTwilio: boolean) {
     if (supabase) await advanceActiveSession(supabase, from, 4);
     const url = process.env.STRIPE_FOUNDING_PAYMENT_LINK || FOUNDING_PAYMENT_LINK;
     const reply = withOptOutNotice(DEMO_MSG.four(url));
+    return isTwilio ? twiml(reply) : NextResponse.json({ reply });
+  }
+
+  // ── LAW → McClain traffic-ticket intake preview ──
+  // Triggered by the sms:+18883020649?&body=LAW link on
+  // goelev8.ai/mcclain/demo. Best-effort log to demo_leads under a
+  // distinct source; skip on failure so the reply still fires.
+  if (isLawKeyword(text)) {
+    if (supabase) {
+      try {
+        const nowIso = new Date().toISOString();
+        await supabase
+          .from('demo_leads')
+          .insert({
+            phone_number: from,
+            source: 'mcclain-law-keyword',
+            keyword: 'LAW',
+            sms_sent: true,
+            sms_sent_at: nowIso,
+            step_completed: 1,
+          });
+      } catch (err) {
+        console.error('[demo-webhook] mcclain LAW log failed:', err);
+      }
+    }
+    const reply = withOptOutNotice(MCCLAIN_LAW_MSG);
+    return isTwilio ? twiml(reply) : NextResponse.json({ reply });
+  }
+
+  // ── BOOK → McClain intake follow-up ──
+  if (isBookKeyword(text)) {
+    if (supabase) {
+      try {
+        await supabase
+          .from('demo_leads')
+          .update({ step_completed: 2, completed_at: new Date().toISOString() })
+          .eq('phone_number', from)
+          .eq('source', 'mcclain-law-keyword')
+          .is('completed_at', null);
+      } catch (err) {
+        console.error('[demo-webhook] mcclain BOOK update failed:', err);
+      }
+    }
+    const reply = withOptOutNotice(MCCLAIN_BOOK_MSG);
     return isTwilio ? twiml(reply) : NextResponse.json({ reply });
   }
 
