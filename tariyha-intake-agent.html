@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<!-- © 2026 GoElev8.ai | Aaron Bryant. All rights reserved. Unauthorized use prohibited. -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Intake & Distribution Agent — GoElev8.ai</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0F1B2D;
+    --ink-2:#16273F;
+    --cream:#EEEBE2;
+    --cream-2:#E2DECF;
+    --brass:#C9A227;
+    --brass-light:#E4C766;
+    --ink-text:#1A2333;
+    --muted:#5C6478;
+    --white:#FBFAF7;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:'Inter', sans-serif;
+    color:var(--ink-text);
+    background:var(--cream);
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{font-family:'Fraunces', serif; font-weight:600; letter-spacing:-0.01em;}
+  .mono{font-family:'IBM Plex Mono', monospace; letter-spacing:0.04em; text-transform:uppercase;}
+  a{color:inherit;}
+  .wrap{max-width:960px; margin:0 auto; padding:0 28px;}
+
+  /* HERO */
+  .hero{
+    background:radial-gradient(120% 140% at 15% 0%, var(--ink-2) 0%, var(--ink) 55%, #0A1420 100%);
+    color:var(--white);
+    padding:88px 0 96px;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero::after{
+    content:"";
+    position:absolute;
+    right:-120px; top:-120px;
+    width:420px; height:420px;
+    border:1px solid rgba(201,162,39,0.18);
+    border-radius:50%;
+  }
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:10px;
+    font-size:12px; color:var(--brass-light);
+    margin-bottom:22px;
+  }
+  .eyebrow::before{content:""; width:20px; height:1px; background:var(--brass-light);}
+  .hero h1{
+    font-size:clamp(34px, 5vw, 54px);
+    line-height:1.08;
+    max-width:760px;
+    color:var(--white);
+  }
+  .hero h1 em{font-style:italic; color:var(--brass-light);}
+  .hero p.sub{
+    margin-top:22px;
+    font-size:18px;
+    color:rgba(251,250,247,0.72);
+    max-width:560px;
+  }
+  .hero-cta{
+    margin-top:36px;
+    display:flex; gap:16px; flex-wrap:wrap;
+  }
+  .btn{
+    display:inline-block;
+    padding:15px 28px;
+    border-radius:2px;
+    font-size:14px;
+    font-weight:600;
+    letter-spacing:0.02em;
+    text-decoration:none;
+    transition:transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .btn-primary{
+    background:var(--brass);
+    color:var(--ink);
+  }
+  .btn-primary:hover{transform:translateY(-2px); box-shadow:0 8px 22px rgba(201,162,39,0.35);}
+  .btn-ghost{
+    border:1px solid rgba(251,250,247,0.3);
+    color:var(--white);
+  }
+  .btn-ghost:hover{border-color:var(--brass-light); color:var(--brass-light);}
+
+  /* DOCKET STAMP TICKER — signature element */
+  .ticker{
+    margin-top:56px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:0;
+    border-top:1px solid rgba(251,250,247,0.15);
+    padding-top:28px;
+  }
+  .stamp{
+    flex:1; min-width:150px;
+    padding:14px 18px 14px 0;
+    opacity:0;
+    animation:stampIn 0.5s ease forwards;
+  }
+  .stamp:nth-child(1){animation-delay:0.15s;}
+  .stamp:nth-child(2){animation-delay:0.55s;}
+  .stamp:nth-child(3){animation-delay:0.95s;}
+  .stamp:nth-child(4){animation-delay:1.35s;}
+  @keyframes stampIn{
+    from{opacity:0; transform:scale(1.15) rotate(-3deg);}
+    to{opacity:1; transform:scale(1) rotate(-1.5deg);}
+  }
+  .stamp .num{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--brass-light); opacity:0.8;}
+  .stamp .label{
+    font-family:'Fraunces', serif;
+    font-size:15px;
+    font-weight:600;
+    color:var(--white);
+    border:1.5px solid var(--brass-light);
+    display:inline-block;
+    padding:3px 10px;
+    margin-top:6px;
+    transform:rotate(-1.5deg);
+  }
+  .stamp .desc{font-size:12.5px; color:rgba(251,250,247,0.55); margin-top:8px; max-width:170px;}
+
+  /* SECTIONS */
+  section{padding:72px 0;}
+  .section-label{
+    font-size:12px; color:var(--brass); margin-bottom:10px;
+  }
+  section h2{font-size:clamp(26px, 3.4vw, 34px); max-width:600px;}
+  .lede{color:var(--muted); max-width:540px; margin-top:14px; font-size:15.5px;}
+
+  /* PROBLEM / BEFORE-AFTER */
+  .compare{
+    display:grid; grid-template-columns:1fr 1fr; gap:1px;
+    background:var(--cream-2);
+    margin-top:40px;
+    border:1px solid var(--cream-2);
+  }
+  .compare > div{background:var(--white); padding:30px;}
+  .compare h3{font-size:13px; text-transform:uppercase; letter-spacing:0.05em; font-family:'IBM Plex Mono', monospace; font-weight:500; margin-bottom:16px;}
+  .compare.before h3, .compare-before h3{color:#A44B3F;}
+  .compare-after h3{color:#1E7A4E;}
+  .compare ul{list-style:none;}
+  .compare li{
+    font-size:14.5px; color:var(--ink-text); padding:9px 0;
+    border-top:1px solid var(--cream-2);
+  }
+  .compare li:first-child{border-top:none;}
+
+  /* HOW IT WORKS */
+  .flow{margin-top:44px; display:flex; flex-direction:column;}
+  .flow-item{
+    display:grid; grid-template-columns:64px 1fr; gap:24px;
+    padding:24px 0;
+    border-top:1px solid var(--cream-2);
+  }
+  .flow-item:last-child{border-bottom:1px solid var(--cream-2);}
+  .flow-num{font-family:'IBM Plex Mono', monospace; font-size:13px; color:var(--brass); padding-top:4px;}
+  .flow-item h3{font-size:19px; margin-bottom:6px;}
+  .flow-item p{color:var(--muted); font-size:14.5px; max-width:520px;}
+
+  /* PRICING */
+  .pricing{
+    margin-top:44px;
+    display:grid; grid-template-columns:repeat(3, 1fr); gap:18px;
+  }
+  .tier{
+    background:var(--white);
+    border:1px solid var(--cream-2);
+    padding:30px 26px;
+    display:flex; flex-direction:column;
+    transition:border-color 0.15s ease, transform 0.15s ease;
+  }
+  .tier:hover{border-color:var(--brass); transform:translateY(-3px);}
+  .tier.featured{border-color:var(--brass); border-width:2px; position:relative;}
+  .tier.featured::before{
+    content:"MOST COMMON";
+    position:absolute; top:-11px; left:26px;
+    background:var(--brass); color:var(--ink);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10px; letter-spacing:0.06em;
+    padding:3px 9px;
+  }
+  .tier .tname{font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:0.05em; color:var(--muted); text-transform:uppercase;}
+  .tier .tprice{font-family:'Fraunces', serif; font-size:32px; margin:10px 0 4px;}
+  .tier .tprice span{font-size:14px; color:var(--muted); font-family:'Inter',sans-serif;}
+  .tier ul{list-style:none; margin-top:18px; flex:1;}
+  .tier li{font-size:13.5px; padding:7px 0; color:var(--ink-text); position:relative; padding-left:16px;}
+  .tier li::before{content:"—"; position:absolute; left:0; color:var(--brass);}
+
+  /* ADDON */
+  .addon{
+    margin-top:60px;
+    background:var(--ink);
+    color:var(--white);
+    padding:36px;
+    display:grid; grid-template-columns:auto 1fr; gap:24px; align-items:start;
+  }
+  .addon .mono{color:var(--brass-light); font-size:11px;}
+  .addon h3{color:var(--white); margin-top:8px; font-size:20px;}
+  .addon p{color:rgba(251,250,247,0.65); font-size:14px; margin-top:8px; max-width:480px;}
+
+  /* FINAL CTA */
+  .final{
+    background:var(--ink);
+    color:var(--white);
+    padding:88px 0;
+    text-align:center;
+  }
+  .final h2{color:var(--white); max-width:none;}
+  .final p{color:rgba(251,250,247,0.65); margin:16px auto 34px; max-width:440px;}
+
+  footer{
+    padding:28px 0; text-align:center; font-size:12.5px; color:var(--muted);
+    background:var(--cream);
+  }
+  footer a{color:var(--brass); text-decoration:none;}
+
+  @media (max-width:720px){
+    .compare{grid-template-columns:1fr;}
+    .pricing{grid-template-columns:1fr;}
+    .addon{grid-template-columns:1fr;}
+    .ticker{flex-direction:column;}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .stamp{animation:none; opacity:1;}
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="wrap">
+    <div class="eyebrow mono">Prepared for Tariyha McClain</div>
+    <h1>Every lead gets a case number<br><em>in under 60 seconds.</em></h1>
+    <p class="sub">An intake system built for a growing practice — so leads never sit waiting on the right attorney to notice them.</p>
+    <div class="hero-cta">
+      <a href="#pricing" class="btn btn-primary">See pricing</a>
+      <a href="#how" class="btn btn-ghost">How it works</a>
+    </div>
+
+    <div class="ticker">
+      <div class="stamp">
+        <div class="num">01 / DOCKET</div>
+        <div class="label">RECEIVED</div>
+        <div class="desc">Lead comes in from site, ad, or missed call</div>
+      </div>
+      <div class="stamp">
+        <div class="num">02 / DOCKET</div>
+        <div class="label">QUALIFIED</div>
+        <div class="desc">County, ticket type, court date confirmed</div>
+      </div>
+      <div class="stamp">
+        <div class="num">03 / DOCKET</div>
+        <div class="label">ROUTED</div>
+        <div class="desc">Assigned to the right attorney, automatically</div>
+      </div>
+      <div class="stamp">
+        <div class="num">04 / DOCKET</div>
+        <div class="label">BOOKED</div>
+        <div class="desc">Consult confirmed by text, on the calendar</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+    <div class="section-label mono">The shift</div>
+    <h2>What worked solo doesn't work at scale.</h2>
+    <p class="lede">A shared inbox or group text was fine when it was just you answering leads. With a full staff, that same setup is where leads start to disappear.</p>
+
+    <div class="compare">
+      <div class="compare-before">
+        <h3>Before</h3>
+        <ul>
+          <li>Leads sit in a shared inbox</li>
+          <li>Everyone assumes someone else has it</li>
+          <li>Response time depends on who's free</li>
+          <li>No-shows just go cold</li>
+        </ul>
+      </div>
+      <div class="compare-after">
+        <h3>With the agent</h3>
+        <ul>
+          <li>Every lead answered in under 60 seconds</li>
+          <li>Auto-routed to the right attorney</li>
+          <li>Consults booked directly on the calendar</li>
+          <li>Non-responders get automatic follow-up</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="how" style="background:var(--white); border-top:1px solid var(--cream-2); border-bottom:1px solid var(--cream-2);">
+  <div class="wrap">
+    <div class="section-label mono">How it works</div>
+    <h2>Four steps, no manual handoffs.</h2>
+
+    <div class="flow">
+      <div class="flow-item">
+        <div class="flow-num">01</div>
+        <div>
+          <h3>Instant response</h3>
+          <p>Website form, Google ad click, or missed call — the agent replies in under a minute, every time.</p>
+        </div>
+      </div>
+      <div class="flow-item">
+        <div class="flow-num">02</div>
+        <div>
+          <h3>Real qualification</h3>
+          <p>Ticket type, county/court, violation date, and how close the court date is — the exact information your intake process needs.</p>
+        </div>
+      </div>
+      <div class="flow-item">
+        <div class="flow-num">03</div>
+        <div>
+          <h3>Automatic routing</h3>
+          <p>Based on caseload, jurisdiction, or availability, the lead is assigned to the right attorney — no group chat required.</p>
+        </div>
+      </div>
+      <div class="flow-item">
+        <div class="flow-num">04</div>
+        <div>
+          <h3>Booking & follow-up</h3>
+          <p>Consult gets booked and confirmed by text. Anyone who doesn't book gets 2–3 automatic follow-ups over 48–72 hours.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="pricing">
+  <div class="wrap">
+    <div class="section-label mono">Investment</div>
+    <h2>Priced like a utility bill, not a project.</h2>
+    <p class="lede">Start where it makes sense, add on as the team grows.</p>
+
+    <div class="pricing">
+      <div class="tier">
+        <div class="tname">Base</div>
+        <div class="tprice">$147<span>/mo</span></div>
+        <ul>
+          <li>Instant lead response</li>
+          <li>Qualification questions</li>
+          <li>Direct calendar booking</li>
+        </ul>
+      </div>
+      <div class="tier featured">
+        <div class="tname">Growth</div>
+        <div class="tprice">$297<span>/mo</span></div>
+        <ul>
+          <li>Everything in Base</li>
+          <li>Auto-routing across attorneys</li>
+          <li>48–72hr follow-up nurture</li>
+        </ul>
+      </div>
+      <div class="tier">
+        <div class="tname">Full Scale</div>
+        <div class="tprice">$497<span>/mo</span></div>
+        <ul>
+          <li>Everything in Growth</li>
+          <li>Case status text updates</li>
+          <li>Client-facing automation</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="addon">
+      <div class="mono">ADD-ON</div>
+      <div>
+        <h3>Case Status Agent</h3>
+        <p>For existing clients — automated "where's my court date" text updates. One of the biggest time drains on paralegal staff in traffic law, and a natural next phase once intake is live.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="final">
+  <div class="wrap">
+    <h2>Let's get this running on your current lead flow.</h2>
+    <p>A short pilot is the fastest way to see it live before committing to anything bigger.</p>
+    <a href="PASTE_STRIPE_PAYMENT_LINK_HERE" class="btn btn-primary">Get started</a>
+  </div>
+</div>
+
+<footer>
+  Built by <a href="https://goelev8.ai" target="_blank">GoElev8.ai</a> — AI systems for growing service businesses.
+</footer>
+
+</body>
+</html>
