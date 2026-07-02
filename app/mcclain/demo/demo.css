@@ -344,6 +344,48 @@
   color: var(--brass);
 }
 
+/* Setup fee — muted secondary line directly below the monthly price. */
+.mcclain-demo .tsetup {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-top: 2px;
+  margin-bottom: 2px;
+}
+
+/* Per-tier CTA button that starts Stripe Checkout. */
+.mcclain-demo .tier-btn {
+  margin-top: 18px;
+  border: none;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  width: 100%;
+}
+.mcclain-demo .tier-btn:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+.mcclain-demo .tier-error {
+  margin-top: 8px;
+  color: #A44B3F;
+  font-size: 12px;
+  text-align: center;
+}
+/* When the tier button is a ghost variant, invert borders for the light
+ * pricing-card background — the base .btn-ghost is designed for the dark
+ * hero, not the cream/white tier cards. */
+.mcclain-demo .tier .btn-ghost {
+  border: 1px solid var(--ink);
+  color: var(--ink);
+  background: transparent;
+}
+.mcclain-demo .tier .btn-ghost:hover {
+  border-color: var(--brass);
+  color: var(--brass);
+}
+
 /* ADDON */
 .mcclain-demo .addon {
   margin-top: 60px;

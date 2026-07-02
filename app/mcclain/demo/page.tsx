@@ -9,14 +9,15 @@
 //     the source HTML but the URL and body text were spec'd
 //     explicitly, so it's a specified addition, not an invention.
 //
-// The "Get started" button href is a placeholder — swap
-// PASTE_STRIPE_PAYMENT_LINK_HERE for the real Stripe Payment Link
-// before sharing broadly.
+// The "Get started" buttons on the pricing cards and the final CTA now
+// hit /api/checkout/mcclain, which creates a Stripe Checkout Session
+// that combines the tier's one-time setup fee with the recurring
+// monthly subscription in a single hosted checkout.
 
 import './demo.css';
+import TierButton from './TierButton';
 
 const SMS_HREF = 'sms:+18883020649?&body=LAW';
-const STRIPE_PLACEHOLDER = 'PASTE_STRIPE_PAYMENT_LINK_HERE';
 
 const OG_TITLE = 'Intake & Distribution Agent — GoElev8.ai';
 const OG_DESCRIPTION =
@@ -192,33 +193,39 @@ export default function McclainDemoPage() {
               <div className="tprice">
                 $147<span>/mo</span>
               </div>
+              <div className="tsetup mono">+ $497 one-time setup</div>
               <ul>
                 <li>Instant lead response</li>
                 <li>Qualification questions</li>
                 <li>Direct calendar booking</li>
               </ul>
+              <TierButton tier="base" variant="ghost" />
             </div>
             <div className="tier featured">
               <div className="tname">Growth</div>
               <div className="tprice">
                 $297<span>/mo</span>
               </div>
+              <div className="tsetup mono">+ $997 one-time setup</div>
               <ul>
                 <li>Everything in Base</li>
                 <li>Auto-routing across attorneys</li>
                 <li>48–72hr follow-up nurture</li>
               </ul>
+              <TierButton tier="growth" variant="primary" />
             </div>
             <div className="tier">
               <div className="tname">Full Scale</div>
               <div className="tprice">
                 $497<span>/mo</span>
               </div>
+              <div className="tsetup mono">+ $1,497 one-time setup</div>
               <ul>
                 <li>Everything in Growth</li>
                 <li>Case status text updates</li>
                 <li>Client-facing automation</li>
               </ul>
+              <TierButton tier="fullscale" variant="ghost" />
             </div>
           </div>
 
@@ -234,14 +241,12 @@ export default function McclainDemoPage() {
         </div>
       </section>
 
-      {/* FINAL CTA */}
+      {/* FINAL CTA — defaults to the featured Growth tier */}
       <div className="final">
         <div className="wrap">
           <h2>Let&apos;s get this running on your current lead flow.</h2>
           <p>A short pilot is the fastest way to see it live before committing to anything bigger.</p>
-          <a href={STRIPE_PLACEHOLDER} className="btn btn-primary">
-            Get started
-          </a>
+          <TierButton tier="growth" variant="primary" label="Get started" />
         </div>
       </div>
 

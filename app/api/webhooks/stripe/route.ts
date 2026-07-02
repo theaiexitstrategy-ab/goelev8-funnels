@@ -68,10 +68,15 @@ async function handleCheckoutCompleted(sessionLite: Stripe.Checkout.Session) {
   const md = sessionLite.metadata ?? {};
 
   // Branch by purchase type. SMS pack purchases go through their own path;
-  // anything else falls back to the client-signup flow (new client paying
-  // the setup fee on /qsetup, /affsetup, /onboard etc.).
+  // McClain intake tier signups go through theirs; anything else falls back
+  // to the client-signup flow (new client paying the setup fee on /qsetup,
+  // /affsetup, /onboard etc.).
   if (md.type === 'sms_pack') {
     await handleSmsPackPurchase(sessionLite);
+    return;
+  }
+  if (md.source === 'mcclain') {
+    await handleMcclainCheckout(sessionLite);
     return;
   }
 
@@ -347,6 +352,94 @@ async function handleSmsPackPurchase(sessionLite: Stripe.Checkout.Session) {
       appliedManually: true,
     }),
   });
+}
+
+// ── McCLAIN INTAKE TIER SIGNUP HANDLER ───────────────────────────────────
+//
+// Fires when a Checkout Session with metadata.source='mcclain' completes.
+// This is the /mcclain/demo checkout flow (Base / Growth / Full Scale
+// tiers), one-time setup + monthly subscription combined. We deliberately
+// do NOT touch the multi-tenant provisioning pipeline — McClain Law is a
+// standalone prospect, and any tenant setup will be handled manually by
+// Aaron after signup. Just log + notify.
+
+async function handleMcclainCheckout(sessionLite: Stripe.Checkout.Session) {
+  const md = sessionLite.metadata ?? {};
+  const tierKey = md.tier ?? 'unknown';
+  const tierName = md.tier_name ?? tierKey;
+  const monthlyCents = Number(md.monthly_cents ?? 0);
+  const setupCents = Number(md.setup_cents ?? 0);
+
+  // Pull the fully expanded session so we get email + name from Stripe.
+  let email: string | null = null;
+  let name: string | null = null;
+  let subscriptionId: string | null = null;
+  try {
+    const full = await stripe.checkout.sessions.retrieve(sessionLite.id, {
+      expand: ['customer_details', 'subscription'],
+    });
+    email = full.customer_details?.email ?? null;
+    name = full.customer_details?.name ?? null;
+    subscriptionId = typeof full.subscription === 'string'
+      ? full.subscription
+      : full.subscription?.id ?? null;
+  } catch (err: any) {
+    console.error('[webhooks/stripe:mcclain] session expand failed:', err?.message ?? err);
+  }
+
+  const monthlyDollars = (monthlyCents / 100).toFixed(0);
+  const setupDollars = (setupCents / 100).toFixed(0);
+
+  console.log(
+    `[webhooks/stripe:mcclain] ✅ ${tierName} tier signup — ${name ?? '(no name)'} <${email ?? 'no email'}> — $${setupDollars} setup + $${monthlyDollars}/mo — session=${sessionLite.id} sub=${subscriptionId ?? '(none)'}`,
+  );
+
+  await notifyAdminSMS(
+    `🎉 McClain Law signup! ${tierName} tier — ${name ?? email ?? 'buyer'} paid $${setupDollars} setup + $${monthlyDollars}/mo starting today.`,
+  );
+
+  await notifyAdminEmail({
+    subject: `McClain Law signed up — ${tierName} tier`,
+    htmlBody: mcclainSignupEmail({
+      tierName,
+      tierKey,
+      monthlyDollars,
+      setupDollars,
+      email: email ?? '(no email on session)',
+      name,
+      subscriptionId,
+      sessionId: sessionLite.id,
+    }),
+  });
+}
+
+function mcclainSignupEmail(args: {
+  tierName: string;
+  tierKey: string;
+  monthlyDollars: string;
+  setupDollars: string;
+  email: string;
+  name: string | null;
+  subscriptionId: string | null;
+  sessionId: string;
+}): string {
+  return `<!doctype html><html><body style="margin:0;background:#0F1B2D;color:#FBFAF7;font-family:Helvetica,Arial,sans-serif;">
+  <div style="max-width:560px;margin:0 auto;padding:32px 24px;">
+    <p style="margin:0 0 6px;letter-spacing:3px;text-transform:uppercase;font-size:11px;color:#E4C766;">McClain Law signup</p>
+    <h1 style="margin:0 0 18px;font-size:24px;font-weight:300;">${esc(args.tierName)} tier — signed up</h1>
+    <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#16273F;border:1px solid #1e304a;border-radius:6px;">
+      <tr><td style="padding:10px 14px;color:#8a94a6;font-size:12px;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid #1e304a;">Buyer</td><td style="padding:10px 14px;color:#fff;font-size:13px;border-bottom:1px solid #1e304a;">${esc(args.name) || '(no name)'}</td></tr>
+      <tr><td style="padding:10px 14px;color:#8a94a6;font-size:12px;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid #1e304a;">Email</td><td style="padding:10px 14px;color:#fff;font-size:13px;border-bottom:1px solid #1e304a;">${esc(args.email)}</td></tr>
+      <tr><td style="padding:10px 14px;color:#8a94a6;font-size:12px;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid #1e304a;">Tier</td><td style="padding:10px 14px;color:#fff;font-size:13px;border-bottom:1px solid #1e304a;">${esc(args.tierName)} (${esc(args.tierKey)})</td></tr>
+      <tr><td style="padding:10px 14px;color:#8a94a6;font-size:12px;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid #1e304a;">Charged today</td><td style="padding:10px 14px;color:#E4C766;font-size:14px;font-weight:700;border-bottom:1px solid #1e304a;">$${esc(args.setupDollars)} setup + $${esc(args.monthlyDollars)} first month</td></tr>
+      <tr><td style="padding:10px 14px;color:#8a94a6;font-size:12px;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid #1e304a;">Recurring</td><td style="padding:10px 14px;color:#fff;font-size:13px;border-bottom:1px solid #1e304a;">$${esc(args.monthlyDollars)}/mo</td></tr>
+      ${args.subscriptionId ? `<tr><td style="padding:10px 14px;color:#8a94a6;font-size:12px;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid #1e304a;">Subscription</td><td style="padding:10px 14px;color:#fff;font-size:12px;font-family:monospace;border-bottom:1px solid #1e304a;">${esc(args.subscriptionId)}</td></tr>` : ''}
+      <tr><td style="padding:10px 14px;color:#8a94a6;font-size:12px;text-transform:uppercase;letter-spacing:1px;">Session</td><td style="padding:10px 14px;color:#fff;font-size:12px;font-family:monospace;">${esc(args.sessionId)}</td></tr>
+    </table>
+    <p style="margin:24px 0 8px;color:#fff;font-size:13px;">Next step: reach out within 1 business day to schedule the kick-off.</p>
+    <p style="margin:18px 0 0;color:#8a94a6;font-size:11px;border-top:1px solid #1e304a;padding-top:14px;">GoElev8.ai · /mcclain/demo webhook · ${esc(new Date().toISOString())}</p>
+  </div>
+</body></html>`;
 }
 
 function smsPackEmail(args: {
