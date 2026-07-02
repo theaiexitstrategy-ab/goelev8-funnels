@@ -296,7 +296,7 @@ export const ONBOARDING_CONFIGS: Record<string, OnboardingConfig> = {
       'Calendar / booking integration (Jobber, GlossGenius, Google, etc.)',
       'Merch shop setup (shop.goelev8.ai/[you])',
       'Client dashboard at portal.goelev8.ai',
-      'iSlay Studios keyword network (SEO boost)',
+      'Local SEO boost',
       'Ongoing site + agent management',
     ],
   },

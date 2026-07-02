@@ -64,11 +64,11 @@ const FEATURE_GROUPS: { icon: string; title: string; items: string[] }[] = [
   },
   {
     icon: '🔍',
-    title: 'iSlay Studios Keyword Network',
+    title: 'SEO Boost',
     items: [
-      'SEO boost through the iSlay Studios keyword network',
       'Local search visibility improvements',
-      'Cross-promotion with other GoElev8.ai clients',
+      'Google Business Profile setup + optimization',
+      'On-page keyword + metadata optimization',
     ],
   },
   {
