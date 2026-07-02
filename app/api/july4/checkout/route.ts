@@ -22,19 +22,19 @@ import { getConfig } from '@/lib/onboarding-configs';
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://www.goelev8.ai';
 const PROMO_CODE = 'JULY4TH50';
 
-// Product blurbs per config for the Stripe line item.
-const PRODUCT_COPY: Record<string, { name: string; description: string; owner_phone: string }> = {
-  roqbody: {
-    name: 'ROQ Body Setup — GoElev8.ai Presence Tier',
+// Product blurbs per config for the Stripe line item. Copy is intentionally
+// generic — the /july4 page is publicly shareable so nothing here names a
+// specific client business (that stays inside private /qsetup and /affsetup).
+const PRODUCT_COPY: Record<string, { name: string; description: string }> = {
+  'presence-lead': {
+    name: 'AI Lead Agent Setup — GoElev8.ai Presence Tier',
     description:
-      'Custom AI lead agent, branded SMS, dashboard, audit + site brief, and ongoing management. 50% off with JULY4TH50.',
-    owner_phone: '',
+      'Custom AI lead agent on your site, branded SMS follow-up, dashboard, and ongoing management. 50% off with JULY4TH50.',
   },
-  afff: {
-    name: 'AFF HVAC Setup — GoElev8.ai Presence Tier',
+  'presence-voice': {
+    name: 'AI Voice Agent Setup — GoElev8.ai Presence Tier',
     description:
-      'Custom 24/7 AI voice agent, Jobber booking integration, SMS confirmations, dashboard, and ongoing management. 50% off with JULY4TH50.',
-    owner_phone: '3145039944',
+      'Custom 24/7 AI voice agent, calendar booking integration, SMS confirmations, dashboard, and ongoing management. 50% off with JULY4TH50.',
   },
 };
 
@@ -101,7 +101,7 @@ export async function POST(req: Request) {
       metadata: {
         slug: cfg.slug,
         config_slug: cfg.slug,
-        owner_phone: copy.owner_phone,
+        owner_phone: '',
         promo_code: PROMO_CODE,
         tier: cfg.tier ?? cfg.plan,
       },

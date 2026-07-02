@@ -9,7 +9,7 @@ const WHITE_BLUE = '#3B82F6';
 const DISPLAY = '"Bebas Neue", sans-serif';
 const BODY = '"Inter", system-ui, -apple-system, sans-serif';
 
-type OfferKey = 'roqbody' | 'afff';
+type OfferKey = 'presence-lead' | 'presence-voice';
 
 const OFFERS: {
   key: OfferKey;
@@ -19,30 +19,30 @@ const OFFERS: {
   accent: string;
 }[] = [
   {
-    key: 'roqbody',
-    headline: 'ROQ Body Setup',
-    subhead: 'Presence Tier — Custom AI Lead Agent',
+    key: 'presence-lead',
+    headline: 'AI Lead Agent Setup',
+    subhead: 'Presence Tier — Chat & SMS Lead Capture',
     bullets: [
-      'Custom AI lead agent embedded on roqbody.com',
+      'Custom AI lead agent embedded on your site',
+      'Qualifies visitors 24/7 and captures name + phone',
       'Branded SMS follow-up (500 credits/mo included)',
-      'Client dashboard at portal.goelev8.ai',
+      'Live dashboard at portal.goelev8.ai',
       'Homepage audit + site brief',
-      'Wix → GoElev8.ai platform migration',
-      'Ongoing management',
+      'Ongoing management by Aaron',
     ],
     accent: GOLD,
   },
   {
-    key: 'afff',
-    headline: 'AFF HVAC Setup',
-    subhead: 'Presence Tier — 24/7 AI Voice Agent',
+    key: 'presence-voice',
+    headline: 'AI Voice Agent Setup',
+    subhead: 'Presence Tier — 24/7 Phone Answering',
     bullets: [
-      '24/7 AI voice agent — answers every call',
-      'Books directly into Jobber (no double-booking)',
-      'SMS confirmation + 24h reminders',
-      'Client dashboard at portal.goelev8.ai',
-      'Emergency call transfer',
-      'Ongoing management',
+      '24/7 AI voice agent — answers every inbound call',
+      'Qualifies callers and books into your calendar',
+      'SMS confirmation + 24-hour reminders',
+      'Emergency / urgent call transfer',
+      'Live dashboard at portal.goelev8.ai',
+      'Ongoing management by Aaron',
     ],
     accent: WHITE_BLUE,
   },

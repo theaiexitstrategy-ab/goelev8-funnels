@@ -210,6 +210,61 @@ export const ONBOARDING_CONFIGS: Record<string, OnboardingConfig> = {
       'Ongoing management',
     ],
   },
+
+  // ── Generic configs used by the public /july4 promo page. No knownInfo
+  // and empty clientName so the Claude onboarding agent greets buyers
+  // fresh and collects everything from scratch. Feature flags line up
+  // with the chosen service type.
+  'presence-lead': {
+    slug: 'presence-lead',
+    clientName: '',
+    ownerName: '',
+    businessName: 'Your business',
+    accentColor: '#F5B800',
+    plan: 'presence',
+    tier: 'presence',
+    setupFeeCents: 40000,
+    monthlyPriceCents: 9900,
+    smsCreditsIncluded: 500,
+    flags: {
+      has_lead_agent: true,
+      has_voice_agent: false,
+      has_site_build: false,
+      jobber_integration: false,
+    },
+    features: [
+      'AI lead agent on your site',
+      'Branded SMS follow-up',
+      'Client dashboard',
+      'Ongoing management',
+    ],
+  },
+
+  'presence-voice': {
+    slug: 'presence-voice',
+    clientName: '',
+    ownerName: '',
+    businessName: 'Your business',
+    accentColor: '#3B82F6',
+    plan: 'presence',
+    tier: 'presence',
+    setupFeeCents: 40000,
+    monthlyPriceCents: 9900,
+    smsCreditsIncluded: 500,
+    flags: {
+      has_lead_agent: false,
+      has_voice_agent: true,
+      has_site_build: false,
+      jobber_integration: false,
+    },
+    features: [
+      '24/7 AI voice agent',
+      'Books into your calendar',
+      'SMS confirmation + reminders',
+      'Client dashboard',
+      'Ongoing management',
+    ],
+  },
 };
 
 export function getConfig(slug: string): OnboardingConfig | null {
