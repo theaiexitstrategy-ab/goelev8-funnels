@@ -26,6 +26,11 @@ const PROMO_CODE = 'JULY4TH50';
 // generic — the /july4 page is publicly shareable so nothing here names a
 // specific client business (that stays inside private /qsetup and /affsetup).
 const PRODUCT_COPY: Record<string, { name: string; description: string }> = {
+  'presence-full': {
+    name: 'GoElev8.AI Setup — Everything Included',
+    description:
+      'Custom website, AI voice + lead agents, branded SMS, merch storefront, client dashboard, and ongoing management. 50% off with JULY4TH50.',
+  },
   'presence-lead': {
     name: 'AI Lead Agent Setup — GoElev8.ai Presence Tier',
     description:

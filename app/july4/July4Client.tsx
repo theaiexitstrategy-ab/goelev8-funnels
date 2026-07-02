@@ -5,61 +5,96 @@ import { useState } from 'react';
 
 const GOLD = '#F5B800';
 const RED = '#C8102E';
-const WHITE_BLUE = '#3B82F6';
 const DISPLAY = '"Bebas Neue", sans-serif';
 const BODY = '"Inter", system-ui, -apple-system, sans-serif';
 
-type OfferKey = 'presence-lead' | 'presence-voice';
-
-const OFFERS: {
-  key: OfferKey;
-  headline: string;
-  subhead: string;
-  bullets: string[];
-  accent: string;
-}[] = [
+// Everything-included package — union of features across all three
+// currently-live client packages (Leslie, Kevin, Quantarrius). Grouped
+// so the reader can scan by category on mobile.
+const FEATURE_GROUPS: { icon: string; title: string; items: string[] }[] = [
   {
-    key: 'presence-lead',
-    headline: 'AI Lead Agent Setup',
-    subhead: 'Presence Tier — Chat & SMS Lead Capture',
-    bullets: [
-      'Custom AI lead agent embedded on your site',
-      'Qualifies visitors 24/7 and captures name + phone',
-      'Branded SMS follow-up (500 credits/mo included)',
-      'Live dashboard at portal.goelev8.ai',
-      'Homepage audit + site brief',
-      'Ongoing management by Aaron',
+    icon: '🌐',
+    title: 'Website + Domain',
+    items: [
+      'Custom website designed and built for your business',
+      'Domain purchase, setup, and hosting handled for you',
+      'Migration from existing platform (Wix, Squarespace, etc.)',
+      'Homepage audit + rewritten copy where needed',
     ],
-    accent: GOLD,
   },
   {
-    key: 'presence-voice',
-    headline: 'AI Voice Agent Setup',
-    subhead: 'Presence Tier — 24/7 Phone Answering',
-    bullets: [
-      '24/7 AI voice agent — answers every inbound call',
+    icon: '📞',
+    title: '24/7 AI Voice Agent',
+    items: [
+      'Answers every inbound call around the clock',
       'Qualifies callers and books into your calendar',
-      'SMS confirmation + 24-hour reminders',
-      'Emergency / urgent call transfer',
-      'Live dashboard at portal.goelev8.ai',
-      'Ongoing management by Aaron',
+      'Handles emergencies with direct transfer to you',
+      'Integrates with Jobber, GlossGenius, Google Calendar, and more',
     ],
-    accent: WHITE_BLUE,
+  },
+  {
+    icon: '💬',
+    title: 'AI Lead Agent + SMS',
+    items: [
+      'AI chat agent on your site captures leads 24/7',
+      'Branded SMS follow-up from your dedicated number',
+      'Automated appointment confirmations + reminders',
+      '500 SMS credits included every month',
+    ],
+  },
+  {
+    icon: '🛒',
+    title: 'Merch Store',
+    items: [
+      'Your own storefront at shop.goelev8.ai/[you]',
+      'Sell products, programs, apparel, or supplements',
+      'Payments processed directly to you via Stripe',
+      'Tied into your dashboard and SMS follow-ups',
+    ],
+  },
+  {
+    icon: '📊',
+    title: 'Client Dashboard',
+    items: [
+      'Your own portal at portal.goelev8.ai',
+      'Live lead + booking log',
+      'SMS usage and credit balance',
+      'Call log and missed-call alerts',
+    ],
+  },
+  {
+    icon: '🔍',
+    title: 'iSlay Studios Keyword Network',
+    items: [
+      'SEO boost through the iSlay Studios keyword network',
+      'Local search visibility improvements',
+      'Cross-promotion with other GoElev8.ai clients',
+    ],
+  },
+  {
+    icon: '⚙️',
+    title: 'Ongoing Management',
+    items: [
+      'Aaron manages and optimizes your setup every month',
+      'Page change requests: 24–72 hour turnaround',
+      'Script updates as your services or pricing change',
+      'You focus on your business — we handle the tech',
+    ],
   },
 ];
 
 export default function July4Client() {
-  const [submitting, setSubmitting] = useState<OfferKey | null>(null);
+  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function startCheckout(key: OfferKey) {
-    setSubmitting(key);
+  async function startCheckout() {
+    setSubmitting(true);
     setError(null);
     try {
       const res = await fetch('/api/july4/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ config_slug: key }),
+        body: JSON.stringify({ config_slug: 'presence-full' }),
       });
       const data = await res.json();
       if (res.ok && data.url) {
@@ -70,15 +105,14 @@ export default function July4Client() {
     } catch {
       setError('Network error. Try again.');
     } finally {
-      setSubmitting(null);
+      setSubmitting(false);
     }
   }
 
   return (
     <div style={{ background: '#000', color: '#fff', minHeight: '100vh', fontFamily: BODY }}>
       {/* ── HERO ─────────────────────────────────────────────────── */}
-      <section style={{ padding: '70px 24px 40px', maxWidth: 980, margin: '0 auto', textAlign: 'center' }}>
-        {/* Discount banner */}
+      <section style={{ padding: '70px 24px 30px', maxWidth: 980, margin: '0 auto', textAlign: 'center' }}>
         <div style={{
           display: 'inline-block', padding: '8px 16px', borderRadius: 999,
           border: `1px solid ${RED}77`, background: `${RED}18`,
@@ -95,157 +129,181 @@ export default function July4Client() {
           50% <span style={{ color: RED }}>OFF</span>
         </h1>
         <p style={{
-          fontFamily: DISPLAY, fontSize: 'clamp(28px, 4vw, 40px)',
-          letterSpacing: 2, margin: '0 0 24px', color: '#fff',
+          fontFamily: DISPLAY, fontSize: 'clamp(26px, 3.6vw, 38px)',
+          letterSpacing: 2, margin: '0 0 22px', color: '#fff',
         }}>
-          Your GoElev8.ai <span style={{ color: GOLD }}>Setup Fee</span>
+          Your <span style={{ color: GOLD }}>GoElev8.AI</span> Setup Fee
         </p>
         <p style={{
-          fontFamily: BODY, fontSize: 'clamp(17px, 2vw, 20px)',
-          color: 'rgba(255,255,255,0.75)', maxWidth: 620, margin: '0 auto 8px',
-          lineHeight: 1.5, fontWeight: 300,
+          fontFamily: BODY, fontSize: 'clamp(16px, 1.8vw, 18px)',
+          color: 'rgba(255,255,255,0.75)', maxWidth: 640, margin: '0 auto 10px',
+          lineHeight: 1.55, fontWeight: 300,
         }}>
           <span style={{ textDecoration: 'line-through', color: 'rgba(255,255,255,0.4)' }}>$400</span>
-          {' '}<strong style={{ color: '#fff' }}>$200</strong> today.
+          {' '}<strong style={{ color: '#fff' }}>$200</strong> today — one price, everything included.
         </p>
         <p style={{
           fontFamily: BODY, fontSize: 14,
           color: 'rgba(255,255,255,0.55)', margin: '0 auto',
-          maxWidth: 520, lineHeight: 1.6,
+          maxWidth: 540, lineHeight: 1.6,
         }}>
-          Your $99/month platform fee doesn&apos;t start until your build is live. Setup takes 5–7 business days from payment.
+          Your $99/month platform fee doesn&apos;t start until your build is live. Setup ships within 5–7 business days.
         </p>
       </section>
 
-      {/* ── OFFERS ───────────────────────────────────────────────── */}
-      <section style={{ padding: '20px 24px 40px', maxWidth: 1100, margin: '0 auto' }}>
-        <p style={{
-          textAlign: 'center', fontSize: 11, letterSpacing: 3, textTransform: 'uppercase',
-          color: GOLD, margin: '0 0 24px', fontWeight: 700,
+      {/* ── SINGLE CTA CARD (top) ────────────────────────────────── */}
+      <section style={{ padding: '10px 24px 24px', maxWidth: 620, margin: '0 auto' }}>
+        <div style={{
+          background: '#0a0a0a',
+          border: `1px solid ${GOLD}66`,
+          borderRadius: 10,
+          padding: '26px 24px',
+          boxShadow: `0 0 0 1px ${GOLD}22, 0 12px 40px rgba(245,184,0,0.08)`,
+          textAlign: 'center',
         }}>
-          Pick your setup
+          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 6 }}>
+            <span style={{
+              fontFamily: DISPLAY, fontSize: 56, color: GOLD,
+              letterSpacing: 1, lineHeight: 1, fontWeight: 400,
+            }}>
+              $200
+            </span>
+            <span style={{ fontSize: 16, color: 'rgba(255,255,255,0.5)', textDecoration: 'line-through' }}>
+              $400
+            </span>
+          </div>
+          <p style={{
+            margin: '0 0 20px', fontSize: 13,
+            color: 'rgba(255,255,255,0.65)', letterSpacing: 2,
+            textTransform: 'uppercase', fontWeight: 600,
+          }}>
+            One-time setup · Everything included
+          </p>
+          <button
+            onClick={startCheckout}
+            disabled={submitting}
+            style={{
+              background: GOLD,
+              color: '#000',
+              border: 'none',
+              padding: '18px 32px',
+              borderRadius: 4,
+              fontFamily: BODY,
+              fontWeight: 700,
+              fontSize: 15,
+              letterSpacing: 2,
+              textTransform: 'uppercase',
+              cursor: submitting ? 'wait' : 'pointer',
+              opacity: submitting ? 0.7 : 1,
+              transition: 'all 0.15s ease',
+              boxShadow: `0 6px 22px rgba(245,184,0,0.28)`,
+              width: '100%',
+              maxWidth: 420,
+            }}
+          >
+            {submitting ? 'Loading…' : 'Claim 50% Off — $200 Setup'}
+          </button>
+          {error ? (
+            <p style={{ marginTop: 14, color: '#ff6b6b', fontSize: 13 }} role="alert">
+              {error}
+            </p>
+          ) : null}
+          <p style={{
+            marginTop: 14, color: 'rgba(255,255,255,0.5)',
+            fontSize: 12, lineHeight: 1.6, maxWidth: 380, margin: '14px auto 0',
+          }}>
+            Secure checkout via Stripe · Discount applied automatically
+          </p>
+        </div>
+      </section>
+
+      {/* ── WHAT'S INCLUDED ──────────────────────────────────────── */}
+      <section style={{ padding: '40px 24px 30px', maxWidth: 1100, margin: '0 auto' }}>
+        <h2 style={{
+          fontFamily: DISPLAY, fontSize: 'clamp(28px, 4vw, 40px)',
+          letterSpacing: 2, textTransform: 'uppercase',
+          textAlign: 'center', marginBottom: 12, fontWeight: 400,
+        }}>
+          Everything <span style={{ color: GOLD }}>Included</span>
+        </h2>
+        <p style={{
+          textAlign: 'center', color: 'rgba(255,255,255,0.55)', marginBottom: 36,
+          maxWidth: 620, marginInline: 'auto', fontSize: 15, lineHeight: 1.6,
+        }}>
+          One flat setup fee. No à la carte pricing. Everything you need to launch, grow, and run your business with AI.
         </p>
 
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-          gap: 20,
-          maxWidth: 900,
-          margin: '0 auto',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+          gap: 18,
         }}>
-          {OFFERS.map((offer) => (
+          {FEATURE_GROUPS.map((group) => (
             <div
-              key={offer.key}
+              key={group.title}
               style={{
                 background: '#0a0a0a',
-                border: `1px solid ${offer.accent}55`,
-                borderRadius: 8,
-                padding: '30px 26px',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 18,
+                border: '1px solid rgba(245,184,0,0.18)',
+                borderRadius: 6,
+                padding: '24px 22px',
               }}
             >
-              <div>
-                <h2 style={{
-                  fontFamily: DISPLAY, fontSize: 32, letterSpacing: 1.5,
-                  textTransform: 'uppercase', margin: '0 0 6px',
-                  color: '#fff', fontWeight: 400,
-                }}>
-                  {offer.headline}
-                </h2>
-                <p style={{
-                  margin: 0, fontSize: 13, color: offer.accent,
-                  letterSpacing: 1.5, textTransform: 'uppercase',
-                  fontWeight: 700,
-                }}>
-                  {offer.subhead}
-                </p>
-              </div>
-
-              {/* Price */}
-              <div style={{
-                background: '#000', border: `1px solid ${offer.accent}33`,
-                borderRadius: 6, padding: '16px 18px',
-                display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap',
+              <div style={{ fontSize: 28, marginBottom: 12 }}>{group.icon}</div>
+              <h3 style={{
+                fontFamily: DISPLAY, fontSize: 20, letterSpacing: 1.5,
+                textTransform: 'uppercase', color: GOLD, margin: '0 0 12px',
+                fontWeight: 400,
               }}>
-                <span style={{
-                  fontFamily: DISPLAY, fontSize: 46, color: offer.accent,
-                  letterSpacing: 1, lineHeight: 1, fontWeight: 400,
-                }}>
-                  $200
-                </span>
-                <span style={{
-                  fontSize: 15, color: 'rgba(255,255,255,0.5)',
-                  textDecoration: 'line-through',
-                }}>
-                  $400
-                </span>
-                <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.65)' }}>
-                  one-time setup
-                </span>
-              </div>
-
-              {/* Bullets */}
+                {group.title}
+              </h3>
               <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
-                {offer.bullets.map((b) => (
-                  <li key={b} style={{
-                    fontSize: 14, lineHeight: 1.55, color: 'rgba(255,255,255,0.82)',
+                {group.items.map((item) => (
+                  <li key={item} style={{
+                    fontSize: 13.5, lineHeight: 1.55, color: 'rgba(255,255,255,0.82)',
                     padding: '5px 0', display: 'flex', gap: 10,
                   }}>
                     <span style={{
-                      color: offer.accent, flexShrink: 0, marginTop: 2,
+                      color: GOLD, flexShrink: 0, marginTop: 2,
                       fontSize: 11, fontWeight: 700,
-                    }}>
-                      ✓
-                    </span>
-                    <span>{b}</span>
+                    }}>✓</span>
+                    <span>{item}</span>
                   </li>
                 ))}
               </ul>
-
-              {/* Button */}
-              <button
-                onClick={() => startCheckout(offer.key)}
-                disabled={submitting !== null}
-                style={{
-                  background: offer.accent,
-                  color: '#000',
-                  border: 'none',
-                  padding: '16px 22px',
-                  borderRadius: 4,
-                  fontFamily: BODY,
-                  fontWeight: 700,
-                  fontSize: 14,
-                  letterSpacing: 2,
-                  textTransform: 'uppercase',
-                  cursor: submitting !== null ? 'wait' : 'pointer',
-                  opacity: submitting !== null && submitting !== offer.key ? 0.5 : 1,
-                  transition: 'all 0.15s ease',
-                  boxShadow: `0 6px 22px ${offer.accent}33`,
-                  marginTop: 4,
-                }}
-              >
-                {submitting === offer.key ? 'Loading…' : `Claim ${offer.headline} — $200`}
-              </button>
             </div>
           ))}
         </div>
+      </section>
 
-        {error ? (
-          <p style={{
-            marginTop: 22, color: '#ff6b6b', fontSize: 14,
-            textAlign: 'center',
-          }} role="alert">{error}</p>
-        ) : null}
-
-        <p style={{
-          marginTop: 32, textAlign: 'center',
-          color: 'rgba(255,255,255,0.55)', fontSize: 13,
-          lineHeight: 1.6, maxWidth: 560, marginInline: 'auto',
-        }}>
-          Discount applied automatically at Stripe checkout. After payment you&apos;ll go through a short onboarding session; your build ships within 5–7 business days.
-        </p>
+      {/* ── BOTTOM CTA ───────────────────────────────────────────── */}
+      <section style={{
+        padding: '30px 24px 20px', maxWidth: 620, margin: '0 auto',
+        textAlign: 'center',
+      }}>
+        <button
+          onClick={startCheckout}
+          disabled={submitting}
+          style={{
+            background: GOLD,
+            color: '#000',
+            border: 'none',
+            padding: '18px 32px',
+            borderRadius: 4,
+            fontFamily: BODY,
+            fontWeight: 700,
+            fontSize: 15,
+            letterSpacing: 2,
+            textTransform: 'uppercase',
+            cursor: submitting ? 'wait' : 'pointer',
+            opacity: submitting ? 0.7 : 1,
+            transition: 'all 0.15s ease',
+            boxShadow: `0 6px 22px rgba(245,184,0,0.28)`,
+            width: '100%',
+            maxWidth: 420,
+          }}
+        >
+          {submitting ? 'Loading…' : 'Claim 50% Off — $200 Setup'}
+        </button>
       </section>
 
       {/* ── FINE PRINT ───────────────────────────────────────────── */}
@@ -275,7 +333,7 @@ export default function July4Client() {
         fontSize: 12,
         lineHeight: 1.55,
       }}>
-        © 2026 GoElev8.ai | Aaron Bryant. All rights reserved. Unauthorized use prohibited.<br />
+        © 2026 GoElev8.AI · Infinite Possibilities with AI · Aaron Bryant.<br />
         <a href="https://goelev8.ai" style={{ color: GOLD, textDecoration: 'none' }}>goelev8.ai</a>
       </footer>
     </div>

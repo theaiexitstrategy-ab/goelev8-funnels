@@ -7,9 +7,8 @@
 import July4Client from './July4Client';
 
 export const metadata = {
-  title: 'July 4th 50% Off — GoElev8.ai',
-  description:
-    'Half off your GoElev8.ai setup fee for a limited time. $200 gets your AI agent, portal, and everything else live.',
+  title: 'July 4th 50% Off — GoElev8.AI',
+  description: 'GoElev8.AI — Infinite Possibilities with AI',
 };
 
 export default function July4Page() {

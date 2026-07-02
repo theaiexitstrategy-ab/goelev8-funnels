@@ -265,6 +265,41 @@ export const ONBOARDING_CONFIGS: Record<string, OnboardingConfig> = {
       'Ongoing management',
     ],
   },
+
+  // Full "everything included" package — the promo landing at /july4 routes
+  // buyers here. Union of every feature offered to Leslie (locs-and-wellness),
+  // Kevin (afff), and Quantarrius (roqbody). Empty clientName so the
+  // onboarding chat greets fresh.
+  'presence-full': {
+    slug: 'presence-full',
+    clientName: '',
+    ownerName: '',
+    businessName: 'Your business',
+    accentColor: '#F5B800',
+    plan: 'presence',
+    tier: 'presence',
+    setupFeeCents: 40000,
+    monthlyPriceCents: 9900,
+    smsCreditsIncluded: 500,
+    flags: {
+      has_lead_agent: true,
+      has_voice_agent: true,
+      has_site_build: true,
+      jobber_integration: false,
+    },
+    features: [
+      'Custom website design & build',
+      'Domain purchase + setup',
+      '24/7 AI voice agent',
+      'AI lead agent on your site',
+      'Branded SMS follow-up + confirmations + reminders',
+      'Calendar / booking integration (Jobber, GlossGenius, Google, etc.)',
+      'Merch shop setup (shop.goelev8.ai/[you])',
+      'Client dashboard at portal.goelev8.ai',
+      'iSlay Studios keyword network (SEO boost)',
+      'Ongoing site + agent management',
+    ],
+  },
 };
 
 export function getConfig(slug: string): OnboardingConfig | null {
