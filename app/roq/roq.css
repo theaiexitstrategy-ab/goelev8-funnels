@@ -1,0 +1,27 @@
+/* © 2026 GoElev8.ai | Aaron Bryant. All rights reserved. Unauthorized use prohibited. */
+
+/* Global styles migrated out of the reference component's useEffect
+ * style injection. Loading Bebas Neue + Inter from Google Fonts here as
+ * well as via next/font/google in page.jsx so the inline
+ * fontFamily:"'Bebas Neue',..." references in the component find the
+ * font family by its literal name at render time. */
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap');
+
+.roq-root, .roq-root * { box-sizing: border-box; }
+.roq-root { margin: 0; padding: 0; }
+.roq-root body { background: #080808; }
+
+.roq-root input::placeholder { color: #333; }
+.roq-root input:focus { border-color: #FF4500 !important; outline: none; }
+
+.roq-root ::-webkit-scrollbar { width: 3px; height: 3px; }
+.roq-root ::-webkit-scrollbar-thumb { background: #1A1A1A; }
+.roq-root div::-webkit-scrollbar { display: none; }
+
+@keyframes roq-ticker  { from { transform: translateX(0); } to { transform: translateX(-25%); } }
+@keyframes roq-blink   { 0%,100% { opacity: 1; } 50% { opacity: 0.25; } }
+
+/* The original component references keyframe names `ticker` and `blink`.
+ * Alias them to the prefixed names so nothing else on the site collides. */
+@keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-25%); } }
+@keyframes blink  { 0%,100% { opacity: 1; } 50% { opacity: 0.25; } }

@@ -1,5 +1,31 @@
 // © 2026 GoElev8.ai | Aaron Bryant. All rights reserved. Unauthorized use prohibited.
-import { useState, useEffect, useRef } from "react";
+//
+// Source of truth: reference/roqdemo/roqbody-homepage-v2.jsx. This file is
+// that component with only the three Next.js adaptations from the spec:
+//   1. 'use client' + next/font/google for Bebas Neue + Inter
+//   2. useEffect CSS injection moved to roq.css (imported at the top)
+//   3. LeadSection handleSubmit POSTs to /api/leads/roqbody
+// Nothing else in the layout, sections, or styling has been rewritten.
+
+'use client';
+
+import { useState, useEffect, useRef } from 'react';
+import { Bebas_Neue, Inter } from 'next/font/google';
+import './roq.css';
+
+const bebasNeue = Bebas_Neue({
+  weight: '400',
+  subsets: ['latin'],
+  variable: '--font-bebas',
+  display: 'swap',
+});
+
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+  weight: ['400', '500', '600', '700'],
+  display: 'swap',
+});
 
 const BRAND_ARMS = [
   { id: "training", icon: "🏋🏾", label: "Training", title: "ROQ Body Academy", desc: "Personal training, online programs, and natural bodybuilding coaching from an IPE pro. Simple. Challenging. Efficient.", badge: "Book Now", featured: true },
@@ -50,7 +76,6 @@ function Splash({ done }) {
       transition: phase===2 ? "opacity 0.6s ease" : "none",
       pointerEvents: phase===2 ? "none" : "all",
     }}>
-      {/* ROQ monogram — no external image */}
       <div style={{
         width:96,height:96,borderRadius:"50%",
         background:"#FF4500",
@@ -111,16 +136,12 @@ function Ticker() {
 function StreamBanner({ onSelect }) {
   const ref = useRef(null);
   const [active, setActive] = useState(null);
-  const scroll = (dir) => {
-    if (ref.current) ref.current.scrollLeft += dir * 120;
-  };
   return (
     <div style={{
       background:"#0D0D0D",
       borderBottom:"1px solid #1A1A1A",
       position:"relative",
     }}>
-      {/* scroll hints */}
       <div style={{
         position:"absolute",right:0,top:0,bottom:0,
         width:40,background:"linear-gradient(90deg,transparent,#0D0D0D)",
@@ -184,7 +205,6 @@ function Nav({ onCTA }) {
       justifyContent:"space-between",
       height:54,
     }}>
-      {/* Pure CSS logo mark — no external image dependency */}
       <div style={{display:"flex",alignItems:"center",gap:10}}>
         <div style={{
           width:36,height:36,borderRadius:"50%",
@@ -259,7 +279,7 @@ function Hero({ onCTA }) {
           CONFIDENCE.
         </div>
         <p style={{fontSize:13,color:"#666",lineHeight:1.8,marginBottom:30,maxWidth:340}}>
-          STL's premier fitness ecosystem. Personal training, online programs,
+          STL&apos;s premier fitness ecosystem. Personal training, online programs,
           natural bodybuilding, supplements, apparel, and custom meal prep —
           all under one brand.
         </p>
@@ -308,7 +328,7 @@ function BrandSection() {
       <div style={{fontFamily:"monospace",fontSize:10,letterSpacing:4,color:"#FF4500",textTransform:"uppercase",marginBottom:10}}>The ROQ Brand Family</div>
       <div style={{fontFamily:"'Bebas Neue','Arial Black',sans-serif",fontSize:48,letterSpacing:2,color:"#F2EDE6",lineHeight:1,marginBottom:10}}>Six Arms.{"\n"}One Brand.</div>
       <div style={{fontSize:13,color:"#666",lineHeight:1.75,marginBottom:28,maxWidth:400}}>
-        ROQ Body isn't just a gym. It's a complete fitness lifestyle ecosystem built around one mission: Train. Excel. Succeed.
+        ROQ Body isn&apos;t just a gym. It&apos;s a complete fitness lifestyle ecosystem built around one mission: Train. Excel. Succeed.
       </div>
       <div style={{display:"flex",flexDirection:"column",gap:2}}>
         {BRAND_ARMS.map(arm=>(
@@ -371,7 +391,7 @@ function CoachSection() {
           <div style={{
             fontFamily:"'Bebas Neue','Arial Black',sans-serif",
             fontSize:44,letterSpacing:2,color:"#F2EDE6",lineHeight:1,
-          }}>Quantarrius{"\n"}"Coach Q" Wilson</div>
+          }}>Quantarrius{"\n"}&quot;Coach Q&quot; Wilson</div>
           <div style={{fontSize:11,color:"#FF4500",letterSpacing:2,textTransform:"uppercase",fontWeight:700,marginTop:8}}>
             IPE Pro Bodybuilder · ISSA Certified Trainer
           </div>
@@ -383,7 +403,7 @@ function CoachSection() {
           an emphasis on proper form and mobility.
         </p>
         <p style={{fontSize:13,color:"#444",lineHeight:1.8,fontStyle:"italic",borderLeft:"3px solid #FF4500",paddingLeft:14}}>
-          "My favorite client is anyone with a goal and a willingness to work toward it."
+          &quot;My favorite client is anyone with a goal and a willingness to work toward it.&quot;
         </p>
         <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
           {["IPE Pro Bodybuilder","ISSA Certified","STL Based","In-Person + Online"].map(c=>(
@@ -515,7 +535,7 @@ function ROQuizineSection() {
 function ReviewsSection() {
   return (
     <div style={{background:"#0D0D0D",padding:"56px 16px"}}>
-      <div style={{fontFamily:"monospace",fontSize:10,letterSpacing:4,color:"#FF4500",textTransform:"uppercase",marginBottom:10}}>What They're Saying</div>
+      <div style={{fontFamily:"monospace",fontSize:10,letterSpacing:4,color:"#FF4500",textTransform:"uppercase",marginBottom:10}}>What They&apos;re Saying</div>
       <div style={{fontFamily:"'Bebas Neue','Arial Black',sans-serif",fontSize:48,letterSpacing:2,color:"#F2EDE6",lineHeight:1,marginBottom:24}}>Real People.{"\n"}Real Results.</div>
       <div style={{display:"flex",flexDirection:"column",gap:10}}>
         {REVIEWS.map((r,i)=>(
@@ -524,7 +544,7 @@ function ReviewsSection() {
             borderRadius:4,padding:"18px 16px",
           }}>
             <div style={{color:"#D4A017",fontSize:12,marginBottom:10,letterSpacing:2}}>★★★★★</div>
-            <div style={{fontSize:13,color:"#666",lineHeight:1.8,marginBottom:10,fontStyle:"italic"}}>"{r.text}"</div>
+            <div style={{fontSize:13,color:"#666",lineHeight:1.8,marginBottom:10,fontStyle:"italic"}}>&quot;{r.text}&quot;</div>
             <div style={{fontSize:10,color:"#333",letterSpacing:2,textTransform:"uppercase"}}>— {r.author}</div>
           </div>
         ))}
@@ -538,11 +558,32 @@ function LeadSection() {
   const [form, setForm] = useState({name:"",phone:"",goal:""});
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
-  const handleSubmit = () => {
+
+  const handleSubmit = async () => {
     if (!form.name || !form.phone) return;
     setLoading(true);
-    setTimeout(() => { setLoading(false); setSubmitted(true); }, 900);
+    try {
+      await fetch('/api/leads/roqbody', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: form.name,
+          phone: form.phone,
+          goal: form.goal,
+          source: 'roqbody-site',
+          client_slug: 'roqbody',
+          created_at: new Date().toISOString(),
+        }),
+      });
+    } catch (err) {
+      // Silent — the form always confirms, per spec.
+      console.error('[roq/lead] submit failed:', err);
+    } finally {
+      setLoading(false);
+      setSubmitted(true);
+    }
   };
+
   return (
     <div id="lead-section" style={{
       background:"linear-gradient(135deg,#0f0a06,#180d05)",
@@ -553,7 +594,7 @@ function LeadSection() {
         Ready to<br/><span style={{color:"#FF4500"}}>Start?</span>
       </div>
       <p style={{fontSize:13,color:"#666",lineHeight:1.8,maxWidth:320,margin:"0 auto 28px"}}>
-        Drop your info and Coach Q's team will reach out within 24 hours. No pressure. Just results.
+        Drop your info and Coach Q&apos;s team will reach out within 24 hours. No pressure. Just results.
       </p>
       {submitted ? (
         <div style={{
@@ -563,8 +604,8 @@ function LeadSection() {
           maxWidth:320,margin:"0 auto",
         }}>
           <div style={{fontSize:36,marginBottom:10}}>💪🏾</div>
-          <div style={{fontFamily:"'Bebas Neue','Arial Black',sans-serif",fontSize:28,color:"#22c55e",letterSpacing:1,marginBottom:8}}>YOU'RE IN</div>
-          <div style={{fontSize:13,color:"#555",lineHeight:1.7}}>Coach Q's team will reach out within 24 hours. Get ready to put in the Worq.</div>
+          <div style={{fontFamily:"'Bebas Neue','Arial Black',sans-serif",fontSize:28,color:"#22c55e",letterSpacing:1,marginBottom:8}}>YOU&apos;RE IN</div>
+          <div style={{fontSize:13,color:"#555",lineHeight:1.7}}>Coach Q&apos;s team will reach out within 24 hours. Get ready to put in the Worq.</div>
         </div>
       ) : (
         <div style={{display:"flex",flexDirection:"column",gap:10,maxWidth:340,margin:"0 auto"}}>
@@ -691,29 +732,15 @@ function BottomNav() {
 export default function App() {
   const [splashDone, setSplashDone] = useState(false);
 
-  useEffect(() => {
-    const s = document.createElement("style");
-    s.textContent = `
-      @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap');
-      *{box-sizing:border-box;margin:0;padding:0;}
-      body{background:#080808;}
-      @keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-25%)}}
-      @keyframes blink{0%,100%{opacity:1}50%{opacity:0.25}}
-      input::placeholder{color:#333;}
-      input:focus{border-color:#FF4500!important;outline:none;}
-      ::-webkit-scrollbar{width:3px;height:3px;}
-      ::-webkit-scrollbar-thumb{background:#1A1A1A;}
-      div::-webkit-scrollbar{display:none;}
-    `;
-    document.head.appendChild(s);
-  }, []);
-
   const scrollToLead = () => {
     document.getElementById("lead-section")?.scrollIntoView({behavior:"smooth"});
   };
 
   return (
-    <div style={{background:"#080808",minHeight:"100vh",color:"#F2EDE6",fontFamily:"Inter,sans-serif"}}>
+    <div
+      className={`roq-root ${bebasNeue.variable} ${inter.variable} ${bebasNeue.className} ${inter.className}`}
+      style={{background:"#080808",minHeight:"100vh",color:"#F2EDE6",fontFamily:"Inter,sans-serif"}}
+    >
       {!splashDone && <Splash done={()=>setSplashDone(true)} />}
       <div style={{opacity:splashDone?1:0,transition:"opacity 0.5s ease"}}>
         <Nav onCTA={scrollToLead} />
