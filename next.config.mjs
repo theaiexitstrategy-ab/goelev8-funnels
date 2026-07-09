@@ -37,6 +37,13 @@ const nextConfig = {
       // beforeFiles runs before the public/ filesystem check, so rewrite
       // destinations resolve to static .html files in public/.
       beforeFiles: [
+        // Locs & Wellness Co. portal lives in the separate `locsandwellness`
+        // repo/deployment. When LOCS_APP_ORIGIN is set (to that Vercel URL),
+        // portal.goelev8.ai/locs/* is proxied there so the portal keeps its
+        // portal.goelev8.ai URL while its code stays in Leslie's repo.
+        ...(process.env.LOCS_APP_ORIGIN
+          ? [{ source: '/locs/:path*', destination: `${process.env.LOCS_APP_ORIGIN}/locs/:path*` }]
+          : []),
         // goelev8.ai/willpower → static index page.
         // (book.goelev8.ai/willpower lives in the separate goelev8-book project.)
         {
