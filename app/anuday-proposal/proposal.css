@@ -1,0 +1,472 @@
+/* © 2026 GoElev8.ai | Aaron Bryant. All rights reserved. Unauthorized use prohibited. */
+
+/* Proposal page — original design, editorial/document aesthetic. All styles
+ * scoped under .proposal so nothing leaks. Fonts loaded via @import so the
+ * literal family names ("Instrument Serif" etc.) resolve inside the JSX. */
+
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+.proposal {
+  --bone: #F7F4EE;
+  --ink: #1A1D1F;
+  --slate: #4A5058;
+  --slate-light: #6B7079;
+  --amber: #C68B3F;
+  --amber-dark: #A57228;
+  --rust: #A6472C;
+  --rule: #D6CFC0;
+  --rule-strong: #B8AF9C;
+
+  background: var(--bone);
+  color: var(--ink);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-size: 16.5px;
+  line-height: 1.65;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+.proposal *, .proposal *::before, .proposal *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.proposal a { color: inherit; }
+
+/* Typography scale */
+.proposal .serif {
+  font-family: 'Instrument Serif', 'Times New Roman', serif;
+  font-weight: 400;
+  letter-spacing: -0.005em;
+}
+.proposal .mono {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  letter-spacing: 0.02em;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   HEADER — thin band, mono metadata
+   ───────────────────────────────────────────────────────────── */
+.proposal .top {
+  border-bottom: 1px solid var(--rule);
+  padding: 18px 32px;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-size: 12px;
+}
+.proposal .brand {
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.14em;
+  font-weight: 500;
+  color: var(--ink);
+  text-transform: uppercase;
+}
+.proposal .brand strong {
+  font-weight: 700;
+  color: var(--amber-dark);
+}
+.proposal .meta {
+  color: var(--slate-light);
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 11px;
+}
+.proposal .meta span + span::before {
+  content: '·';
+  margin: 0 10px;
+  color: var(--rule-strong);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   PAGE FRAME — narrow centered column with margin markers
+   at wide viewports. The vertical rule connecting the markers
+   is a pseudo-element on .page itself.
+   ───────────────────────────────────────────────────────────── */
+.proposal .page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 80px 32px 120px;
+  position: relative;
+}
+
+/* Hero — no section marker */
+.proposal .hero {
+  margin-bottom: 96px;
+}
+.proposal .hero .eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--amber-dark);
+  margin-bottom: 24px;
+}
+.proposal .hero h1 {
+  font-family: 'Instrument Serif', serif;
+  font-weight: 400;
+  font-size: clamp(44px, 6vw, 68px);
+  line-height: 1.05;
+  letter-spacing: -0.015em;
+  margin-bottom: 22px;
+  color: var(--ink);
+}
+.proposal .hero h1 em {
+  font-style: italic;
+  color: var(--amber-dark);
+}
+.proposal .hero .lede {
+  font-size: 18px;
+  color: var(--slate);
+  line-height: 1.65;
+  max-width: 580px;
+  margin-bottom: 32px;
+}
+.proposal .hero .prepared {
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  padding: 18px 0;
+  display: flex;
+  gap: 36px;
+  flex-wrap: wrap;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+}
+.proposal .hero .prepared dt {
+  color: var(--slate-light);
+  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  margin-bottom: 4px;
+}
+.proposal .hero .prepared dd {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   SECTIONS with numbered margin markers
+   ───────────────────────────────────────────────────────────── */
+.proposal section.chapter {
+  position: relative;
+  padding: 48px 0;
+  border-top: 1px solid var(--rule);
+}
+.proposal section.chapter:last-of-type {
+  border-bottom: 1px solid var(--rule);
+}
+
+/* Margin marker: absolute at wide viewports, static at mobile */
+.proposal .marker {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin-bottom: 24px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--amber-dark);
+}
+.proposal .marker .num {
+  font-family: 'Instrument Serif', serif;
+  font-style: italic;
+  font-size: 30px;
+  line-height: 1;
+  color: var(--ink);
+  letter-spacing: 0;
+}
+.proposal .marker .rule-h {
+  flex: 1;
+  height: 1px;
+  background: var(--rule);
+}
+
+@media (min-width: 980px) {
+  .proposal .page {
+    max-width: 900px;
+    padding-left: 180px; /* room for the margin markers on the left */
+  }
+  .proposal section.chapter { border-top: none; padding: 72px 0 24px; }
+  .proposal section.chapter + section.chapter { border-top: 1px solid var(--rule); }
+  .proposal .marker {
+    position: absolute;
+    left: -160px;
+    top: 74px;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 130px;
+    gap: 6px;
+  }
+  .proposal .marker .num {
+    font-size: 44px;
+  }
+  .proposal .marker .rule-h { display: none; }
+}
+
+.proposal .chapter h2 {
+  font-family: 'Instrument Serif', serif;
+  font-weight: 400;
+  font-size: clamp(28px, 3.5vw, 38px);
+  line-height: 1.12;
+  letter-spacing: -0.01em;
+  margin-bottom: 20px;
+}
+.proposal .chapter h2 em { font-style: italic; color: var(--amber-dark); }
+
+.proposal .chapter p {
+  margin-bottom: 18px;
+  color: var(--slate);
+}
+.proposal .chapter p strong { color: var(--ink); font-weight: 600; }
+
+.proposal .chapter ul {
+  list-style: none;
+  margin: 12px 0 20px;
+  padding: 0;
+}
+.proposal .chapter ul li {
+  padding: 6px 0 6px 22px;
+  position: relative;
+  color: var(--slate);
+}
+.proposal .chapter ul li::before {
+  content: '—';
+  position: absolute;
+  left: 0;
+  color: var(--amber);
+  font-weight: 500;
+}
+
+/* Sub-heading inside a chapter */
+.proposal .chapter h3 {
+  font-family: 'Instrument Serif', serif;
+  font-weight: 400;
+  font-style: italic;
+  font-size: 20px;
+  color: var(--ink);
+  margin: 32px 0 10px;
+  letter-spacing: -0.005em;
+}
+
+/* Callout: SimplePractice honesty box */
+.proposal .callout {
+  margin: 28px 0 8px;
+  padding: 22px 24px;
+  background: rgba(198, 139, 63, 0.06);
+  border-left: 2px solid var(--amber);
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--slate);
+}
+.proposal .callout .label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--amber-dark);
+  display: block;
+  margin-bottom: 8px;
+}
+.proposal .callout strong { color: var(--ink); }
+
+/* ─────────────────────────────────────────────────────────────
+   PRICING TABLES — monospace, tabular, no card chrome
+   ───────────────────────────────────────────────────────────── */
+.proposal .pricing {
+  margin: 36px 0 28px;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  padding: 20px 0;
+}
+.proposal .pricing dt {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--slate-light);
+}
+.proposal .pricing .row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 16px;
+  padding: 12px 0;
+  align-items: baseline;
+  border-bottom: 1px dashed var(--rule);
+}
+.proposal .pricing .row:last-child { border-bottom: none; }
+.proposal .pricing .row .label {
+  color: var(--ink);
+  font-size: 15px;
+}
+.proposal .pricing .row .price {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 15px;
+  color: var(--ink);
+  font-weight: 500;
+  white-space: nowrap;
+}
+.proposal .pricing .row .price .was {
+  color: var(--rust);
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+  margin-right: 10px;
+  font-weight: 400;
+  opacity: 0.85;
+}
+.proposal .pricing .row.total {
+  border-top: 2px solid var(--ink);
+  border-bottom: none;
+  padding-top: 16px;
+  margin-top: 4px;
+}
+.proposal .pricing .row.total .label {
+  font-family: 'Instrument Serif', serif;
+  font-style: italic;
+  font-size: 20px;
+}
+.proposal .pricing .row.total .price {
+  font-size: 17px;
+  font-weight: 600;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   BUTTONS
+   ───────────────────────────────────────────────────────────── */
+.proposal .actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 4px;
+}
+.proposal .btn {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  padding: 14px 22px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  text-align: left;
+  line-height: 1.2;
+  border-radius: 2px;
+}
+.proposal .btn:disabled { opacity: 0.55; cursor: wait; }
+
+.proposal .btn-primary {
+  background: var(--ink);
+  color: var(--bone);
+}
+.proposal .btn-primary:hover:not(:disabled) {
+  background: var(--amber-dark);
+}
+.proposal .btn-primary .amount {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 500;
+  margin-left: 8px;
+  color: var(--amber);
+}
+
+.proposal .btn-secondary {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--ink);
+}
+.proposal .btn-secondary:hover:not(:disabled) {
+  background: var(--ink);
+  color: var(--bone);
+}
+.proposal .btn-secondary .amount {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 500;
+  margin-left: 8px;
+  color: var(--amber-dark);
+}
+.proposal .btn-secondary:hover:not(:disabled) .amount {
+  color: var(--amber);
+}
+
+.proposal .btn-error {
+  margin-top: 8px;
+  color: var(--rust);
+  font-size: 13px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Bundle math — quiet, italic, no button */
+.proposal .bundle {
+  margin: 20px 0 0;
+  padding: 22px 24px;
+  background: var(--ink);
+  color: var(--bone);
+}
+.proposal .bundle .label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--amber);
+  margin-bottom: 12px;
+  display: block;
+}
+.proposal .bundle .math {
+  font-family: 'Instrument Serif', serif;
+  font-style: italic;
+  font-size: 22px;
+  line-height: 1.35;
+}
+.proposal .bundle .math .was {
+  color: rgba(247, 244, 238, 0.45);
+  text-decoration: line-through;
+}
+.proposal .bundle .savings {
+  margin-top: 14px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--amber);
+}
+
+/* FAQ — Q as italic, A as body */
+.proposal .faq {
+  margin-top: 12px;
+}
+.proposal .faq dt {
+  font-family: 'Instrument Serif', serif;
+  font-style: italic;
+  font-size: 20px;
+  color: var(--ink);
+  margin: 26px 0 8px;
+  letter-spacing: -0.005em;
+}
+.proposal .faq dt:first-child { margin-top: 0; }
+.proposal .faq dd {
+  color: var(--slate);
+  line-height: 1.65;
+  margin-left: 0;
+}
+
+/* Footer */
+.proposal .foot {
+  padding: 32px 32px 40px;
+  border-top: 1px solid var(--rule);
+  text-align: center;
+  color: var(--slate-light);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}
+.proposal .foot a { color: var(--amber-dark); text-decoration: none; }
+
+/* Print — because someone might actually print this */
+@media print {
+  .proposal { background: white; color: black; font-size: 11pt; }
+  .proposal .btn, .proposal .actions { display: none; }
+  .proposal section.chapter { break-inside: avoid; }
+}
