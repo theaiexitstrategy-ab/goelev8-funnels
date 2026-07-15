@@ -147,9 +147,37 @@ export default function ProposalPage() {
             </p>
           </div>
 
-          <p style={{ color: 'var(--slate-light)', fontStyle: 'italic' }}>
-            Priced with Free Flow as one bundled founding-partner offer &mdash; see section 04 for terms.
-          </p>
+          <dl className="pricing">
+            <div className="row">
+              <span className="label">Website setup (one-time)</span>
+              <span className="price">
+                <span className="was">$400</span>
+                $200
+              </span>
+            </div>
+            <div className="row">
+              <span className="label">Monthly platform (recurring)</span>
+              <span className="price">
+                <span className="was">$99</span>
+                $49.50 / mo
+              </span>
+            </div>
+          </dl>
+
+          <div className="actions">
+            <CheckoutButton
+              plan="anuday-setup"
+              label="Start A Nu Day setup"
+              amountLabel="→  $200"
+              variant="primary"
+            />
+            <CheckoutButton
+              plan="anuday-monthly"
+              label="Start monthly (after go-live)"
+              amountLabel="→  $49.50 / mo"
+              variant="secondary"
+            />
+          </div>
         </section>
 
         {/* 03 — FREE FLOW FITNESS */}
@@ -196,66 +224,73 @@ export default function ProposalPage() {
             </li>
           </ul>
 
-          <p style={{ color: 'var(--slate-light)', fontStyle: 'italic' }}>
-            Priced with A Nu Day as one bundled founding-partner offer &mdash; see section 04 for terms.
-          </p>
-        </section>
-
-        {/* 04 — BUNDLED · THE ACTION POINT */}
-        <section className="chapter">
-          <div className="marker">
-            <span className="num">04</span>
-            <span>Founding-Partner Terms</span>
-            <span className="rule-h" />
-          </div>
-          <h2>
-            One payment. <em>Both businesses live.</em>
-          </h2>
-          <p>
-            Both websites built. Both AI phone lines wired. Both auto-SMS systems running.
-            One dashboard, one invoice, one setup timeline. Founding-partner rate is
-            <strong> locked as long as the account stays active</strong> &mdash; if you cancel and
-            re-onboard later, it&apos;s standard pricing.
-          </p>
-
           <dl className="pricing">
             <div className="row">
-              <span className="label">Website setup (both businesses)</span>
+              <span className="label">Website setup (one-time)</span>
               <span className="price">
-                <span className="was">$800</span>
-                $400 one-time
+                <span className="was">$400</span>
+                $200
               </span>
             </div>
             <div className="row">
-              <span className="label">Monthly platform (both, after go-live)</span>
+              <span className="label">Monthly platform (recurring)</span>
               <span className="price">
-                <span className="was">$198</span>
-                $99 / mo
+                <span className="was">$99</span>
+                $49.50 / mo
               </span>
-            </div>
-            <div className="row total">
-              <span className="label">Charged today</span>
-              <span className="price">$400</span>
             </div>
           </dl>
 
-          <div className="bundle" style={{ textAlign: 'center' }}>
-            <span className="label">Start the build</span>
-            <div style={{ marginTop: 4 }}>
-              <CheckoutButton
-                plan="bundle"
-                label="Start Setup"
-                amountLabel="→  $400 today"
-                variant="hero"
-              />
+          <div className="actions">
+            <CheckoutButton
+              plan="freeflow-setup"
+              label="Start Free Flow setup"
+              amountLabel="→  $200"
+              variant="primary"
+            />
+            <CheckoutButton
+              plan="freeflow-monthly"
+              label="Start monthly (after go-live)"
+              amountLabel="→  $49.50 / mo"
+              variant="secondary"
+            />
+          </div>
+        </section>
+
+        {/* 04 — BUNDLED · SUMMARY MATH (no CTA — 4 buttons above are the action) */}
+        <section className="chapter">
+          <div className="marker">
+            <span className="num">04</span>
+            <span>If You Do Both</span>
+            <span className="rule-h" />
+          </div>
+          <h2>
+            The founding-partner math, side by side.
+          </h2>
+          <p>
+            Nothing to click here &mdash; the per-business buttons above are how you actually
+            start. This is just the total, so the discount is honest and visible.
+          </p>
+
+          <div className="bundle">
+            <span className="label">Combined founding-partner terms</span>
+            <div className="math">
+              Website setup, both businesses <br />
+              <span className="was">$800</span> &nbsp; <strong>$400 one-time</strong>
+              <br />
+              <br />
+              Monthly platform, both businesses <br />
+              <span className="was">$198 / mo</span> &nbsp; <strong>$99 / mo</strong>
             </div>
-            <div className="hero-fine-print">
-              $99/mo begins after your 30-day build window &nbsp;·&nbsp; secure checkout via Stripe
-            </div>
-            <div className="savings" style={{ marginTop: 20 }}>
+            <div className="savings">
               Year-one savings vs. standard rates: <strong>$1,588</strong> ($400 on setup + $99/mo × 12).
             </div>
           </div>
+
+          <p style={{ marginTop: '20px' }}>
+            The founding-partner rate is <strong>locked for as long as the account stays
+            active</strong>. If you cancel and re-onboard later, it&apos;s standard pricing.
+          </p>
         </section>
 
         {/* 05 — TIMELINE */}
@@ -317,13 +352,12 @@ export default function ProposalPage() {
               the domain to the new site. No downtime for existing search traffic.
             </dd>
 
-            <dt>When does the $99/mo actually start?</dt>
+            <dt>Why two payments per business (setup + monthly)?</dt>
             <dd>
-              30 days after you sign up. The setup fee ($400) is charged today; the
-              monthly subscription has a 30-day trial baked in, so it doesn&apos;t bill
-              until roughly the time your new sites should be live. If for some reason
-              the build runs long, we adjust so you&apos;re not paying monthly for something
-              that isn&apos;t up yet.
+              Because they don&apos;t start at the same time. You pay setup to kick off the
+              build; you start monthly once your new site is actually live and doing the
+              work. If we combined them into one checkout, you&apos;d start paying monthly
+              during the week I&apos;m still building.
             </dd>
 
             <dt>Can I cancel the monthly?</dt>
