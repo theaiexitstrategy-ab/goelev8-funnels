@@ -62,6 +62,11 @@ const nextConfig = {
           source: '/mcclainlaw',
           destination: '/mcclainlaw_v3.html',
         },
+        // goelev8.ai/anudaydemo → A Nu Day Therapy (Adrianne Martin) redesign preview.
+        {
+          source: '/anudaydemo',
+          destination: '/anudaydemo.html',
+        },
         // Mother's Day uplift landing pages — one per profile.
         { source: '/courtney', destination: '/courtney.html' },
         { source: '/ashlen',   destination: '/ashlen.html' },

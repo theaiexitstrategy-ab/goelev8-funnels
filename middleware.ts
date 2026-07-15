@@ -28,6 +28,7 @@ function isPublicRoute(pathname: string): boolean {
   if (pathname.startsWith('/roq')) return true;
   if (pathname.startsWith('/july4')) return true;
   if (pathname.startsWith('/mcclain')) return true;
+  if (pathname.startsWith('/anudaydemo')) return true;
   if (pathname.startsWith('/api/')) return true;
   if (pathname.startsWith('/_next/')) return true;
   if (pathname.startsWith('/images/')) return true;
