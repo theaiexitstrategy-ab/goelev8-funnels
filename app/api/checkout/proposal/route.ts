@@ -24,6 +24,7 @@ import Stripe from 'stripe';
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://www.goelev8.ai';
 
 type ProposalPlan =
+  | 'bundle'
   | 'anuday-setup'
   | 'anuday-monthly'
   | 'freeflow-setup'
@@ -35,9 +36,40 @@ type PlanDef = {
   productDescription: string;
   amountCents: number;
   recurring: boolean;
+  // Bundle-only: additional recurring line item alongside the setup.
+  // When present, the checkout is created in subscription mode with
+  // BOTH the one-time setup (amountCents) and the recurring price
+  // (bundleRecurring) as line items. The subscription gets a 30-day
+  // trial so only the setup fee lands today.
+  bundleRecurring?: {
+    productName: string;
+    productDescription: string;
+    amountCents: number;
+  };
 };
 
 const PLANS: Record<ProposalPlan, PlanDef> = {
+  // CANONICAL PLAN — one payment covering both businesses.
+  // Setup fee ($400 = 2 × $200 founding-partner rate) today; $99/mo
+  // subscription (2 × $49.50 founding-partner rate) starts after a
+  // 30-day trial so monthly billing doesn't kick in during the build.
+  bundle: {
+    business: 'A Nu Day Therapy · Free Flow Fitness',
+    productName: 'GoElev8.ai — Website Setup (Both Businesses)',
+    productDescription:
+      'One-time setup for both A Nu Day Therapy and Free Flow Fitness: two Next.js sites, two dedicated AI phone lines, auto-SMS follow-up on all forms, one dashboard. Founding-partner combined rate.',
+    amountCents: 40000, // $400 today
+    recurring: false,
+    bundleRecurring: {
+      productName: 'GoElev8.ai — Monthly Platform (Both Businesses)',
+      productDescription:
+        'Ongoing platform covering both A Nu Day Therapy and Free Flow Fitness: AI phone lines, SMS automation, hosting, dashboard, edits. Founding-partner combined rate. First billing period starts 30 days after signup so monthly does not begin during the build.',
+      amountCents: 9900, // $99/mo
+    },
+  },
+  // Kept for backwards compatibility / direct-link flexibility.
+  // Not linked from the proposal page anymore, but the endpoint still
+  // accepts them if you ever want to sell a single business à la carte.
   'anuday-setup': {
     business: 'A Nu Day Therapy',
     productName: 'A Nu Day Therapy — Website Setup',
@@ -97,23 +129,60 @@ export async function POST(req: Request) {
   const stripe = new Stripe(stripeKey);
 
   try {
-    const session = await stripe.checkout.sessions.create({
-      mode: plan.recurring ? 'subscription' : 'payment',
-      payment_method_types: ['card'],
-      line_items: [
-        {
-          quantity: 1,
-          price_data: {
-            currency: 'usd',
-            unit_amount: plan.amountCents,
-            ...(plan.recurring ? { recurring: { interval: 'month' } } : {}),
-            product_data: {
-              name: plan.productName,
-              description: plan.productDescription,
+    // Bundle plan is unique: subscription-mode checkout with BOTH the
+    // one-time setup fee AND the recurring monthly as line items. A
+    // 30-day trial on the subscription means only the setup fee lands
+    // today; monthly billing starts after the build is expected to be
+    // complete.
+    const isBundle = planKey === 'bundle' && plan.bundleRecurring;
+
+    const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = isBundle
+      ? [
+          {
+            quantity: 1,
+            price_data: {
+              currency: 'usd',
+              unit_amount: plan.bundleRecurring!.amountCents,
+              recurring: { interval: 'month' },
+              product_data: {
+                name: plan.bundleRecurring!.productName,
+                description: plan.bundleRecurring!.productDescription,
+              },
             },
           },
-        },
-      ],
+          {
+            quantity: 1,
+            price_data: {
+              currency: 'usd',
+              unit_amount: plan.amountCents,
+              product_data: {
+                name: plan.productName,
+                description: plan.productDescription,
+              },
+            },
+          },
+        ]
+      : [
+          {
+            quantity: 1,
+            price_data: {
+              currency: 'usd',
+              unit_amount: plan.amountCents,
+              ...(plan.recurring ? { recurring: { interval: 'month' } } : {}),
+              product_data: {
+                name: plan.productName,
+                description: plan.productDescription,
+              },
+            },
+          },
+        ];
+
+    const useSubMode = plan.recurring || isBundle;
+
+    const session = await stripe.checkout.sessions.create({
+      mode: useSubMode ? 'subscription' : 'payment',
+      payment_method_types: ['card'],
+      line_items: lineItems,
       billing_address_collection: 'auto',
       allow_promotion_codes: true,
       success_url: `${APP_URL}/anuday-proposal/thank-you?session_id={CHECKOUT_SESSION_ID}`,
@@ -124,9 +193,14 @@ export async function POST(req: Request) {
         business: plan.business,
         prepared_for: 'Adrianne Martin',
       },
-      ...(plan.recurring
+      ...(useSubMode
         ? {
             subscription_data: {
+              // 30-day trial only for the bundle — the standalone
+              // monthly plans (anuday-monthly / freeflow-monthly)
+              // begin billing immediately since they're purchased
+              // after go-live, per the timeline copy on the page.
+              ...(isBundle ? { trial_period_days: 30 } : {}),
               metadata: {
                 source: 'proposal',
                 plan: planKey,

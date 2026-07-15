@@ -399,6 +399,49 @@
   font-family: 'JetBrains Mono', monospace;
 }
 
+/* Hero button — the single primary action on the whole page. Sits inside
+ * the dark bundle panel in section 04, so its background is bone against
+ * ink for maximum contrast. Bigger padding, mono amount inline.
+ */
+.proposal .btn-hero {
+  background: var(--bone);
+  color: var(--ink);
+  padding: 22px 32px;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  border: none;
+  cursor: pointer;
+  border-radius: 2px;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 14px;
+  transition: background 0.15s ease, color 0.15s ease;
+  line-height: 1.2;
+}
+.proposal .btn-hero:hover:not(:disabled) {
+  background: var(--amber);
+  color: var(--ink);
+}
+.proposal .btn-hero:disabled { opacity: 0.55; cursor: wait; }
+.proposal .btn-hero .amount {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 500;
+  color: var(--amber-dark);
+  font-size: 15px;
+}
+.proposal .btn-hero:hover:not(:disabled) .amount { color: var(--ink); }
+
+/* Fine print sitting under the hero button */
+.proposal .hero-fine-print {
+  margin-top: 14px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--amber);
+  opacity: 0.85;
+}
+
 /* Bundle math — quiet, italic, no button */
 .proposal .bundle {
   margin: 20px 0 0;

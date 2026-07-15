@@ -8,6 +8,7 @@
 import { useState } from 'react';
 
 export type ProposalPlan =
+  | 'bundle'
   | 'anuday-setup'
   | 'anuday-monthly'
   | 'freeflow-setup'
@@ -22,7 +23,7 @@ export default function CheckoutButton({
   plan: ProposalPlan;
   label: string;
   amountLabel: string;
-  variant?: 'primary' | 'secondary';
+  variant?: 'primary' | 'secondary' | 'hero';
 }) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);

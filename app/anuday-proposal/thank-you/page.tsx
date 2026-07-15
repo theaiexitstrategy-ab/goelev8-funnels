@@ -21,7 +21,16 @@ export default async function ProposalThankYouPage({
 }) {
   const sessionId = searchParams.session_id ?? '';
   let result:
-    | { ok: true; business: string; plan: string; amountDollars: string; recurring: boolean; email: string | null; name: string | null }
+    | {
+        ok: true;
+        business: string;
+        plan: string;
+        amountDollars: string;
+        recurring: boolean;
+        isBundle: boolean;
+        email: string | null;
+        name: string | null;
+      }
     | { ok: false; error: string }
     | null = null;
 
@@ -43,12 +52,14 @@ export default async function ProposalThankYouPage({
         } else {
           const amountTotal = session.amount_total ?? 0;
           const md = session.metadata ?? {};
+          const plan = md.plan ?? '';
           result = {
             ok: true,
             business: md.business ?? 'Your business',
-            plan: md.plan ?? '',
+            plan,
             amountDollars: (amountTotal / 100).toFixed(2),
-            recurring: (md.plan ?? '').endsWith('-monthly'),
+            recurring: plan.endsWith('-monthly'),
+            isBundle: plan === 'bundle',
             email: session.customer_details?.email ?? null,
             name: session.customer_details?.name ?? null,
           };
@@ -80,20 +91,48 @@ export default async function ProposalThankYouPage({
                 Thank you{result.name ? `, ${result.name.split(' ')[0]}` : ''}. <em>Received.</em>
               </h1>
               <p className="lede">
-                Your <strong>{result.business}</strong> {result.recurring ? 'monthly subscription' : 'setup fee'} of{' '}
-                <strong>${result.amountDollars}</strong> is confirmed. I&apos;ll email you within one business day
-                to schedule the 30-minute kickoff{result.recurring ? '' : ' and get the build started'}.
-                Your new site will be live within 5&ndash;7 business days from that call.
+                {result.isBundle ? (
+                  <>
+                    Your <strong>${result.amountDollars}</strong> setup fee for{' '}
+                    <strong>A Nu Day Therapy + Free Flow Fitness</strong> is confirmed. The
+                    $99/mo subscription starts in 30 days, after both sites go live.
+                    I&apos;ll email you within one business day to schedule the 30-minute
+                    kickoff. Both sites will be built and live within 5&ndash;7 business
+                    days from that call.
+                  </>
+                ) : (
+                  <>
+                    Your <strong>{result.business}</strong>{' '}
+                    {result.recurring ? 'monthly subscription' : 'setup fee'} of{' '}
+                    <strong>${result.amountDollars}</strong> is confirmed. I&apos;ll email you
+                    within one business day to schedule the 30-minute kickoff
+                    {result.recurring ? '' : ' and get the build started'}. Your new site
+                    will be live within 5&ndash;7 business days from that call.
+                  </>
+                )}
               </p>
               <dl className="prepared">
                 <div>
-                  <dt>Business</dt>
+                  <dt>{result.isBundle ? 'Businesses' : 'Business'}</dt>
                   <dd>{result.business}</dd>
                 </div>
                 <div>
                   <dt>Charged today</dt>
-                  <dd>${result.amountDollars}{result.recurring ? ' / mo' : ' one-time'}</dd>
+                  <dd>
+                    ${result.amountDollars}
+                    {result.isBundle
+                      ? ' setup'
+                      : result.recurring
+                        ? ' / mo'
+                        : ' one-time'}
+                  </dd>
                 </div>
+                {result.isBundle ? (
+                  <div>
+                    <dt>Recurring (after 30d)</dt>
+                    <dd>$99.00 / mo</dd>
+                  </div>
+                ) : null}
                 {result.email ? (
                   <div>
                     <dt>Receipt to</dt>
