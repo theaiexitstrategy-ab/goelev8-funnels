@@ -188,6 +188,28 @@ function isLive(value: string): boolean {
   return Boolean(value) && !value.includes('REPLACE_');
 }
 
+/* Both Stripe payments go through /api/checkout/kbsetup, which builds the
+   Checkout Session server-side (inline price_data — no pre-made payment
+   links to keep in sync). Resolves to an error string, or never returns
+   because the browser has navigated to Stripe. */
+async function startCheckout(payload: Record<string, unknown>): Promise<string> {
+  try {
+    const res = await fetch('/api/checkout/kbsetup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (res.ok && data.url) {
+      window.location.href = data.url;
+      return '';
+    }
+    return data.error || 'Checkout could not start. Please try again.';
+  } catch {
+    return 'Network error. Please check your connection and try again.';
+  }
+}
+
 function smoothScrollTo(e: React.MouseEvent<HTMLAnchorElement>, id: string) {
   const el = document.getElementById(id);
   if (!el) return;
@@ -205,6 +227,9 @@ export default function KbsetupClient() {
   const [slot, setSlot] = useState('');
   const [slotError, setSlotError] = useState('');
   const [setupNotice, setSetupNotice] = useState('');
+  const [setupBusy, setSetupBusy] = useState(false);
+  const [depositBusy, setDepositBusy] = useState(false);
+  const [depositError, setDepositError] = useState('');
 
   useEffect(() => {
     const d = buildDays();
@@ -212,12 +237,30 @@ export default function KbsetupClient() {
     setDay(d[0] ?? null);
   }, []);
 
-  /* The two "$400 setup" buttons. While STRIPE_SETUP_LINK is still a
-     placeholder we block the navigation rather than dumping Stephen on a 404. */
-  function handleSetupCheckout(e: React.MouseEvent<HTMLAnchorElement>) {
-    if (isLive(CONFIG.STRIPE_SETUP_LINK)) return; // let the anchor navigate
+  /* Returning from Stripe. ?booked=1 lands the guest on the confirmation
+     step; ?setup=success is Stephen's post-payment receipt state. */
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('booked') === '1') setStep(4);
+    if (params.get('setup') === 'success') {
+      setSetupNotice('Payment received — your build slot is locked in. We’ll be in touch within one business day.');
+    }
+  }, []);
+
+  /* All three "$400 setup" buttons. Creates the Checkout Session server-side,
+     then hands off to Stripe. */
+  async function handleSetupCheckout(e: React.MouseEvent<HTMLAnchorElement>) {
     e.preventDefault();
-    setSetupNotice('Stripe checkout isn’t connected yet — the setup payment link is still being configured.');
+    if (setupBusy) return;
+    setSetupBusy(true);
+    setSetupNotice('');
+    const err = await startCheckout({ plan: 'setup' });
+    if (err) {
+      setSetupNotice(err);
+      setSetupBusy(false);
+    }
+    // On success the browser is already navigating to Stripe — leave the
+    // button disabled so it can't be double-fired mid-redirect.
   }
 
   /* Menu cards deep-link into the funnel with that experience preselected. */
@@ -275,12 +318,22 @@ export default function KbsetupClient() {
     setStep(3);
   }
 
-  function payDeposit() {
-    if (isLive(CONFIG.STRIPE_DEPOSIT_LINK)) {
-      window.location.href = CONFIG.STRIPE_DEPOSIT_LINK;
-      return;
+  async function payDeposit() {
+    if (depositBusy) return;
+    setDepositBusy(true);
+    setDepositError('');
+    const err = await startCheckout({
+      plan: 'deposit',
+      experience: lead.goal,
+      when,
+      name: lead.name,
+      email: lead.email,
+      phone: lead.phone,
+    });
+    if (err) {
+      setDepositError(err);
+      setDepositBusy(false);
     }
-    setStep(4); // demo mode — show the confirmation the client would see
   }
 
   function resetFunnel() {
@@ -335,11 +388,12 @@ export default function KbsetupClient() {
             ))}
           </nav>
           <a
-            href={CONFIG.STRIPE_SETUP_LINK}
+            href="#pricing"
             onClick={handleSetupCheckout}
+            aria-disabled={setupBusy}
             style={{ ...cyanButton, padding: '9px 20px', fontSize: 11, whiteSpace: 'nowrap' }}
           >
-            Approve &amp; Launch
+            {setupBusy ? 'Opening Stripe…' : 'Approve & Launch'}
           </a>
         </div>
       </header>
@@ -375,11 +429,12 @@ export default function KbsetupClient() {
 
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 30 }}>
               <a
-                href={CONFIG.STRIPE_SETUP_LINK}
+                href="#pricing"
                 onClick={handleSetupCheckout}
+            aria-disabled={setupBusy}
                 style={{ ...cyanButton, padding: '14px 26px', fontSize: 12.5 }}
               >
-                Approve &amp; Pay $400 Setup
+                {setupBusy ? 'Opening Stripe…' : 'Approve & Pay $400 Setup'}
               </a>
               <a
                 href="#menu"
@@ -602,11 +657,12 @@ export default function KbsetupClient() {
             </p>
 
             <a
-              href={CONFIG.STRIPE_SETUP_LINK}
+              href="#pricing"
               onClick={handleSetupCheckout}
+            aria-disabled={setupBusy}
               style={{ ...cyanButton, display: 'block', textAlign: 'center', marginTop: 24, padding: '16px 24px', fontSize: 13.5 }}
             >
-              Approve &amp; Pay $400 Setup
+              {setupBusy ? 'Opening Stripe…' : 'Approve & Pay $400 Setup'}
             </a>
 
             {setupNotice && (
@@ -849,9 +905,24 @@ export default function KbsetupClient() {
                   </p>
                 </div>
 
-                <button type="button" onClick={payDeposit} style={{ ...cyanButton, ...fullButton, marginTop: 22 }}>
-                  Pay $200 deposit with Stripe
+                <button
+                  type="button"
+                  onClick={payDeposit}
+                  disabled={depositBusy}
+                  style={{
+                    ...cyanButton, ...fullButton, marginTop: 22,
+                    opacity: depositBusy ? 0.6 : 1,
+                    cursor: depositBusy ? 'wait' : 'pointer',
+                  }}
+                >
+                  {depositBusy ? 'Opening Stripe…' : 'Pay $200 deposit with Stripe'}
                 </button>
+
+                {depositError && (
+                  <p role="alert" style={{ ...errorTextStyle, marginTop: 12, textAlign: 'center' }}>
+                    {depositError}
+                  </p>
+                )}
 
                 <div style={{ display: 'flex', gap: 12, marginTop: 12, flexWrap: 'wrap' }}>
                   <button type="button" onClick={() => setStep(2)} style={{ ...ghostButton, padding: '13px 22px' }}>
@@ -946,11 +1017,12 @@ export default function KbsetupClient() {
 
         <div style={{ display: 'flex', justifyContent: 'center', marginTop: 40 }}>
           <a
-            href={CONFIG.STRIPE_SETUP_LINK}
+            href="#pricing"
             onClick={handleSetupCheckout}
+            aria-disabled={setupBusy}
             style={{ ...cyanButton, padding: '16px 32px', fontSize: 13.5 }}
           >
-            Approve &amp; Pay $400 Setup
+            {setupBusy ? 'Opening Stripe…' : 'Approve & Pay $400 Setup'}
           </a>
         </div>
       </section>
@@ -1254,17 +1326,11 @@ const errorTextStyle: CSSProperties = {
 };
 
 /* ── Integration config ───────────────────────────────────────────────
-   Swap each REPLACE_* placeholder for the real value. Anything still
-   containing "REPLACE_" is treated as not-yet-connected: the $400 buttons
-   show a notice instead of navigating, the lead webhook is skipped, and the
-   deposit button falls through to the demo confirmation.               */
+   Both Stripe payments are now handled server-side by
+   /api/checkout/kbsetup — there are no payment-link placeholders left to
+   swap. What remains here is the portal wiring: anything still containing
+   "REPLACE_" is treated as not-yet-connected and skipped silently.     */
 const CONFIG = {
-  // Stripe Payment Link for the one-time $400 setup fee (Stephen pays this).
-  STRIPE_SETUP_LINK: 'REPLACE_WITH_STRIPE_SETUP_PAYMENT_LINK',
-
-  // Stripe Payment Link for the $200 event deposit (end customers pay this).
-  STRIPE_DEPOSIT_LINK: 'REPLACE_WITH_STRIPE_DEPOSIT_PAYMENT_LINK',
-
   // portal.goelev8.ai (GoHighLevel) inbound webhook that receives lead form posts.
   LEAD_WEBHOOK_URL: 'REPLACE_WITH_PORTAL_GOELEV8_LEAD_WEBHOOK_URL',
 
