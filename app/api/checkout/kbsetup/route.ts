@@ -7,10 +7,13 @@
 // Two very different payments live on /kbsetup, and they land in two
 // different Stripe accounts:
 //
-//   'setup'   — $400 one-time. Stephen Simmons pays goElev8. Straight
-//               platform charge on STRIPE_SECRET_KEY, same inline
-//               price_data pattern as /qsetup, /affsetup, /july4,
-//               /mcclain and /anuday-proposal.
+//   'setup'   — $400 one-time + $99/mo. Stephen Simmons pays goElev8.
+//               Subscription-mode checkout carrying BOTH line items, with a
+//               30-day trial on the recurring half so only the $400 setup
+//               fee lands today and monthly billing starts well after the
+//               5–7 day build. Same shape as /anuday-proposal's 'bundle'.
+//               Platform charge on STRIPE_SECRET_KEY — inline price_data,
+//               no pre-created Stripe Prices.
 //
 //   'deposit' — $200 per event. A guest pays KONQUERED BALANCE, not us.
 //               The page promises "you keep 100% of the deposits", so this
@@ -34,6 +37,8 @@ const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://www.goelev8.ai';
 const KB_ACCOUNT = process.env.KB_STRIPE_CONNECTED_ACCOUNT_ID;
 
 const SETUP_CENTS = 40000;   // $400 one-time build fee
+const MONTHLY_CENTS = 9900;  // $99/mo hosting & management
+const TRIAL_DAYS = 30;       // monthly starts after the build is long done
 const DEPOSIT_CENTS = 20000; // $200 event deposit
 const BOOKING_FEE_CENTS = 1000; // $10 per booked event — our cut of the deposit
 
@@ -63,11 +68,24 @@ export async function POST(req: Request) {
   const stripe = new Stripe(stripeKey);
 
   try {
-    /* ── $400 setup fee — Stephen → goElev8 ─────────────────────────── */
+    /* ── $400 setup + $99/mo — Stephen → goElev8 ────────────────────── */
     if (plan === 'setup') {
       const session = await stripe.checkout.sessions.create({
-        mode: 'payment',
+        mode: 'subscription',
         line_items: [
+          {
+            quantity: 1,
+            price_data: {
+              currency: 'usd',
+              unit_amount: MONTHLY_CENTS,
+              recurring: { interval: 'month' },
+              product_data: {
+                name: 'Konquered Balance — Hosting & Management',
+                description:
+                  'Ongoing hosting, monitoring, and optimization of the kocktail booking system: funnel, event calendar, deposit collection, portal sync, and book.konqueredbalance.com. First charge 30 days from today, well after go-live.',
+              },
+            },
+          },
           {
             quantity: 1,
             price_data: {
@@ -85,6 +103,16 @@ export async function POST(req: Request) {
         allow_promotion_codes: true,
         success_url: `${APP_URL}/kbsetup?setup=success&session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${APP_URL}/kbsetup#pricing`,
+        subscription_data: {
+          // Only the $400 setup lands today. The recurring half sits in trial
+          // for 30 days so monthly never starts during the 5–7 day build.
+          trial_period_days: TRIAL_DAYS,
+          metadata: {
+            source: 'kbsetup',
+            plan: 'setup',
+            business: 'Konquered Balance',
+          },
+        },
         metadata: {
           source: 'kbsetup',
           plan: 'setup',

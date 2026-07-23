@@ -609,7 +609,13 @@ export default function KbsetupClient() {
             </h3>
             <div style={{ marginTop: 22 }}>
               <InvoiceLine label="One-time setup &amp; build" amount="$400" unit="one-time" accent={GOLD} />
-              <InvoiceLine label="Hosting &amp; management" amount="$99" unit="/ month" accent={CYAN} />
+              <InvoiceLine
+                label="Hosting &amp; management"
+                amount="$99"
+                unit="/ month"
+                accent={CYAN}
+                note="First charge 30 days from today — your system will be live for roughly three weeks before it bills. Cancel anytime before then."
+              />
               <InvoiceLine
                 label="Per booked event"
                 amount="$10"
@@ -625,7 +631,8 @@ export default function KbsetupClient() {
             }}>
               <p style={{ margin: 0, fontSize: 15, lineHeight: 1.65 }}>
                 <strong style={{ color: GOLD, fontWeight: 500 }}>$400 due today to launch</strong>, then{' '}
-                <strong style={{ fontWeight: 500 }}>$99/mo begins at go-live</strong>. Per-booking fees are billed monthly.
+                <strong style={{ fontWeight: 500 }}>$99/mo starting 30 days from today</strong>. Per-booking fees are
+                billed monthly.
               </p>
               <p style={{ margin: '10px 0 0', fontSize: 14.5, lineHeight: 1.6, color: MUTED }}>
                 You keep <strong style={{ color: TEXT, fontWeight: 500 }}>100% of the $200 deposits</strong> — they go
@@ -651,7 +658,19 @@ export default function KbsetupClient() {
               </span>
               <span style={{ fontSize: 15, color: MUTED }}>one-time setup</span>
             </div>
-            <p style={{ margin: '16px 0 0', fontSize: 15, color: MUTED, lineHeight: 1.65 }}>
+            {/* Checkout enrolls the $99/mo alongside the setup fee, so the
+                recurring half is disclosed here rather than only on Stripe. */}
+            <p style={{
+              margin: '14px 0 0', padding: '12px 14px', borderRadius: 2,
+              background: 'rgba(0,207,255,0.05)', border: '1px solid rgba(0,207,255,0.22)',
+              fontSize: 14, color: MUTED, lineHeight: 1.6,
+            }}>
+              <strong style={{ color: TEXT, fontWeight: 500 }}>$400 charges today.</strong> Checkout also enrolls
+              your <strong style={{ color: TEXT, fontWeight: 500 }}>$99/mo hosting &amp; management</strong>, which
+              does not bill for <strong style={{ color: TEXT, fontWeight: 500 }}>30 days</strong> — long after
+              your system is live. Cancel anytime before the first charge.
+            </p>
+            <p style={{ margin: '14px 0 0', fontSize: 15, color: MUTED, lineHeight: 1.65 }}>
               Approving locks your build slot. We start immediately and your booking system is live
               within 5–7 days.
             </p>
