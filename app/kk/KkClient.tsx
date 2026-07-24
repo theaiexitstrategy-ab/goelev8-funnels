@@ -4,30 +4,29 @@
 import Image from 'next/image';
 import { useEffect, useState, type CSSProperties } from 'react';
 
-/* ── Palette — goElev8 cyber-noir, dressed for a premium bar ────────── */
-const BLK = '#000000';
-const SURFACE = '#0e0e0e';
-const SURFACE2 = '#141414';
-const CYAN = '#00CFFF';
-const GOLD = '#C9A84C';       // leads here — this is a top-shelf bar brand
-const GOLD_D = '#8F7A35';
-const GRN = '#00FF94';
-const TEXT = '#F5F5F5';
-const MUTED = '#aaaaaa';
-const DIM = '#666666';
-const HAIRLINE = '#1e1e1e';
+/* ── Konquered Kocktails palette — warm, luxe, black-and-gold ─────────
+   Deliberately its OWN brand, not goElev8's cyber-noir: no cyan, no
+   monospace, no sharp tech edges. Elegant serif display + gold on ink. */
+const INK = '#0A0A0A';        // base black, faintly warm
+const PANEL = '#131110';      // raised surfaces
+const PANEL2 = '#1c1916';     // nested surfaces
+const GOLD = '#C6A15B';       // Konquered gold
+const GOLD_HI = '#E8CC86';    // bright gold for gradients / shimmer
+const GOLD_D = '#8a6f3a';     // deep gold
+const CREAM = '#EDE4D3';      // parchment accent
+const TEXT = '#F4EFE6';       // warm off-white body
+const MUTED = '#9c9284';      // warm muted
+const DIM = '#6b6357';        // faint
+const LINE = 'rgba(198,161,91,0.15)';   // gold hairline
+const LINE2 = 'rgba(198,161,91,0.28)';  // stronger gold hairline
 
-const FD = '"Bebas Neue", sans-serif';                  // display
-const FB = '"DM Sans", system-ui, sans-serif';          // body
-const FM = '"JetBrains Mono", monospace';               // labels / eyebrows
+const FD = '"Cormorant Garamond", Georgia, serif';       // display
+const FB = '"Outfit", system-ui, -apple-system, sans-serif'; // body + labels
 
-/* ── Real Konquered Kocktails content ──────────────────────────────────
-   Menu recipes, packages, and contact are taken verbatim from
-   konqueredbalance.com/konqueredkocktails. */
+/* ── Real Konquered Kocktails content (verbatim from the live page) ── */
 
 const PACKAGES = [
   {
-    icon: '🍸',
     accent: GOLD,
     img: '/images/kk/bourbon-bar.jpeg',
     name: 'The Kustom Mixology Experience',
@@ -40,12 +39,11 @@ const PACKAGES = [
     goal: 'The Kustom Mixology Experience',
   },
   {
-    icon: '🥃',
-    accent: CYAN,
+    accent: GOLD,
     img: '/images/kk/signature-sour.png',
     imgContain: true,
     name: 'Spirits & Kocktail Tasting',
-    tagline: 'Guided tasting for the curious',
+    tagline: 'A guided tasting for the curious',
     bullets: [
       'Custom spirits & cocktail tasting',
       'Personalized tasting profile kit',
@@ -54,7 +52,6 @@ const PACKAGES = [
     goal: 'Spirits & Kocktail Tasting',
   },
   {
-    icon: '🎉',
     accent: GOLD,
     img: '/images/kk/live-mixology.jpg',
     name: 'Full-Service Mobile Bar',
@@ -68,7 +65,6 @@ const PACKAGES = [
   },
 ];
 
-/* Signature kocktails — real recipes from the menu. */
 const MENU = [
   {
     name: 'Nearest to Happiness',
@@ -85,7 +81,6 @@ const MENU = [
   },
 ];
 
-/* Booking dropdown — every option is a bookable event held with a deposit. */
 const GOALS = [
   'The Kustom Mixology Experience',
   'Spirits & Kocktail Tasting',
@@ -95,7 +90,6 @@ const GOALS = [
   'Kocktail Masterclass',
 ];
 
-/* Event start times — an evening-weighted mobile-bar schedule. */
 const SLOTS = ['1:00 PM', '3:00 PM', '5:00 PM', '6:00 PM', '7:00 PM', '8:00 PM', '9:00 PM'];
 
 const STEP_LABELS = ['Your info', 'Pick a date', 'Deposit', 'Booked'];
@@ -111,8 +105,6 @@ type DayOption = { key: string; dow: string; md: string };
 type Lead = { name: string; phone: string; email: string; goal: string };
 type FieldErrors = Partial<Record<'name' | 'phone' | 'email', string>>;
 
-/* Next six days, weekends included — events cluster on Fri/Sat/Sun. Built in
-   an effect so SSR markup and first client paint can't disagree. */
 function buildDays(): DayOption[] {
   const out: DayOption[] = [];
   const d = new Date();
@@ -152,7 +144,6 @@ export default function KkClient() {
     setDay(d[0] ?? null);
   }, []);
 
-  /* Returning from Stripe with ?booked=1 lands on the confirmation step. */
   useEffect(() => {
     if (new URLSearchParams(window.location.search).get('booked') === '1') setStep(4);
   }, []);
@@ -190,10 +181,6 @@ export default function KkClient() {
 
   const when = day ? `${day.dow}, ${day.md} at ${slot}` : slot;
 
-  /* Real deposit checkout. Hits the shared endpoint; on a live connected
-     account this redirects to Stripe. Until then the endpoint answers 402 —
-     for this demo we treat that as "show the confirmation the guest would
-     see" so the flow reads as complete end to end. */
   async function payDeposit() {
     if (depositBusy) return;
     setDepositBusy(true);
@@ -218,7 +205,6 @@ export default function KkClient() {
         return;
       }
       if (res.status === 402) {
-        // Deposits not yet connected — complete the demo booking.
         setDemoNote(true);
         setStep(4);
         return;
@@ -243,27 +229,30 @@ export default function KkClient() {
   }
 
   return (
-    <main style={{ background: BLK, color: TEXT, fontFamily: FB, fontWeight: 300, minHeight: '100vh', overflowX: 'hidden' }}>
+    <main style={{ background: INK, color: TEXT, fontFamily: FB, fontWeight: 300, minHeight: '100vh', overflowX: 'hidden' }}>
+      {/* Animation + a couple of pseudo-element effects that inline styles can't express. */}
+      <style>{KEYFRAMES}</style>
+
       {/* ── Sticky header ──────────────────────────────────────────── */}
       <header
         style={{
           position: 'sticky', top: 0, zIndex: 50,
-          background: 'rgba(0,0,0,0.92)',
-          backdropFilter: 'blur(24px) saturate(1.5)',
-          WebkitBackdropFilter: 'blur(24px) saturate(1.5)',
-          borderBottom: `1px solid rgba(201,168,76,0.16)`,
+          background: 'rgba(10,10,10,0.86)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          borderBottom: `1px solid ${LINE}`,
         }}
       >
         <div style={{
-          maxWidth: 1180, margin: '0 auto', padding: '12px 20px',
+          maxWidth: 1180, margin: '0 auto', padding: '14px 20px',
           display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap',
         }}>
           <Brand />
           <nav
             aria-label="Sections"
             style={{
-              display: 'flex', gap: 22, marginLeft: 'auto', flexWrap: 'wrap',
-              fontFamily: FM, fontSize: 11, letterSpacing: '0.8px', textTransform: 'uppercase',
+              display: 'flex', gap: 26, marginLeft: 'auto', flexWrap: 'wrap',
+              fontFamily: FB, fontSize: 12, letterSpacing: '1.6px', textTransform: 'uppercase', fontWeight: 500,
             }}
           >
             {[
@@ -272,142 +261,150 @@ export default function KkClient() {
               ['About', 'about'],
             ].map(([label, id]) => (
               <a key={id} href={`#${id}`} onClick={(e) => smoothScrollTo(e, id)}
-                 style={{ color: DIM, textDecoration: 'none', whiteSpace: 'nowrap' }}>
+                 className="kk-navlink"
+                 style={{ color: MUTED, textDecoration: 'none', whiteSpace: 'nowrap' }}>
                 {label}
               </a>
             ))}
           </nav>
           <a href="#book" onClick={(e) => smoothScrollTo(e, 'book')}
-             style={{ ...goldButton, padding: '9px 20px', fontSize: 11, whiteSpace: 'nowrap' }}>
+             className="kk-gold-btn" style={{ ...goldButton, padding: '10px 22px', fontSize: 12 }}>
             Book an Event
           </a>
         </div>
       </header>
 
       {/* ── Hero ───────────────────────────────────────────────────── */}
-      <section style={{ ...shell, paddingTop: 'clamp(40px, 7vw, 84px)', paddingBottom: 'clamp(36px, 6vw, 68px)' }}>
+      <section style={{ ...shell, position: 'relative', paddingTop: 'clamp(36px, 6vw, 72px)', paddingBottom: 'clamp(36px, 6vw, 72px)' }}>
+        {/* warm ambient wash behind the whole hero */}
+        <div aria-hidden="true" style={{
+          position: 'absolute', inset: 0, pointerEvents: 'none',
+          background: 'radial-gradient(60% 70% at 78% 40%, rgba(198,161,91,0.10) 0%, transparent 60%)',
+        }} />
         <div style={{
-          display: 'grid', gap: 40,
+          position: 'relative',
+          display: 'grid', gap: 'clamp(24px, 4vw, 56px)',
           gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
           alignItems: 'center',
         }}>
-          <div>
+          <div className="kk-fade-up">
             <Eyebrow>Kraft Kocktails · Mobile Bar · {CONTACT.area}</Eyebrow>
             <h1 style={{
-              margin: '18px 0 0', fontFamily: FD, fontWeight: 400,
-              fontSize: 'clamp(44px, 8vw, 88px)',
-              lineHeight: 0.92, letterSpacing: '1.5px', textTransform: 'uppercase',
+              margin: '20px 0 0', fontFamily: FD, fontWeight: 600,
+              fontSize: 'clamp(46px, 8vw, 92px)',
+              lineHeight: 0.98, letterSpacing: '-0.01em',
             }}>
-              Handcrafted{' '}
-              <span style={{ color: GOLD }}>kocktail experiences</span>,{' '}
-              <span style={{ color: CYAN }}>konquered</span>.
+              Handcrafted<br />
+              <span style={{ color: GOLD, fontStyle: 'italic', fontWeight: 500 }}>kocktail</span> experiences,<br />
+              konquered.
             </h1>
             <p style={{
-              margin: '22px 0 0', color: MUTED,
-              fontSize: 'clamp(15px, 2vw, 18px)', lineHeight: 1.7, maxWidth: 540,
+              margin: '24px 0 0', color: CREAM, opacity: 0.82,
+              fontSize: 'clamp(15px, 2vw, 18px)', lineHeight: 1.75, maxWidth: 520, fontWeight: 300,
             }}>
               Themed, handcrafted kocktails and full-service mobile bar for weddings, corporate
               events, and private parties. Custom menus, live mixology, and guided tastings — built
-              around your night. Reserve your date online with a{' '}
-              <strong style={{ color: TEXT, fontWeight: 500 }}>$200 deposit</strong>.
+              around your night. Reserve your date with a{' '}
+              <strong style={{ color: GOLD, fontWeight: 500 }}>$200 deposit</strong>.
             </p>
 
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 30 }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14, marginTop: 32 }}>
               <a href="#book" onClick={(e) => smoothScrollTo(e, 'book')}
-                 style={{ ...goldButton, padding: '14px 28px', fontSize: 13 }}>
-                Book Your Event →
+                 className="kk-gold-btn" style={{ ...goldButton, padding: '15px 30px', fontSize: 13 }}>
+                Book Your Event
               </a>
               <a href="#experiences" onClick={(e) => smoothScrollTo(e, 'experiences')}
-                 style={{ ...ghostButton, padding: '14px 28px', fontSize: 13 }}>
+                 className="kk-ghost-btn" style={{ ...ghostButton, padding: '15px 30px', fontSize: 13 }}>
                 See Experiences
               </a>
             </div>
 
             <div style={{
-              display: 'flex', alignItems: 'center', gap: 10, marginTop: 26, flexWrap: 'wrap',
-              fontFamily: FM, fontSize: 10, letterSpacing: '1.5px', textTransform: 'uppercase',
+              display: 'flex', alignItems: 'center', gap: 12, marginTop: 30, flexWrap: 'wrap',
+              fontFamily: FB, fontSize: 11, letterSpacing: '1.4px', textTransform: 'uppercase', fontWeight: 500,
             }}>
-              <span style={{ width: 6, height: 6, borderRadius: '50%', background: GRN, flexShrink: 0 }} />
-              <span style={{ color: GRN }}>Now booking</span>
-              <span style={{ color: '#2e2e2e' }}>/</span>
-              <span style={{ color: DIM }}>Licensed &amp; insured</span>
-              <span style={{ color: '#2e2e2e' }}>/</span>
-              <span style={{ color: DIM }}>Deposit secured by Stripe</span>
+              <span className="kk-live-dot" style={{ width: 7, height: 7, borderRadius: '50%', background: GOLD, flexShrink: 0 }} />
+              <span style={{ color: GOLD }}>Now booking</span>
+              <span style={{ color: GOLD_D }}>·</span>
+              <span style={{ color: MUTED }}>Licensed &amp; insured</span>
+              <span style={{ color: GOLD_D }}>·</span>
+              <span style={{ color: MUTED }}>Deposit secured by Stripe</span>
             </div>
           </div>
 
-          {/* Signature drink, floating on black */}
-          <div style={{ position: 'relative', display: 'flex', justifyContent: 'center' }}>
-            <div style={{
-              position: 'absolute', width: '78%', aspectRatio: '1', borderRadius: '50%',
-              background: 'radial-gradient(circle, rgba(201,168,76,0.20) 0%, transparent 68%)',
-              filter: 'blur(8px)',
-            }} />
-            <Image
-              src="/images/kk/signature-sour.png"
-              alt="The Konquered Sour — bourbon, barrel-aged maple, ginger liqueur, orange and brandied cherries"
-              width={520}
-              height={640}
-              priority
-              style={{ position: 'relative', width: '100%', maxWidth: 380, height: 'auto', display: 'block' }}
-            />
+          {/* Animated hero medallion — the KB logo as a spinning gold seal
+              behind the signature drink, with a rotating ring, pulsing glow,
+              and a few rising sparkles. */}
+          <div className="kk-stage" aria-hidden="false">
+            <div className="kk-glow" />
+            <div className="kk-ring" />
+            <div className="kk-seal">
+              <Image
+                src="/images/kbalance-logo.jpg"
+                alt="Konquered Kocktails seal"
+                width={300}
+                height={300}
+                priority
+                style={{ width: '100%', height: '100%', borderRadius: '50%', display: 'block' }}
+              />
+            </div>
+            <div className="kk-drink">
+              <Image
+                src="/images/kk/signature-sour.png"
+                alt="The Konquered Sour — bourbon, barrel-aged maple, ginger liqueur, orange and brandied cherries"
+                width={520}
+                height={640}
+                priority
+                style={{ width: '100%', height: 'auto', display: 'block', filter: 'drop-shadow(0 24px 40px rgba(0,0,0,0.6))' }}
+              />
+            </div>
+            <span className="kk-spark kk-spark-1" />
+            <span className="kk-spark kk-spark-2" />
+            <span className="kk-spark kk-spark-3" />
           </div>
         </div>
       </section>
+
+      <GoldDivider />
 
       {/* ── Experiences / packages ─────────────────────────────────── */}
       <section id="experiences" style={{ ...shell, ...sectionPad }}>
         <SectionHead
           eyebrow="What we bring"
-          title={<>Book an <span style={{ color: GOLD }}>experience</span></>}
+          title={<>Book an <em style={{ color: GOLD, fontStyle: 'italic' }}>experience</em></>}
           sub="Every experience is fully custom and holds your date with a $200 deposit that applies to your final balance."
         />
         <div style={{
-          display: 'grid', gap: 18, marginTop: 40,
+          display: 'grid', gap: 20, marginTop: 44,
           gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
         }}>
           {PACKAGES.map((p) => (
-            <article key={p.name} style={{ ...card, padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-              <div style={{ position: 'relative', width: '100%', height: 200, background: SURFACE2 }}>
-                <Image
-                  src={p.img}
-                  alt={p.name}
-                  fill
-                  sizes="(max-width: 700px) 100vw, 380px"
-                  style={{ objectFit: p.imgContain ? 'contain' : 'cover', objectPosition: 'center' }}
-                />
-                <span style={{
-                  position: 'absolute', top: 12, left: 12,
-                  width: 38, height: 38, borderRadius: 2, display: 'grid', placeItems: 'center',
-                  fontSize: 18, background: 'rgba(0,0,0,0.6)', border: `1px solid ${p.accent}55`,
-                  backdropFilter: 'blur(6px)',
-                }}>
-                  {p.icon}
-                </span>
+            <article key={p.name} className="kk-card" style={{ ...card, padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+              <div style={{ position: 'relative', width: '100%', height: 210, background: PANEL2 }}>
+                <Image src={p.img} alt={p.name} fill sizes="(max-width: 700px) 100vw, 380px"
+                  style={{ objectFit: p.imgContain ? 'contain' : 'cover', objectPosition: 'center' }} />
+                <div aria-hidden="true" style={{
+                  position: 'absolute', inset: 0,
+                  background: 'linear-gradient(180deg, transparent 40%, rgba(10,10,10,0.55) 100%)',
+                }} />
               </div>
-              <div style={{ padding: 24, display: 'flex', flexDirection: 'column', flex: 1 }}>
-                <span style={{ fontFamily: FM, fontSize: 10, letterSpacing: '1.4px', textTransform: 'uppercase', color: p.accent }}>
+              <div style={{ padding: 26, display: 'flex', flexDirection: 'column', flex: 1 }}>
+                <span style={{ fontFamily: FB, fontSize: 11, letterSpacing: '1.8px', textTransform: 'uppercase', color: GOLD, fontWeight: 500 }}>
                   {p.tagline}
                 </span>
-                <h3 style={{
-                  margin: '10px 0 0', fontFamily: FD, fontWeight: 400,
-                  fontSize: 26, letterSpacing: '0.6px', textTransform: 'uppercase', lineHeight: 1.05,
-                }}>
+                <h3 style={{ margin: '10px 0 0', fontFamily: FD, fontWeight: 600, fontSize: 28, lineHeight: 1.08, letterSpacing: '-0.01em' }}>
                   {p.name}
                 </h3>
-                <ul style={{ margin: '16px 0 0', padding: 0, listStyle: 'none', display: 'grid', gap: 9 }}>
+                <ul style={{ margin: '16px 0 0', padding: 0, listStyle: 'none', display: 'grid', gap: 10 }}>
                   {p.bullets.map((b) => (
-                    <li key={b} style={{ display: 'flex', gap: 9, fontSize: 14, color: MUTED, lineHeight: 1.5 }}>
-                      <span aria-hidden="true" style={{ color: p.accent, flexShrink: 0 }}>▸</span>
+                    <li key={b} style={{ display: 'flex', gap: 10, fontSize: 14.5, color: MUTED, lineHeight: 1.5 }}>
+                      <span aria-hidden="true" style={{ color: GOLD, flexShrink: 0 }}>◆</span>
                       {b}
                     </li>
                   ))}
                 </ul>
-                <a
-                  href="#book"
-                  onClick={(e) => bookExperience(e, p.goal)}
-                  style={{ ...goldButton, marginTop: 22, textAlign: 'center', padding: '13px 20px', fontSize: 12 }}
-                >
+                <a href="#book" onClick={(e) => bookExperience(e, p.goal)}
+                   className="kk-gold-btn" style={{ ...goldButton, marginTop: 24, textAlign: 'center', padding: '14px 20px', fontSize: 12 }}>
                   Book this — $200 deposit
                 </a>
               </div>
@@ -416,51 +413,45 @@ export default function KkClient() {
         </div>
       </section>
 
+      <GoldDivider />
+
       {/* ── Signature menu ─────────────────────────────────────────── */}
       <section id="menu" style={{ ...shell, ...sectionPad }}>
         <div style={{
-          display: 'grid', gap: 40,
+          display: 'grid', gap: 'clamp(28px, 4vw, 52px)',
           gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
           alignItems: 'center',
         }}>
-          <div style={{ position: 'relative', minHeight: 340, borderRadius: 2, overflow: 'hidden', border: `1px solid ${HAIRLINE}` }}>
-            <Image
-              src="/images/kk/bourbon-bar.jpeg"
-              alt="Stephen behind the Konquered Kocktails bourbon bar"
-              fill
-              sizes="(max-width: 700px) 100vw, 540px"
-              style={{ objectFit: 'cover', objectPosition: 'center' }}
-            />
+          <div style={{ position: 'relative', minHeight: 360, borderRadius: 14, overflow: 'hidden', border: `1px solid ${LINE2}` }}>
+            <Image src="/images/kk/bourbon-bar.jpeg" alt="Stephen behind the Konquered Kocktails bourbon bar"
+              fill sizes="(max-width: 700px) 100vw, 540px" style={{ objectFit: 'cover', objectPosition: 'center' }} />
+            <div aria-hidden="true" style={{
+              position: 'absolute', inset: 0, background: 'linear-gradient(180deg, transparent 55%, rgba(10,10,10,0.5) 100%)',
+            }} />
           </div>
           <div>
             <SectionHead
               eyebrow="From the bar"
-              title={<>Signature <span style={{ color: GOLD }}>kocktails</span></>}
+              title={<>Signature <em style={{ color: GOLD, fontStyle: 'italic' }}>kocktails</em></>}
               sub="A taste of the menu. Every event gets its own custom kocktail list — these are house favorites."
             />
-            <div style={{ marginTop: 30 }}>
+            <div style={{ marginTop: 32 }}>
               {MENU.map((m, i) => (
-                <div key={m.name} style={{
-                  padding: '18px 0',
-                  borderBottom: i < MENU.length - 1 ? `1px solid ${HAIRLINE}` : 'none',
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap' }}>
-                    <h3 style={{
-                      margin: 0, fontFamily: FD, fontWeight: 400, fontSize: 24,
-                      letterSpacing: '0.6px', textTransform: 'uppercase', color: TEXT,
-                    }}>
+                <div key={m.name} style={{ padding: '20px 0', borderBottom: i < MENU.length - 1 ? `1px solid ${LINE}` : 'none' }}>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, flexWrap: 'wrap' }}>
+                    <h3 style={{ margin: 0, fontFamily: FD, fontWeight: 600, fontSize: 26, letterSpacing: '-0.01em', color: TEXT }}>
                       {m.name}
                     </h3>
                     {m.signature && (
                       <span style={{
-                        fontFamily: FM, fontSize: 9, letterSpacing: '1.4px', textTransform: 'uppercase',
-                        color: GOLD, border: `1px solid ${GOLD_D}`, borderRadius: 2, padding: '3px 7px',
+                        fontFamily: FB, fontSize: 9.5, letterSpacing: '1.6px', textTransform: 'uppercase', fontWeight: 600,
+                        color: INK, background: `linear-gradient(180deg, ${GOLD_HI}, ${GOLD})`, borderRadius: 999, padding: '4px 10px',
                       }}>
                         House signature
                       </span>
                     )}
                   </div>
-                  <p style={{ margin: '8px 0 0', fontSize: 13.5, color: MUTED, lineHeight: 1.6 }}>
+                  <p style={{ margin: '8px 0 0', fontSize: 14, color: MUTED, lineHeight: 1.6, fontStyle: 'italic', fontFamily: FD }}>
                     {m.build}
                   </p>
                 </div>
@@ -470,96 +461,91 @@ export default function KkClient() {
         </div>
       </section>
 
+      <GoldDivider />
+
       {/* ── About / team ───────────────────────────────────────────── */}
       <section id="about" style={{ ...shell, ...sectionPad }}>
         <div style={{
-          display: 'grid', gap: 40,
+          display: 'grid', gap: 'clamp(28px, 4vw, 52px)',
           gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
           alignItems: 'center',
         }}>
           <div>
             <SectionHead
               eyebrow="Meet the makers"
-              title={<>Kraft, <span style={{ color: CYAN }}>konquered</span></>}
+              title={<>Kraft, <em style={{ color: GOLD, fontStyle: 'italic' }}>konquered</em></>}
               sub="Konquered Kocktails is a St. Charles mobile bar built on handcrafted drinks, Uncle Nearest bourbon, and a whole lot of showmanship. We bring the bar, the tools, and the talent — you bring the guests."
             />
-            <div style={{ display: 'grid', gap: 14, marginTop: 28 }}>
-              <ContactRow icon="📞" label="Call or text" value={CONTACT.phone} href={`tel:${CONTACT.phone.replace(/\D/g, '')}`} />
-              <ContactRow icon="✉️" label="Email" value={CONTACT.email} href={`mailto:${CONTACT.email}`} />
-              <ContactRow icon="📍" label="Based in" value={CONTACT.address} />
+            <div style={{ display: 'grid', gap: 14, marginTop: 30 }}>
+              <ContactRow icon="☎" label="Call or text" value={CONTACT.phone} href={`tel:${CONTACT.phone.replace(/\D/g, '')}`} />
+              <ContactRow icon="✉" label="Email" value={CONTACT.email} href={`mailto:${CONTACT.email}`} />
+              <ContactRow icon="✦" label="Based in" value={CONTACT.address} />
             </div>
           </div>
-          <div style={{
-            display: 'grid', gap: 14,
-            gridTemplateColumns: '1fr 1fr',
-          }}>
-            <div style={{ position: 'relative', aspectRatio: '3/4', borderRadius: 2, overflow: 'hidden', border: `1px solid ${HAIRLINE}` }}>
+          <div style={{ display: 'grid', gap: 16, gridTemplateColumns: '1fr 1fr' }}>
+            <div style={{ position: 'relative', aspectRatio: '3/4', borderRadius: 14, overflow: 'hidden', border: `1px solid ${LINE2}` }}>
               <Image src="/images/kk/founder-portrait.jpeg" alt="Konquered Kocktails founder" fill
-                     sizes="(max-width: 700px) 50vw, 260px" style={{ objectFit: 'cover', objectPosition: 'top' }} />
+                sizes="(max-width: 700px) 50vw, 260px" style={{ objectFit: 'cover', objectPosition: 'top' }} />
             </div>
-            <div style={{ position: 'relative', aspectRatio: '3/4', borderRadius: 2, overflow: 'hidden', border: `1px solid ${HAIRLINE}` }}>
+            <div style={{ position: 'relative', aspectRatio: '3/4', borderRadius: 14, overflow: 'hidden', border: `1px solid ${LINE2}`, marginTop: 28 }}>
               <Image src="/images/kk/team-aprons.jpeg" alt="The Konquered Kocktails team in branded aprons" fill
-                     sizes="(max-width: 700px) 50vw, 260px" style={{ objectFit: 'cover', objectPosition: 'center' }} />
+                sizes="(max-width: 700px) 50vw, 260px" style={{ objectFit: 'cover', objectPosition: 'center' }} />
             </div>
           </div>
         </div>
       </section>
 
+      <GoldDivider />
+
       {/* ── Booking funnel ─────────────────────────────────────────── */}
       <section id="book" style={{ ...shell, ...sectionPad }}>
         <SectionHead
+          center
           eyebrow="Reserve your date"
-          title={<>Book your <span style={{ color: GOLD }}>experience</span></>}
+          title={<>Book your <em style={{ color: GOLD, fontStyle: 'italic' }}>experience</em></>}
           sub="Tell us about your event, pick a date, and hold it with a $200 deposit — applied in full to your final balance."
         />
 
-        <div style={{ ...card, marginTop: 40, padding: 0, overflow: 'hidden', maxWidth: 760, marginLeft: 'auto', marginRight: 'auto' }}>
-          {/* Step progress */}
+        <div style={{ ...card, marginTop: 44, padding: 0, overflow: 'hidden', maxWidth: 760, marginLeft: 'auto', marginRight: 'auto' }}>
           <div style={{
-            display: 'flex', gap: 8, padding: '20px 16px 0', flexWrap: 'wrap', justifyContent: 'center',
-            borderBottom: `1px solid ${HAIRLINE}`, paddingBottom: 18,
+            display: 'flex', gap: 10, padding: '22px 16px 20px', flexWrap: 'wrap', justifyContent: 'center',
+            borderBottom: `1px solid ${LINE}`,
           }}>
             {STEP_LABELS.map((label, i) => {
               const n = i + 1;
               const done = step > n;
               const active = step === n;
               return (
-                <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
                   <span style={{
-                    width: 24, height: 24, borderRadius: 2, display: 'grid', placeItems: 'center',
-                    fontFamily: FM, fontSize: 11,
-                    background: done ? GOLD : active ? 'rgba(201,168,76,0.14)' : SURFACE2,
-                    border: `1px solid ${done ? GOLD : active ? GOLD : HAIRLINE}`,
-                    color: done ? BLK : active ? GOLD : DIM,
+                    width: 26, height: 26, borderRadius: '50%', display: 'grid', placeItems: 'center',
+                    fontFamily: FB, fontSize: 12, fontWeight: 600,
+                    background: done ? `linear-gradient(180deg, ${GOLD_HI}, ${GOLD})` : active ? 'rgba(198,161,91,0.12)' : PANEL2,
+                    border: `1px solid ${done ? GOLD : active ? GOLD : LINE}`,
+                    color: done ? INK : active ? GOLD : DIM,
                   }}>
                     {done ? '✓' : n}
                   </span>
                   <span style={{
-                    fontFamily: FM, fontSize: 10.5, letterSpacing: '0.8px', textTransform: 'uppercase',
+                    fontFamily: FB, fontSize: 11, letterSpacing: '1.2px', textTransform: 'uppercase', fontWeight: 500,
                     color: active ? TEXT : DIM,
                   }}>
                     {label}
                   </span>
-                  {n < STEP_LABELS.length && (
-                    <span aria-hidden="true" style={{ width: 16, height: 1, background: HAIRLINE }} />
-                  )}
+                  {n < STEP_LABELS.length && <span aria-hidden="true" style={{ width: 16, height: 1, background: LINE }} />}
                 </div>
               );
             })}
           </div>
 
-          <div style={{ padding: 'clamp(20px, 4vw, 34px)' }}>
-            {/* Step 1 — lead */}
+          <div style={{ padding: 'clamp(22px, 4vw, 36px)' }}>
             {step === 1 && (
               <form onSubmit={submitLead} noValidate>
                 <h3 style={stepHeading}>Tell us about your event</h3>
                 <p style={{ margin: '10px 0 0', color: MUTED, fontSize: 15, lineHeight: 1.65 }}>
                   A few details and we’ll get your date on the Konquered Kocktails calendar.
                 </p>
-                <div style={{
-                  display: 'grid', gap: 16, marginTop: 26,
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-                }}>
+                <div style={{ display: 'grid', gap: 16, marginTop: 26, gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))' }}>
                   <Field id="kk-name" label="Full name" value={lead.name} error={errors.name}
                     autoComplete="name" placeholder="Jordan Ellis" onChange={(v) => setLead({ ...lead, name: v })} />
                   <Field id="kk-phone" label="Mobile number" value={lead.phone} error={errors.phone}
@@ -568,17 +554,14 @@ export default function KkClient() {
                     type="email" autoComplete="email" placeholder="you@example.com" onChange={(v) => setLead({ ...lead, email: v })} />
                   <div>
                     <label htmlFor="kk-goal" style={labelStyle}>Experience</label>
-                    <select id="kk-goal" value={lead.goal}
-                      onChange={(e) => setLead({ ...lead, goal: e.target.value })}
+                    <select id="kk-goal" value={lead.goal} onChange={(e) => setLead({ ...lead, goal: e.target.value })}
                       style={{ ...inputStyle, appearance: 'none', cursor: 'pointer' }}>
-                      {GOALS.map((g) => (
-                        <option key={g} value={g} style={{ background: SURFACE, color: TEXT }}>{g}</option>
-                      ))}
+                      {GOALS.map((g) => <option key={g} value={g} style={{ background: PANEL, color: TEXT }}>{g}</option>)}
                     </select>
                   </div>
                 </div>
-                <button type="submit" style={{ ...goldButton, ...fullButton, marginTop: 26 }}>
-                  Continue to date &amp; time →
+                <button type="submit" className="kk-gold-btn" style={{ ...goldButton, ...fullButton, marginTop: 26 }}>
+                  Continue to date &amp; time
                 </button>
                 <p style={{ margin: '14px 0 0', fontSize: 12.5, color: DIM, textAlign: 'center' }}>
                   By continuing you agree to be contacted about your event.
@@ -586,7 +569,6 @@ export default function KkClient() {
               </form>
             )}
 
-            {/* Step 2 — date */}
             {step === 2 && (
               <form onSubmit={confirmSlot}>
                 <h3 style={stepHeading}>Pick your event date</h3>
@@ -599,15 +581,10 @@ export default function KkClient() {
                     {days.map((d) => {
                       const on = day?.key === d.key;
                       return (
-                        <button key={d.key} type="button" aria-pressed={on}
-                          onClick={() => { setDay(d); setSlot(''); }}
-                          style={{
-                            ...chipStyle, minWidth: 78,
-                            background: on ? 'rgba(201,168,76,0.14)' : SURFACE2,
-                            borderColor: on ? GOLD : HAIRLINE, color: on ? TEXT : MUTED,
-                          }}>
-                          <span style={{ display: 'block', fontFamily: FM, fontSize: 10, letterSpacing: '1px', textTransform: 'uppercase', opacity: 0.75 }}>{d.dow}</span>
-                          <span style={{ display: 'block', fontSize: 15, fontWeight: 500, marginTop: 3 }}>{d.md}</span>
+                        <button key={d.key} type="button" aria-pressed={on} onClick={() => { setDay(d); setSlot(''); }}
+                          style={{ ...chipStyle, minWidth: 78, background: on ? 'rgba(198,161,91,0.14)' : PANEL2, borderColor: on ? GOLD : LINE, color: on ? TEXT : MUTED }}>
+                          <span style={{ display: 'block', fontFamily: FB, fontSize: 10.5, letterSpacing: '1px', textTransform: 'uppercase', opacity: 0.75 }}>{d.dow}</span>
+                          <span style={{ display: 'block', fontFamily: FD, fontSize: 19, fontWeight: 600, marginTop: 2 }}>{d.md}</span>
                         </button>
                       );
                     })}
@@ -619,13 +596,8 @@ export default function KkClient() {
                     {SLOTS.map((s) => {
                       const on = slot === s;
                       return (
-                        <button key={s} type="button" aria-pressed={on}
-                          onClick={() => { setSlot(s); setSlotError(''); }}
-                          style={{
-                            ...chipStyle, padding: '13px 10px', fontSize: 14.5, fontWeight: 500,
-                            background: on ? 'rgba(0,207,255,0.12)' : SURFACE2,
-                            borderColor: on ? CYAN : HAIRLINE, color: on ? TEXT : MUTED,
-                          }}>
+                        <button key={s} type="button" aria-pressed={on} onClick={() => { setSlot(s); setSlotError(''); }}
+                          style={{ ...chipStyle, padding: '13px 10px', fontSize: 14.5, fontWeight: 500, background: on ? 'rgba(198,161,91,0.14)' : PANEL2, borderColor: on ? GOLD : LINE, color: on ? TEXT : MUTED }}>
                           {s}
                         </button>
                       );
@@ -634,76 +606,71 @@ export default function KkClient() {
                 </fieldset>
                 {slotError && <p role="alert" style={errorTextStyle}>{slotError}</p>}
                 <div style={{ display: 'flex', gap: 12, marginTop: 24, flexWrap: 'wrap' }}>
-                  <button type="button" onClick={() => setStep(1)} style={{ ...ghostButton, padding: '15px 22px' }}>← Back</button>
-                  <button type="submit" style={{ ...goldButton, flex: 1, minWidth: 200, padding: '15px 22px' }}>Continue to deposit →</button>
+                  <button type="button" onClick={() => setStep(1)} className="kk-ghost-btn" style={{ ...ghostButton, padding: '15px 22px' }}>← Back</button>
+                  <button type="submit" className="kk-gold-btn" style={{ ...goldButton, flex: 1, minWidth: 200, padding: '15px 22px' }}>Continue to deposit</button>
                 </div>
               </form>
             )}
 
-            {/* Step 3 — deposit */}
             {step === 3 && (
               <div>
                 <h3 style={stepHeading}>Confirm &amp; secure your date</h3>
                 <p style={{ margin: '10px 0 0', color: MUTED, fontSize: 15, lineHeight: 1.65 }}>
                   Your event date is held for 15 minutes while you complete the deposit.
                 </p>
-                <div style={{ marginTop: 24, padding: 20, borderRadius: 2, background: SURFACE2, border: `1px solid ${HAIRLINE}` }}>
+                <div style={{ marginTop: 24, padding: 20, borderRadius: 12, background: PANEL2, border: `1px solid ${LINE}` }}>
                   <SummaryRow label="Name" value={lead.name} />
                   <SummaryRow label="Experience" value={lead.goal} />
                   <SummaryRow label="Event date" value={when} last />
                 </div>
-                <div style={{ marginTop: 16, padding: 20, borderRadius: 2, background: 'rgba(201,168,76,0.06)', border: '1px solid rgba(201,168,76,0.28)' }}>
+                <div style={{ marginTop: 16, padding: 22, borderRadius: 12, background: 'rgba(198,161,91,0.06)', border: `1px solid ${LINE2}` }}>
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap' }}>
-                    <span style={{ fontFamily: FD, fontWeight: 400, fontSize: 38, color: GOLD, lineHeight: 1 }}>$200</span>
+                    <span style={{ fontFamily: FD, fontWeight: 600, fontSize: 42, color: GOLD, lineHeight: 1 }}>$200</span>
                     <span style={{ fontSize: 15, color: TEXT, fontWeight: 500 }}>event deposit</span>
                   </div>
                   <p style={{ margin: '12px 0 0', fontSize: 14.5, color: MUTED, lineHeight: 1.65 }}>
                     Applied in full to your final event balance. It reserves your date and covers bar prep.
                   </p>
                 </div>
-                <button type="button" onClick={payDeposit} disabled={depositBusy}
+                <button type="button" onClick={payDeposit} disabled={depositBusy} className="kk-gold-btn"
                   style={{ ...goldButton, ...fullButton, marginTop: 22, opacity: depositBusy ? 0.6 : 1, cursor: depositBusy ? 'wait' : 'pointer' }}>
                   {depositBusy ? 'Opening secure checkout…' : 'Pay $200 deposit'}
                 </button>
                 {depositError && <p role="alert" style={{ ...errorTextStyle, marginTop: 12, textAlign: 'center' }}>{depositError}</p>}
                 <div style={{ display: 'flex', gap: 12, marginTop: 12, flexWrap: 'wrap' }}>
-                  <button type="button" onClick={() => setStep(2)} style={{ ...ghostButton, padding: '13px 22px' }}>← Change date</button>
+                  <button type="button" onClick={() => setStep(2)} className="kk-ghost-btn" style={{ ...ghostButton, padding: '13px 22px' }}>← Change date</button>
                 </div>
-                <p style={{ margin: '16px 0 0', fontFamily: FM, fontSize: 10.5, color: DIM, textAlign: 'center', letterSpacing: '0.6px' }}>
-                  🔒 Secured by Stripe · Your card details never touch our servers.
+                <p style={{ margin: '16px 0 0', fontFamily: FB, fontSize: 11, color: DIM, textAlign: 'center', letterSpacing: '0.6px' }}>
+                  ✦ Secured by Stripe · Your card details never touch our servers.
                 </p>
               </div>
             )}
 
-            {/* Step 4 — booked */}
             {step === 4 && (
               <div style={{ textAlign: 'center', padding: '10px 0' }}>
                 <div style={{
-                  width: 64, height: 64, borderRadius: 2, margin: '0 auto',
-                  display: 'grid', placeItems: 'center', fontSize: 28,
-                  background: 'rgba(0,255,148,0.08)', border: `1px solid ${GRN}`, color: GRN,
+                  width: 68, height: 68, borderRadius: '50%', margin: '0 auto',
+                  display: 'grid', placeItems: 'center', fontSize: 30,
+                  background: `linear-gradient(180deg, ${GOLD_HI}, ${GOLD})`, color: INK,
                 }}>✓</div>
-                <h3 style={{ ...stepHeading, margin: '22px 0 0', fontSize: 'clamp(28px, 4.4vw, 38px)' }}>
+                <h3 style={{ ...stepHeading, margin: '22px 0 0', fontSize: 'clamp(30px, 4.4vw, 42px)' }}>
                   Your date is booked
                 </h3>
                 <p style={{ margin: '12px 0 0', color: MUTED, fontSize: 15.5, lineHeight: 1.65 }}>
                   Konquered Kocktails will be in touch to lock your custom menu. Your deposit is confirmed.
                 </p>
-                <div style={{ marginTop: 26, padding: 20, borderRadius: 2, textAlign: 'left', background: SURFACE2, border: `1px solid ${HAIRLINE}` }}>
+                <div style={{ marginTop: 26, padding: 20, borderRadius: 12, textAlign: 'left', background: PANEL2, border: `1px solid ${LINE}` }}>
                   <SummaryRow label="Experience" value={lead.goal} />
                   <SummaryRow label="Event date" value={when} />
                   <SummaryRow label="Deposit" value="$200 — applied to your final balance" />
                   <SummaryRow label="Confirmation to" value={lead.email || 'your email'} last />
                 </div>
                 {demoNote && (
-                  <p style={{
-                    margin: '16px 0 0', fontFamily: FM, fontSize: 10.5, letterSpacing: '0.5px',
-                    color: GOLD, lineHeight: 1.6,
-                  }}>
+                  <p style={{ margin: '16px 0 0', fontFamily: FB, fontSize: 11, letterSpacing: '0.5px', color: GOLD, lineHeight: 1.6 }}>
                     Demo mode — no live charge. Deposits go live once the Stripe account is connected.
                   </p>
                 )}
-                <button type="button" onClick={resetFunnel} style={{ ...ghostButton, marginTop: 22, padding: '13px 26px' }}>
+                <button type="button" onClick={resetFunnel} className="kk-ghost-btn" style={{ ...ghostButton, marginTop: 22, padding: '13px 26px' }}>
                   Book another event
                 </button>
               </div>
@@ -713,22 +680,21 @@ export default function KkClient() {
       </section>
 
       {/* ── Footer ─────────────────────────────────────────────────── */}
-      <footer style={{ borderTop: `1px solid ${HAIRLINE}`, marginTop: 'clamp(40px, 6vw, 72px)' }}>
+      <footer style={{ borderTop: `1px solid ${LINE}`, marginTop: 'clamp(44px, 6vw, 80px)' }}>
         <div style={{
-          maxWidth: 1180, margin: '0 auto', padding: '32px 20px 44px',
-          display: 'flex', flexWrap: 'wrap', gap: 20,
-          alignItems: 'center', justifyContent: 'space-between',
+          maxWidth: 1180, margin: '0 auto', padding: '36px 20px 48px',
+          display: 'flex', flexWrap: 'wrap', gap: 22, alignItems: 'center', justifyContent: 'space-between',
         }}>
           <Brand />
-          <div style={{ fontFamily: FM, fontSize: 11, color: DIM, letterSpacing: '0.5px', lineHeight: 1.9 }}>
+          <div style={{ fontFamily: FB, fontSize: 12.5, color: MUTED, letterSpacing: '0.3px', lineHeight: 1.9 }}>
             <div>{CONTACT.phone} · {CONTACT.email}</div>
             <div>{CONTACT.address}</div>
           </div>
-          <a href="https://goelev8.ai" style={{
-            fontFamily: FM, fontSize: 10.5, color: DIM, letterSpacing: '0.8px',
-            textTransform: 'uppercase', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 8,
+          <a href="https://goelev8.ai" className="kk-navlink" style={{
+            fontFamily: FB, fontSize: 11, color: DIM, letterSpacing: '1.2px',
+            textTransform: 'uppercase', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 8, fontWeight: 500,
           }}>
-            <Image src="/images/goelev8-full-logo.png" alt="" width={22} height={22} style={{ width: 22, height: 22, opacity: 0.8 }} />
+            <Image src="/images/goelev8-full-logo.png" alt="" width={22} height={22} style={{ width: 22, height: 22, opacity: 0.75 }} />
             Powered by goElev8
           </a>
         </div>
@@ -741,25 +707,14 @@ export default function KkClient() {
 
 function Brand() {
   return (
-    <span style={{ display: 'flex', alignItems: 'center', gap: 11 }}>
-      <Image
-        src="/images/kbalance-logo.jpg"
-        alt="Konquered Kocktails"
-        width={40}
-        height={40}
-        style={{ height: 40, width: 40, display: 'block', borderRadius: '50%' }}
-      />
+    <span style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+      <Image src="/images/kbalance-logo.jpg" alt="Konquered Kocktails" width={42} height={42}
+        style={{ height: 42, width: 42, display: 'block', borderRadius: '50%', border: `1px solid ${LINE2}` }} />
       <span style={{ lineHeight: 1 }}>
-        <span style={{
-          display: 'block', fontFamily: FD, fontWeight: 400, fontSize: 19,
-          letterSpacing: '1.6px', color: TEXT, textTransform: 'uppercase',
-        }}>
+        <span style={{ display: 'block', fontFamily: FD, fontWeight: 600, fontSize: 22, letterSpacing: '0.02em', color: TEXT }}>
           Konquered Kocktails
         </span>
-        <span style={{
-          display: 'block', fontFamily: FM, fontSize: 8.5, letterSpacing: '2.4px',
-          textTransform: 'uppercase', color: GOLD, marginTop: 3,
-        }}>
+        <span style={{ display: 'block', fontFamily: FB, fontSize: 9, letterSpacing: '3px', textTransform: 'uppercase', color: GOLD, marginTop: 3, fontWeight: 500 }}>
           Kraft Kocktail Experiences
         </span>
       </span>
@@ -770,58 +725,58 @@ function Brand() {
 function Eyebrow({ children }: { children: React.ReactNode }) {
   return (
     <span style={{
-      display: 'inline-flex', alignItems: 'center', gap: 10,
-      fontFamily: FM, fontSize: 11, letterSpacing: '2.2px',
-      textTransform: 'uppercase', color: GOLD,
+      display: 'inline-flex', alignItems: 'center', gap: 11,
+      fontFamily: FB, fontSize: 11.5, letterSpacing: '2.4px', textTransform: 'uppercase', color: GOLD, fontWeight: 500,
     }}>
-      <span aria-hidden="true" style={{ width: 24, height: 1, background: GOLD }} />
+      <span aria-hidden="true" style={{ width: 26, height: 1, background: `linear-gradient(90deg, ${GOLD}, transparent)` }} />
       {children}
     </span>
   );
 }
 
-function SectionHead({ eyebrow, title, sub }: { eyebrow: string; title: React.ReactNode; sub: string }) {
+function SectionHead({ eyebrow, title, sub, center }: { eyebrow: string; title: React.ReactNode; sub: string; center?: boolean }) {
   return (
-    <div style={{ maxWidth: 640 }}>
+    <div style={{ maxWidth: 640, ...(center ? { marginLeft: 'auto', marginRight: 'auto', textAlign: 'center' } : {}) }}>
       <Eyebrow>{eyebrow}</Eyebrow>
-      <h2 style={{
-        margin: '18px 0 0', fontFamily: FD, fontWeight: 400,
-        fontSize: 'clamp(30px, 5vw, 52px)',
-        lineHeight: 1, letterSpacing: '1.2px', textTransform: 'uppercase',
-      }}>
+      <h2 style={{ margin: '18px 0 0', fontFamily: FD, fontWeight: 600, fontSize: 'clamp(34px, 5.4vw, 58px)', lineHeight: 1.02, letterSpacing: '-0.01em' }}>
         {title}
       </h2>
-      <p style={{ margin: '14px 0 0', fontSize: 'clamp(14.5px, 2vw, 16.5px)', color: MUTED, lineHeight: 1.7 }}>
+      <p style={{ margin: '16px 0 0', fontSize: 'clamp(14.5px, 2vw, 16.5px)', color: MUTED, lineHeight: 1.7, ...(center ? { marginLeft: 'auto', marginRight: 'auto' } : {}) }}>
         {sub}
       </p>
     </div>
   );
 }
 
+function GoldDivider() {
+  return (
+    <div aria-hidden="true" style={{ maxWidth: 1180, margin: '0 auto', padding: '0 20px' }}>
+      <div style={{ height: 1, background: `linear-gradient(90deg, transparent, ${LINE2}, transparent)`, marginTop: 'clamp(24px, 4vw, 44px)' }} />
+    </div>
+  );
+}
+
 function ContactRow({ icon, label, value, href }: { icon: string; label: string; value: string; href?: string }) {
   const inner = (
-    <span style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+    <span style={{ display: 'flex', alignItems: 'center', gap: 13 }}>
       <span style={{
-        width: 38, height: 38, borderRadius: 2, display: 'grid', placeItems: 'center',
-        fontSize: 16, background: SURFACE2, border: `1px solid ${HAIRLINE}`, flexShrink: 0,
+        width: 40, height: 40, borderRadius: '50%', display: 'grid', placeItems: 'center',
+        fontSize: 15, color: GOLD, background: PANEL2, border: `1px solid ${LINE2}`, flexShrink: 0,
       }}>{icon}</span>
       <span style={{ minWidth: 0 }}>
-        <span style={{ display: 'block', fontFamily: FM, fontSize: 9.5, letterSpacing: '1.2px', textTransform: 'uppercase', color: DIM }}>{label}</span>
-        <span style={{ display: 'block', fontSize: 14.5, fontWeight: 500, color: TEXT, marginTop: 2, wordBreak: 'break-word' }}>{value}</span>
+        <span style={{ display: 'block', fontFamily: FB, fontSize: 10, letterSpacing: '1.6px', textTransform: 'uppercase', color: DIM, fontWeight: 500 }}>{label}</span>
+        <span style={{ display: 'block', fontSize: 15, fontWeight: 400, color: TEXT, marginTop: 3, wordBreak: 'break-word' }}>{value}</span>
       </span>
     </span>
   );
-  return href ? <a href={href} style={{ textDecoration: 'none' }}>{inner}</a> : inner;
+  return href ? <a href={href} className="kk-contact" style={{ textDecoration: 'none' }}>{inner}</a> : inner;
 }
 
 function SummaryRow({ label, value, last }: { label: string; value: string; last?: boolean }) {
   return (
-    <div style={{
-      display: 'flex', justifyContent: 'space-between', gap: 14, flexWrap: 'wrap',
-      padding: '11px 0', borderBottom: last ? 'none' : `1px solid ${HAIRLINE}`,
-    }}>
-      <span style={{ fontFamily: FM, fontSize: 10.5, letterSpacing: '1px', textTransform: 'uppercase', color: DIM }}>{label}</span>
-      <span style={{ fontSize: 14.5, fontWeight: 500, textAlign: 'right', minWidth: 0, wordBreak: 'break-word' }}>{value}</span>
+    <div style={{ display: 'flex', justifyContent: 'space-between', gap: 14, flexWrap: 'wrap', padding: '11px 0', borderBottom: last ? 'none' : `1px solid ${LINE}` }}>
+      <span style={{ fontFamily: FB, fontSize: 11, letterSpacing: '1px', textTransform: 'uppercase', color: DIM, fontWeight: 500 }}>{label}</span>
+      <span style={{ fontSize: 15, fontWeight: 400, textAlign: 'right', minWidth: 0, wordBreak: 'break-word' }}>{value}</span>
     </div>
   );
 }
@@ -835,8 +790,8 @@ function Field({ id, label, value, onChange, error, type = 'text', placeholder, 
       <label htmlFor={id} style={labelStyle}>{label}</label>
       <input id={id} type={type} value={value} placeholder={placeholder} autoComplete={autoComplete}
         aria-invalid={error ? true : undefined} aria-describedby={error ? `${id}-err` : undefined}
-        onChange={(e) => onChange(e.target.value)}
-        style={{ ...inputStyle, borderColor: error ? '#FF3B3B' : HAIRLINE }} />
+        onChange={(e) => onChange(e.target.value)} className="kk-input"
+        style={{ ...inputStyle, borderColor: error ? '#c65b5b' : LINE }} />
       {error && <p id={`${id}-err`} role="alert" style={{ ...errorTextStyle, marginTop: 7 }}>{error}</p>}
     </div>
   );
@@ -847,55 +802,98 @@ function Field({ id, label, value, onChange, error, type = 'text', placeholder, 
 const shell: CSSProperties = { maxWidth: 1180, margin: '0 auto', padding: '0 20px' };
 
 const sectionPad: CSSProperties = {
-  paddingTop: 'clamp(44px, 7vw, 84px)',
-  paddingBottom: 'clamp(10px, 2vw, 20px)',
-  scrollMarginTop: 80,
+  paddingTop: 'clamp(40px, 6vw, 72px)',
+  paddingBottom: 'clamp(8px, 2vw, 16px)',
+  scrollMarginTop: 84,
 };
 
-const card: CSSProperties = { background: SURFACE, border: `1px solid ${HAIRLINE}`, borderRadius: 2 };
+const card: CSSProperties = { background: PANEL, border: `1px solid ${LINE}`, borderRadius: 16 };
 
 const stepHeading: CSSProperties = {
-  margin: 0, fontFamily: FD, fontWeight: 400,
-  fontSize: 'clamp(24px, 3.6vw, 32px)', letterSpacing: '1px', textTransform: 'uppercase', lineHeight: 1.05,
+  margin: 0, fontFamily: FD, fontWeight: 600, fontSize: 'clamp(26px, 3.6vw, 34px)', letterSpacing: '-0.01em', lineHeight: 1.05,
 };
 
+/* Gold-gradient pill — deliberately unlike goElev8's flat monospace rectangles. */
 const goldButton: CSSProperties = {
-  display: 'inline-block', background: GOLD, color: BLK,
-  fontFamily: FM, fontWeight: 500, fontSize: 12.5, letterSpacing: '1px', textTransform: 'uppercase',
-  border: `1px solid ${GOLD}`, borderRadius: 2, padding: '14px 24px',
-  cursor: 'pointer', textDecoration: 'none', lineHeight: 1.2,
+  display: 'inline-block', background: `linear-gradient(180deg, ${GOLD_HI} 0%, ${GOLD} 55%, ${GOLD_D} 100%)`, color: INK,
+  fontFamily: FB, fontWeight: 600, fontSize: 13, letterSpacing: '1.4px', textTransform: 'uppercase',
+  border: 'none', borderRadius: 999, padding: '15px 28px', cursor: 'pointer', textDecoration: 'none', lineHeight: 1.2,
+  boxShadow: '0 8px 22px rgba(198,161,91,0.22)',
 };
 
 const ghostButton: CSSProperties = {
-  display: 'inline-block', background: 'transparent', color: TEXT,
-  fontFamily: FM, fontWeight: 500, fontSize: 12.5, letterSpacing: '1px', textTransform: 'uppercase',
-  border: `1px solid #2e2e2e`, borderRadius: 2, padding: '14px 24px',
-  cursor: 'pointer', textDecoration: 'none', lineHeight: 1.2,
+  display: 'inline-block', background: 'transparent', color: CREAM,
+  fontFamily: FB, fontWeight: 500, fontSize: 13, letterSpacing: '1.4px', textTransform: 'uppercase',
+  border: `1px solid ${LINE2}`, borderRadius: 999, padding: '15px 28px', cursor: 'pointer', textDecoration: 'none', lineHeight: 1.2,
 };
 
-const fullButton: CSSProperties = { display: 'block', width: '100%', textAlign: 'center', padding: '16px 24px', fontSize: 13.5 };
+const fullButton: CSSProperties = { display: 'block', width: '100%', textAlign: 'center', padding: '17px 24px', fontSize: 14 };
 
 const labelStyle: CSSProperties = {
-  display: 'block', fontFamily: FM, fontSize: 10.5, letterSpacing: '1px', textTransform: 'uppercase',
-  color: DIM, marginBottom: 8,
+  display: 'block', fontFamily: FB, fontSize: 10.5, letterSpacing: '1.4px', textTransform: 'uppercase', color: DIM, marginBottom: 8, fontWeight: 500,
 };
 
 const inputStyle: CSSProperties = {
-  width: '100%', boxSizing: 'border-box', background: '#060606',
-  border: `1px solid ${HAIRLINE}`, borderRadius: 2, padding: '13px 14px',
-  color: TEXT, fontFamily: FB, fontSize: 15, outline: 'none',
+  width: '100%', boxSizing: 'border-box', background: '#0c0b0a',
+  border: `1px solid ${LINE}`, borderRadius: 10, padding: '14px 15px', color: TEXT, fontFamily: FB, fontSize: 15, outline: 'none',
 };
 
 const chipStyle: CSSProperties = {
-  padding: '10px 14px', borderRadius: 2, border: `1px solid ${HAIRLINE}`,
-  fontFamily: FB, cursor: 'pointer', textAlign: 'center', lineHeight: 1.25,
+  padding: '10px 14px', borderRadius: 10, border: `1px solid ${LINE}`, fontFamily: FB, cursor: 'pointer', textAlign: 'center', lineHeight: 1.25,
 };
 
 const fieldsetStyle: CSSProperties = { border: 'none', padding: 0, margin: '26px 0 0', minWidth: 0 };
 
 const legendStyle: CSSProperties = {
-  padding: 0, fontFamily: FM, fontSize: 10.5, letterSpacing: '1px', textTransform: 'uppercase',
-  color: DIM, marginBottom: 12,
+  padding: 0, fontFamily: FB, fontSize: 10.5, letterSpacing: '1.4px', textTransform: 'uppercase', color: DIM, marginBottom: 12, fontWeight: 500,
 };
 
-const errorTextStyle: CSSProperties = { margin: '10px 0 0', fontSize: 13, color: '#FF3B3B', lineHeight: 1.45 };
+const errorTextStyle: CSSProperties = { margin: '10px 0 0', fontSize: 13, color: '#d98a8a', lineHeight: 1.45 };
+
+/* ── Keyframes + effects (things inline styles can't do) ──────────────
+   The hero medallion: KB logo as a slow-spinning gold seal behind the
+   drink, a counter-rotating conic gold ring, a pulsing radial glow, the
+   drink gently floating, and a few rising gold sparkles. */
+const KEYFRAMES = `
+.kk-stage{position:relative;display:flex;align-items:center;justify-content:center;min-height:clamp(360px,44vw,540px)}
+.kk-glow{position:absolute;width:82%;aspect-ratio:1;border-radius:50%;
+  background:radial-gradient(circle, rgba(198,161,91,0.32) 0%, rgba(198,161,91,0.10) 40%, transparent 66%);
+  filter:blur(10px);animation:kkGlow 6s ease-in-out infinite}
+.kk-ring{position:absolute;width:70%;aspect-ratio:1;border-radius:50%;
+  background:conic-gradient(from 0deg, transparent 0deg, rgba(232,204,134,0.55) 60deg, transparent 130deg, transparent 230deg, rgba(198,161,91,0.45) 300deg, transparent 360deg);
+  -webkit-mask:radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2px));
+  mask:radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2px));
+  animation:kkSpin 26s linear infinite}
+.kk-seal{position:absolute;width:56%;aspect-ratio:1;opacity:0.9;
+  filter:drop-shadow(0 0 24px rgba(198,161,91,0.28));animation:kkSpin 48s linear infinite}
+.kk-drink{position:relative;width:100%;max-width:360px;z-index:2;
+  animation:kkFadeUp 1s .1s both, kkFloat 5.5s ease-in-out 1s infinite}
+.kk-spark{position:absolute;bottom:22%;width:6px;height:6px;border-radius:50%;
+  background:radial-gradient(circle, ${GOLD_HI}, ${GOLD_D});box-shadow:0 0 8px rgba(232,204,134,0.8);
+  opacity:0;z-index:3}
+.kk-spark-1{left:38%;animation:kkRise 4.2s ease-in 0.4s infinite}
+.kk-spark-2{left:54%;width:4px;height:4px;animation:kkRise 5s ease-in 1.6s infinite}
+.kk-spark-3{left:62%;width:5px;height:5px;animation:kkRise 4.6s ease-in 2.9s infinite}
+.kk-fade-up{animation:kkFadeUp .9s .05s both}
+.kk-live-dot{animation:kkGlow 2.4s ease-in-out infinite}
+.kk-navlink{transition:color .2s ease}
+.kk-navlink:hover{color:${GOLD}}
+.kk-contact{transition:opacity .2s ease}
+.kk-contact:hover{opacity:.82}
+.kk-gold-btn{transition:transform .18s ease, box-shadow .18s ease, filter .18s ease}
+.kk-gold-btn:hover{transform:translateY(-1px);filter:brightness(1.05);box-shadow:0 12px 28px rgba(198,161,91,0.34)}
+.kk-ghost-btn{transition:border-color .2s ease, color .2s ease, background .2s ease}
+.kk-ghost-btn:hover{border-color:${GOLD};color:${GOLD};background:rgba(198,161,91,0.05)}
+.kk-card{transition:transform .22s ease, border-color .22s ease}
+.kk-card:hover{transform:translateY(-3px);border-color:${LINE2}}
+.kk-input:focus{border-color:${GOLD}!important}
+@keyframes kkSpin{to{transform:rotate(360deg)}}
+@keyframes kkGlow{0%,100%{opacity:.5;transform:scale(1)}50%{opacity:.95;transform:scale(1.07)}}
+@keyframes kkFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+@keyframes kkFadeUp{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:translateY(0)}}
+@keyframes kkRise{0%{opacity:0;transform:translateY(24px) scale(.5)}18%{opacity:1}100%{opacity:0;transform:translateY(-150px) scale(1)}}
+@media (prefers-reduced-motion: reduce){
+  .kk-glow,.kk-ring,.kk-seal,.kk-drink,.kk-spark,.kk-fade-up,.kk-live-dot{animation:none!important}
+  .kk-drink{opacity:1;transform:none}
+}
+`;
