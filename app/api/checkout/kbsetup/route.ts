@@ -144,6 +144,10 @@ export async function POST(req: Request) {
     const name = meta(body.name, 120);
     const email = meta(body.email, 200);
     const phone = meta(body.phone, 40);
+    // Which page originated the deposit — 'kbsetup' (scope demo) or 'kk'
+    // (the customer-facing Konquered Kocktails site). Same connected account
+    // either way; this is only for attribution in the dashboard.
+    const src = meta(body.source, 20) || 'kbsetup';
 
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
@@ -154,7 +158,7 @@ export async function POST(req: Request) {
             currency: 'usd',
             unit_amount: DEPOSIT_CENTS,
             product_data: {
-              name: `Konquered Balance — ${experience}`,
+              name: `Konquered Kocktails — ${experience}`,
               description: when
                 ? `$200 deposit holding ${when}. Applied in full to your final event balance.`
                 : '$200 deposit holding your event date. Applied in full to your final event balance.',
@@ -169,7 +173,7 @@ export async function POST(req: Request) {
         application_fee_amount: BOOKING_FEE_CENTS,
         transfer_data: { destination: KB_ACCOUNT },
         metadata: {
-          source: 'kbsetup',
+          source: src,
           plan: 'deposit',
           business: 'Konquered Balance',
           experience,
@@ -179,7 +183,7 @@ export async function POST(req: Request) {
         },
       },
       metadata: {
-        source: 'kbsetup',
+        source: src,
         plan: 'deposit',
         business: 'Konquered Balance',
         experience,
