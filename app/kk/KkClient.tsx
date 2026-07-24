@@ -281,61 +281,37 @@ export default function KkClient() {
           position: 'absolute', inset: 0, pointerEvents: 'none',
           background: 'radial-gradient(60% 70% at 78% 40%, rgba(198,161,91,0.10) 0%, transparent 60%)',
         }} />
-        <div style={{
+        {/* Single centered column: copy, then the animated drink medallion,
+            then the CTAs directly beneath it. */}
+        <div className="kk-fade-up" style={{
           position: 'relative',
-          display: 'grid', gap: 'clamp(24px, 4vw, 56px)',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-          alignItems: 'center',
+          maxWidth: 760, margin: '0 auto', textAlign: 'center',
+          display: 'flex', flexDirection: 'column', alignItems: 'center',
         }}>
-          <div className="kk-fade-up">
-            <Eyebrow>Kraft Kocktails · Mobile Bar · {CONTACT.area}</Eyebrow>
-            <h1 style={{
-              margin: '20px 0 0', fontFamily: FD, fontWeight: 600,
-              fontSize: 'clamp(46px, 8vw, 92px)',
-              lineHeight: 0.98, letterSpacing: '-0.01em',
-            }}>
-              Handcrafted<br />
-              <span style={{ color: GOLD, fontStyle: 'italic', fontWeight: 500 }}>kocktail</span> experiences,<br />
-              konquered.
-            </h1>
-            <p style={{
-              margin: '24px 0 0', color: CREAM, opacity: 0.82,
-              fontSize: 'clamp(15px, 2vw, 18px)', lineHeight: 1.75, maxWidth: 520, fontWeight: 300,
-            }}>
-              Themed, handcrafted kocktails and full-service mobile bar for weddings, corporate
-              events, and private parties. Custom menus, live mixology, and guided tastings — built
-              around your night. Reserve your date with a{' '}
-              <strong style={{ color: GOLD, fontWeight: 500 }}>$200 deposit</strong>.
-            </p>
+          <Eyebrow>Kraft Kocktails · Mobile Bar · {CONTACT.area}</Eyebrow>
+          <h1 style={{
+            margin: '20px 0 0', fontFamily: FD, fontWeight: 600,
+            fontSize: 'clamp(46px, 8vw, 92px)',
+            lineHeight: 0.98, letterSpacing: '-0.01em',
+          }}>
+            Handcrafted<br />
+            <span style={{ color: GOLD, fontStyle: 'italic', fontWeight: 500 }}>kocktail</span> experiences,<br />
+            konquered.
+          </h1>
+          <p style={{
+            margin: '24px auto 0', color: CREAM, opacity: 0.82,
+            fontSize: 'clamp(15px, 2vw, 18px)', lineHeight: 1.75, maxWidth: 540, fontWeight: 300,
+          }}>
+            Themed, handcrafted kocktails and full-service mobile bar for weddings, corporate
+            events, and private parties. Custom menus, live mixology, and guided tastings — built
+            around your night. Reserve your date with a{' '}
+            <strong style={{ color: GOLD, fontWeight: 500 }}>$200 deposit</strong>.
+          </p>
 
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14, marginTop: 32 }}>
-              <a href="#book" onClick={(e) => smoothScrollTo(e, 'book')}
-                 className="kk-gold-btn" style={{ ...goldButton, padding: '15px 30px', fontSize: 13 }}>
-                Book Your Event
-              </a>
-              <a href="#experiences" onClick={(e) => smoothScrollTo(e, 'experiences')}
-                 className="kk-ghost-btn" style={{ ...ghostButton, padding: '15px 30px', fontSize: 13 }}>
-                See Experiences
-              </a>
-            </div>
-
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: 12, marginTop: 30, flexWrap: 'wrap',
-              fontFamily: FB, fontSize: 11, letterSpacing: '1.4px', textTransform: 'uppercase', fontWeight: 500,
-            }}>
-              <span className="kk-live-dot" style={{ width: 7, height: 7, borderRadius: '50%', background: GOLD, flexShrink: 0 }} />
-              <span style={{ color: GOLD }}>Now booking</span>
-              <span style={{ color: GOLD_D }}>·</span>
-              <span style={{ color: MUTED }}>Licensed &amp; insured</span>
-              <span style={{ color: GOLD_D }}>·</span>
-              <span style={{ color: MUTED }}>Deposit secured by Stripe</span>
-            </div>
-          </div>
-
-          {/* Animated hero medallion — the KB logo as a spinning gold seal
-              behind the signature drink, with a rotating ring, pulsing glow,
-              and a few rising sparkles. */}
-          <div className="kk-stage" aria-hidden="false">
+          {/* Animated medallion — KB logo as a spinning gold seal behind the
+              signature drink, with a rotating ring, pulsing glow, and rising
+              sparkles. Sits directly above the CTAs. */}
+          <div className="kk-stage" style={{ width: '100%', maxWidth: 420, margin: 'clamp(20px, 3vw, 34px) auto 0' }}>
             <div className="kk-glow" />
             <div className="kk-ring" />
             <div className="kk-seal">
@@ -361,6 +337,29 @@ export default function KkClient() {
             <span className="kk-spark kk-spark-1" />
             <span className="kk-spark kk-spark-2" />
             <span className="kk-spark kk-spark-3" />
+          </div>
+
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14, marginTop: 'clamp(20px, 3vw, 34px)', justifyContent: 'center' }}>
+            <a href="#book" onClick={(e) => smoothScrollTo(e, 'book')}
+               className="kk-gold-btn" style={{ ...goldButton, padding: '15px 30px', fontSize: 13 }}>
+              Book Your Event
+            </a>
+            <a href="#experiences" onClick={(e) => smoothScrollTo(e, 'experiences')}
+               className="kk-ghost-btn" style={{ ...ghostButton, padding: '15px 30px', fontSize: 13 }}>
+              See Experiences
+            </a>
+          </div>
+
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 12, marginTop: 30, flexWrap: 'wrap', justifyContent: 'center',
+            fontFamily: FB, fontSize: 11, letterSpacing: '1.4px', textTransform: 'uppercase', fontWeight: 500,
+          }}>
+            <span className="kk-live-dot" style={{ width: 7, height: 7, borderRadius: '50%', background: GOLD, flexShrink: 0 }} />
+            <span style={{ color: GOLD }}>Now booking</span>
+            <span style={{ color: GOLD_D }}>·</span>
+            <span style={{ color: MUTED }}>Licensed &amp; insured</span>
+            <span style={{ color: GOLD_D }}>·</span>
+            <span style={{ color: MUTED }}>Deposit secured by Stripe</span>
           </div>
         </div>
       </section>
