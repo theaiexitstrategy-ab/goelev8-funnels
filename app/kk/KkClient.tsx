@@ -43,7 +43,7 @@ const DIM = '#776C58';        // faint
 const LINE = 'rgba(195,154,69,0.16)';   // royal-gold hairline
 const LINE2 = 'rgba(195,154,69,0.30)';  // stronger gold hairline
 
-const FD = '"Cormorant Garamond", Georgia, serif';       // display
+const FD = '"Outfit", system-ui, -apple-system, sans-serif'; // display — matches the Konquered Balance logo
 const FB = '"Outfit", system-ui, -apple-system, sans-serif'; // body + labels
 
 /* ── Real Konquered Kocktails content (verbatim from the live page) ── */
@@ -349,7 +349,7 @@ export default function KkClient() {
             lineHeight: 0.98, letterSpacing: '-0.01em',
           }}>
             Handcrafted<br />
-            <span style={{ color: GOLD, fontStyle: 'italic', fontWeight: 500 }}>Kocktail</span> experiences,<br />
+            <span style={{ color: GOLD, fontWeight: 500 }}>Kocktail</span> experiences,<br />
             konquered.
           </h1>
           <p style={{
@@ -455,7 +455,7 @@ export default function KkClient() {
       <section id="experiences" style={{ ...shell, ...sectionPad }}>
         <SectionHead
           eyebrow="What we bring"
-          title={<>Book an <em style={{ color: GOLD, fontStyle: 'italic' }}>experience</em></>}
+          title={<>Book an <em style={{ color: GOLD }}>experience</em></>}
           sub="Every experience is fully custom and holds your date with a $200 deposit that applies to your final balance."
         />
         <div style={{
@@ -528,7 +528,7 @@ export default function KkClient() {
           <div>
             <SectionHead
               eyebrow="From the studio"
-              title={<>Signature <em style={{ color: GOLD, fontStyle: 'italic' }}>Kocktails</em></>}
+              title={<>Signature <em style={{ color: GOLD }}>Kocktails</em></>}
               sub="A taste of the gallery. Every event gets its own custom Kocktail list — each pour an emotion in the moment. These are house favorites."
             />
             <div style={{ marginTop: 32 }}>
@@ -547,7 +547,7 @@ export default function KkClient() {
                       </span>
                     )}
                   </div>
-                  <p style={{ margin: '8px 0 0', fontSize: 14, color: MUTED, lineHeight: 1.6, fontStyle: 'italic', fontFamily: FD }}>
+                  <p style={{ margin: '8px 0 0', fontSize: 14, color: MUTED, lineHeight: 1.6, fontFamily: FD }}>
                     {m.build}
                   </p>
                 </div>
@@ -569,7 +569,7 @@ export default function KkClient() {
           <div>
             <SectionHead
               eyebrow="Meet the makers"
-              title={<>Kraft, <em style={{ color: GOLD, fontStyle: 'italic' }}>konquered</em></>}
+              title={<>Kraft, <em style={{ color: GOLD }}>konquered</em></>}
               sub="Konquered Kocktails is an art gallery in a glass. Ninety percent of what Stephen creates is emotion in the moment — curated Art + Kreativity, handcrafted into Kocktail experiences built on craft, showmanship, and intention. We bring the artistry, the tools, and the talent — you bring the guests."
             />
             <div style={{ display: 'grid', gap: 14, marginTop: 30 }}>
@@ -609,7 +609,7 @@ export default function KkClient() {
               style={{ width: '100%', aspectRatio: '16 / 9', display: 'block' }}
             />
           </div>
-          <p style={{ margin: '14px 0 0', fontSize: 14, color: MUTED, fontFamily: FD, fontStyle: 'italic' }}>
+          <p style={{ margin: '14px 0 0', fontSize: 14, color: MUTED, fontFamily: FD }}>
             Stephen featured in Jack Daniel’s Gentleman Jack — 2021 Culture Shakers.
           </p>
         </div>
@@ -625,7 +625,7 @@ export default function KkClient() {
         <SectionHead
           center
           eyebrow="Reserve your date"
-          title={<>Book your <em style={{ color: GOLD, fontStyle: 'italic' }}>experience</em></>}
+          title={<>Book your <em style={{ color: GOLD }}>experience</em></>}
           sub="Tell us about your event, pick a date, and hold it with a $200 deposit — applied in full to your final balance."
         />
 
