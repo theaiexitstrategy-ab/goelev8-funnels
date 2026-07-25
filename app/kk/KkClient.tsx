@@ -13,6 +13,13 @@ const MuxPlayer = dynamic(() => import('@mux/mux-player-react'), { ssr: false })
 const HERO_VIDEO_ID = 'FSsAfj00KwDZSPPaApJjMHqx5msnrneNULZFEdDov01g8';   // silent background loop
 const ABOUT_VIDEO_ID = 'MOxiZEb302JK1hwfkQzUQU3EDriQ401stR1CoSrTx02lq00'; // Gentleman Jack feature
 
+/* Header / mobile-menu links — shared by desktop nav and the mobile drawer. */
+const NAV_LINKS: [string, string][] = [
+  ['Experiences', 'experiences'],
+  ['Menu', 'menu'],
+  ['About', 'about'],
+];
+
 /* ── Konquered Kocktails brand palette (CLAUDE.md source of truth) ────
    Warm Black / Deep Emerald backgrounds · Cream Highlight body text ·
    Royal Gold / Konquered Bronze accents & CTAs · Garnet + Amethyst
@@ -143,6 +150,7 @@ function smoothScrollTo(e: React.MouseEvent<HTMLAnchorElement>, id: string) {
 
 export default function KkClient() {
   const [step, setStep] = useState(1);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [lead, setLead] = useState<Lead>({ name: '', phone: '', email: '', goal: GOALS[0] });
   const [errors, setErrors] = useState<FieldErrors>({});
   const [days, setDays] = useState<DayOption[]>([]);
@@ -260,59 +268,60 @@ export default function KkClient() {
       >
         <div style={{
           maxWidth: 1180, margin: '0 auto', padding: '14px 20px',
-          display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap',
+          display: 'flex', alignItems: 'center', gap: 16,
         }}>
           <Brand />
-          <nav
-            aria-label="Sections"
-            style={{
-              display: 'flex', gap: 26, marginLeft: 'auto', flexWrap: 'wrap',
-              fontFamily: FB, fontSize: 12, letterSpacing: '1.6px', textTransform: 'uppercase', fontWeight: 500,
-            }}
-          >
-            {[
-              ['Experiences', 'experiences'],
-              ['Menu', 'menu'],
-              ['About', 'about'],
-            ].map(([label, id]) => (
+          {/* Desktop nav — hidden below the mobile breakpoint (see kk-desktop-nav) */}
+          <nav aria-label="Sections" className="kk-desktop-nav"
+            style={{ fontFamily: FB, fontSize: 12, letterSpacing: '1.6px', textTransform: 'uppercase', fontWeight: 500 }}>
+            {NAV_LINKS.map(([label, id]) => (
               <a key={id} href={`#${id}`} onClick={(e) => smoothScrollTo(e, id)}
                  className="kk-navlink"
                  style={{ color: MUTED, textDecoration: 'none', whiteSpace: 'nowrap' }}>
                 {label}
               </a>
             ))}
+            <a href="#book" onClick={(e) => smoothScrollTo(e, 'book')}
+               className="kk-gold-btn" style={{ ...goldButton, padding: '10px 22px', fontSize: 12 }}>
+              Book an Event
+            </a>
           </nav>
-          <a href="#book" onClick={(e) => smoothScrollTo(e, 'book')}
-             className="kk-gold-btn" style={{ ...goldButton, padding: '10px 22px', fontSize: 12 }}>
-            Book an Event
-          </a>
+          {/* Mobile menu tab — only shown below the breakpoint (see kk-menu-toggle) */}
+          <button
+            type="button"
+            className="kk-menu-toggle"
+            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={menuOpen}
+            aria-controls="kk-mobile-menu"
+            onClick={() => setMenuOpen((o) => !o)}
+            style={{
+              background: 'transparent', color: CREAM, border: `1px solid ${LINE2}`,
+              borderRadius: 999, padding: '9px 16px', cursor: 'pointer',
+              fontFamily: FB, fontSize: 12, letterSpacing: '1.4px', textTransform: 'uppercase', fontWeight: 500,
+            }}
+          >
+            <span aria-hidden="true" style={{ fontSize: 15, lineHeight: 1 }}>{menuOpen ? '✕' : '☰'}</span>{' '}Menu
+          </button>
         </div>
+        {menuOpen && (
+          <nav id="kk-mobile-menu" className="kk-mobile-menu" aria-label="Menu">
+            {NAV_LINKS.map(([label, id]) => (
+              <a key={id} href={`#${id}`} className="kk-mobile-link"
+                 onClick={(e) => { smoothScrollTo(e, id); setMenuOpen(false); }}>
+                {label}
+              </a>
+            ))}
+            <a href="#book" className="kk-gold-btn"
+               onClick={(e) => { smoothScrollTo(e, 'book'); setMenuOpen(false); }}
+               style={{ ...goldButton, ...fullButton, marginTop: 10, fontSize: 13 }}>
+              Book an Event
+            </a>
+          </nav>
+        )}
       </header>
 
       {/* ── Hero ───────────────────────────────────────────────────── */}
       <section style={{ ...shell, position: 'relative', paddingTop: 'clamp(36px, 6vw, 72px)', paddingBottom: 'clamp(36px, 6vw, 72px)' }}>
-        {/* Mux background loop — muted, autoplay, looping, full-bleed behind
-            the hero. Warm Black scrim keeps the cream headline/CTAs legible. */}
-        <div aria-hidden="true" style={{
-          position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)',
-          width: '100vw', height: '100%', overflow: 'hidden', zIndex: 0, pointerEvents: 'none',
-        }}>
-          <MuxPlayer
-            playbackId={HERO_VIDEO_ID}
-            streamType="on-demand"
-            autoPlay="muted"
-            loop
-            muted
-            playsInline
-            style={{
-              width: '100%', height: '100%',
-              '--controls': 'none',
-              '--media-object-fit': 'cover',
-              '--media-object-position': 'center',
-            }}
-          />
-          <div style={{ position: 'absolute', inset: 0, background: INK, opacity: 0.55 }} />
-        </div>
         {/* warm ambient wash — royal gold core with emerald depth and a
             whisper of amethyst/garnet, per the brand palette */}
         <div aria-hidden="true" style={{
@@ -351,31 +360,39 @@ export default function KkClient() {
             <strong style={{ color: GOLD, fontWeight: 500 }}>$200 deposit</strong>.
           </p>
 
-          {/* Animated medallion — KB logo as a spinning gold seal behind the
-              signature drink, with a rotating ring, pulsing glow, and rising
-              sparkles. Sits directly above the CTAs. */}
-          <div className="kk-stage" style={{ width: '100%', maxWidth: 420, margin: 'clamp(20px, 3vw, 34px) auto 0' }}>
+          {/* Hero video framed as an iPhone — the Mux loop plays on the
+              screen, the Konquered seal spins as a badge, a gold glow sits
+              behind. Directly above the CTAs. */}
+          <div className="kk-stage" style={{ width: '100%', maxWidth: 300, margin: 'clamp(16px, 3vw, 30px) auto 0' }}>
             <div className="kk-glow" />
-            <div className="kk-ring" />
-            <div className="kk-seal">
-              <Image
-                src="/images/kbalance-logo.jpg"
-                alt="Konquered Kocktails seal"
-                width={300}
-                height={300}
-                priority
-                style={{ width: '100%', height: '100%', borderRadius: '50%', display: 'block' }}
-              />
-            </div>
-            <div className="kk-drink">
-              <Image
-                src="/images/kk/signature-sour.png"
-                alt="The Konquered Sour — bourbon, barrel-aged maple, ginger liqueur, orange and brandied cherries"
-                width={520}
-                height={640}
-                priority
-                style={{ width: '100%', height: 'auto', display: 'block', filter: 'drop-shadow(0 24px 40px rgba(0,0,0,0.6))' }}
-              />
+            <div className="kk-phone">
+              <div className="kk-phone-island" />
+              <div className="kk-phone-screen">
+                <MuxPlayer
+                  playbackId={HERO_VIDEO_ID}
+                  streamType="on-demand"
+                  autoPlay="muted"
+                  loop
+                  muted
+                  playsInline
+                  style={{
+                    width: '100%', height: '100%',
+                    '--controls': 'none',
+                    '--media-object-fit': 'cover',
+                    '--media-object-position': 'center',
+                  }}
+                />
+              </div>
+              <div className="kk-badge">
+                <Image
+                  src="/images/kbalance-logo.jpg"
+                  alt="Konquered Kocktails seal"
+                  width={120}
+                  height={120}
+                  priority
+                  style={{ width: '100%', height: '100%', display: 'block' }}
+                />
+              </div>
             </div>
             <span className="kk-spark kk-spark-1" />
             <span className="kk-spark kk-spark-2" />
@@ -925,19 +942,25 @@ const errorTextStyle: CSSProperties = { margin: '10px 0 0', fontSize: 13, color:
    drink, a counter-rotating conic gold ring, a pulsing radial glow, the
    drink gently floating, and a few rising gold sparkles. */
 const KEYFRAMES = `
-.kk-stage{position:relative;display:flex;align-items:center;justify-content:center;min-height:clamp(360px,44vw,540px)}
+.kk-stage{position:relative;display:flex;align-items:center;justify-content:center;min-height:0}
 .kk-glow{position:absolute;width:82%;aspect-ratio:1;border-radius:50%;
   background:radial-gradient(circle, ${GOLD}57 0%, ${GARNET}29 44%, transparent 68%);
   filter:blur(10px);animation:kkGlow 6s ease-in-out infinite}
-.kk-ring{position:absolute;width:70%;aspect-ratio:1;border-radius:50%;
-  background:conic-gradient(from 0deg, transparent 0deg, rgba(217,178,90,0.55) 60deg, transparent 130deg, transparent 230deg, rgba(195,154,69,0.45) 300deg, transparent 360deg);
-  -webkit-mask:radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2px));
-  mask:radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2px));
-  animation:kkSpin 26s linear infinite}
-.kk-seal{position:absolute;width:56%;aspect-ratio:1;opacity:0.9;
-  filter:drop-shadow(0 0 24px rgba(195,154,69,0.28));animation:kkSpin 48s linear infinite}
-.kk-drink{position:relative;width:100%;max-width:360px;z-index:2;
-  animation:kkFadeUp 1s .1s both, kkFloat 5.5s ease-in-out 1s infinite}
+.kk-phone{position:relative;z-index:2;width:100%;max-width:250px;aspect-ratio:9/19;
+  background:linear-gradient(155deg,#3a3a3f 0%,#161618 55%,#0c0c0e 100%);
+  border-radius:44px;padding:9px;
+  box-shadow:0 32px 64px rgba(0,0,0,0.6),0 0 0 2px rgba(0,0,0,0.55),inset 0 1px 1px rgba(255,255,255,0.10);
+  animation:kkFadeUp 1s .1s both, kkFloat 6.5s ease-in-out 1s infinite}
+.kk-phone::after{content:'';position:absolute;inset:0;border-radius:44px;padding:1.5px;
+  background:linear-gradient(155deg, ${GOLD} 0%, transparent 34%, transparent 66%, ${BRONZE} 100%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;opacity:.55}
+.kk-phone-screen{position:relative;width:100%;height:100%;border-radius:36px;overflow:hidden;background:#000}
+.kk-phone-island{position:absolute;top:14px;left:50%;transform:translateX(-50%);
+  width:32%;height:19px;background:#000;border-radius:20px;z-index:4;box-shadow:0 0 0 1px rgba(255,255,255,0.06)}
+.kk-badge{position:absolute;z-index:5;bottom:-10px;left:50%;transform:translateX(-50%);
+  width:58px;height:58px;border-radius:50%;overflow:hidden;border:2px solid ${GOLD};
+  box-shadow:0 8px 20px rgba(0,0,0,0.55),0 0 18px ${GOLD}55;animation:kkSpin 22s linear infinite}
 .kk-spark{position:absolute;bottom:22%;width:6px;height:6px;border-radius:50%;
   background:radial-gradient(circle, ${GOLD_HI}, ${GOLD_D});box-shadow:0 0 8px rgba(217,178,90,0.8);
   opacity:0;z-index:3}
@@ -948,6 +971,16 @@ const KEYFRAMES = `
 .kk-live-dot{animation:kkGlow 2.4s ease-in-out infinite}
 .kk-navlink{transition:color .2s ease}
 .kk-navlink:hover{color:${GOLD}}
+.kk-desktop-nav{display:flex;align-items:center;gap:26px;margin-left:auto}
+.kk-menu-toggle{display:none;align-items:center;gap:8px;margin-left:auto}
+.kk-mobile-menu{display:none;flex-direction:column;gap:2px;padding:8px 20px 18px;border-top:1px solid ${LINE};background:rgba(21,19,16,0.98)}
+.kk-mobile-link{display:block;padding:14px 6px;color:${CREAM};text-decoration:none;font-family:${FB};font-size:14px;letter-spacing:1.4px;text-transform:uppercase;border-bottom:1px solid ${LINE}}
+.kk-mobile-link:hover{color:${GOLD}}
+@media (max-width:760px){
+  .kk-desktop-nav{display:none}
+  .kk-menu-toggle{display:inline-flex}
+  .kk-mobile-menu{display:flex}
+}
 .kk-contact{transition:opacity .2s ease}
 .kk-contact:hover{opacity:.82}
 .kk-gold-btn{transition:transform .18s ease, box-shadow .18s ease, filter .18s ease}
@@ -963,7 +996,7 @@ const KEYFRAMES = `
 @keyframes kkFadeUp{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:translateY(0)}}
 @keyframes kkRise{0%{opacity:0;transform:translateY(24px) scale(.5)}18%{opacity:1}100%{opacity:0;transform:translateY(-150px) scale(1)}}
 @media (prefers-reduced-motion: reduce){
-  .kk-glow,.kk-ring,.kk-seal,.kk-drink,.kk-spark,.kk-fade-up,.kk-live-dot{animation:none!important}
-  .kk-drink{opacity:1;transform:none}
+  .kk-glow,.kk-phone,.kk-badge,.kk-spark,.kk-fade-up,.kk-live-dot{animation:none!important}
+  .kk-phone{opacity:1;transform:none}
 }
 `;
