@@ -12,6 +12,7 @@ const MuxPlayer = dynamic(() => import('@mux/mux-player-react'), { ssr: false })
 /* Public Mux playback IDs. */
 const HERO_VIDEO_ID = 'FSsAfj00KwDZSPPaApJjMHqx5msnrneNULZFEdDov01g8';   // silent background loop
 const ABOUT_VIDEO_ID = 'MOxiZEb302JK1hwfkQzUQU3EDriQ401stR1CoSrTx02lq00'; // Gentleman Jack feature
+const MENU_VIDEO_ID = 'aJAE59oLfQgbyWqAY1cs9avjbrCg6FsIJunL8cNr5nw';      // "From the bar" feature
 
 /* Header / mobile-menu links — shared by desktop nav and the mobile drawer. */
 const NAV_LINKS: [string, string][] = [
@@ -54,9 +55,9 @@ const PACKAGES = [
     name: 'The Kustom Mixology Experience',
     tagline: 'Our signature private event',
     bullets: [
-      'Custom kocktail list built for your event',
+      'Custom Kocktail list built for your event',
       '2.5 hours of kustom mixology, live',
-      'Handcrafted, themed kocktails all night',
+      'Handcrafted, themed Kocktails all night',
     ],
     goal: 'The Kustom Mixology Experience',
   },
@@ -151,6 +152,7 @@ function smoothScrollTo(e: React.MouseEvent<HTMLAnchorElement>, id: string) {
 export default function KkClient() {
   const [step, setStep] = useState(1);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [heroMuted, setHeroMuted] = useState(true);
   const [lead, setLead] = useState<Lead>({ name: '', phone: '', email: '', goal: GOALS[0] });
   const [errors, setErrors] = useState<FieldErrors>({});
   const [days, setDays] = useState<DayOption[]>([]);
@@ -347,14 +349,14 @@ export default function KkClient() {
             lineHeight: 0.98, letterSpacing: '-0.01em',
           }}>
             Handcrafted<br />
-            <span style={{ color: GOLD, fontStyle: 'italic', fontWeight: 500 }}>kocktail</span> experiences,<br />
+            <span style={{ color: GOLD, fontStyle: 'italic', fontWeight: 500 }}>Kocktail</span> experiences,<br />
             konquered.
           </h1>
           <p style={{
             margin: '24px auto 0', color: CREAM, opacity: 0.82,
             fontSize: 'clamp(15px, 2vw, 18px)', lineHeight: 1.75, maxWidth: 540, fontWeight: 300,
           }}>
-            Themed, handcrafted kocktails and full-service mobile bar for weddings, corporate
+            Themed, handcrafted Kocktails and full-service mobile bar for weddings, corporate
             events, and private parties. Custom menus, live mixology, and guided tastings — built
             around your night. Reserve your date with a{' '}
             <strong style={{ color: GOLD, fontWeight: 500 }}>$200 deposit</strong>.
@@ -373,7 +375,7 @@ export default function KkClient() {
                   streamType="on-demand"
                   autoPlay="muted"
                   loop
-                  muted
+                  muted={heroMuted}
                   playsInline
                   style={{
                     width: '100%', height: '100%',
@@ -383,6 +385,28 @@ export default function KkClient() {
                   }}
                 />
               </div>
+              <button
+                type="button"
+                className="kk-sound-btn"
+                aria-label={heroMuted ? 'Turn video sound on' : 'Mute video'}
+                aria-pressed={!heroMuted}
+                onClick={() => setHeroMuted((m) => !m)}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M11 5 6 9H3v6h3l5 4z" fill="currentColor" stroke="none" />
+                  {heroMuted ? (
+                    <>
+                      <line x1="16" y1="9" x2="21" y2="14" />
+                      <line x1="21" y1="9" x2="16" y2="14" />
+                    </>
+                  ) : (
+                    <>
+                      <path d="M15.5 8.5a5 5 0 0 1 0 7" />
+                      <path d="M18.5 6a8 8 0 0 1 0 12" />
+                    </>
+                  )}
+                </svg>
+              </button>
               <div className="kk-badge">
                 <Image
                   src="/images/kbalance-logo.jpg"
@@ -482,8 +506,20 @@ export default function KkClient() {
           alignItems: 'center',
         }}>
           <div style={{ position: 'relative', minHeight: 360, borderRadius: 14, overflow: 'hidden', border: `1px solid ${LINE2}` }}>
-            <Image src="/images/kk/bourbon-bar.jpeg" alt="Stephen behind the Konquered Kocktails bourbon bar"
-              fill sizes="(max-width: 700px) 100vw, 540px" style={{ objectFit: 'cover', objectPosition: 'center' }} />
+            <MuxPlayer
+              playbackId={MENU_VIDEO_ID}
+              streamType="on-demand"
+              autoPlay="muted"
+              loop
+              muted
+              playsInline
+              style={{
+                position: 'absolute', inset: 0, width: '100%', height: '100%',
+                '--controls': 'none',
+                '--media-object-fit': 'cover',
+                '--media-object-position': 'center',
+              }}
+            />
             <div aria-hidden="true" style={{
               position: 'absolute', inset: 0, background: 'linear-gradient(180deg, transparent 55%, rgba(10,10,10,0.5) 100%)',
             }} />
@@ -491,8 +527,8 @@ export default function KkClient() {
           <div>
             <SectionHead
               eyebrow="From the bar"
-              title={<>Signature <em style={{ color: GOLD, fontStyle: 'italic' }}>kocktails</em></>}
-              sub="A taste of the menu. Every event gets its own custom kocktail list — these are house favorites."
+              title={<>Signature <em style={{ color: GOLD, fontStyle: 'italic' }}>Kocktails</em></>}
+              sub="A taste of the menu. Every event gets its own custom Kocktail list — these are house favorites."
             />
             <div style={{ marginTop: 32 }}>
               {MENU.map((m, i) => (
@@ -961,6 +997,12 @@ const KEYFRAMES = `
 .kk-badge{position:absolute;z-index:5;bottom:-10px;left:50%;transform:translateX(-50%);
   width:58px;height:58px;border-radius:50%;overflow:hidden;border:2px solid ${GOLD};
   box-shadow:0 8px 20px rgba(0,0,0,0.55),0 0 18px ${GOLD}55;animation:kkSpin 22s linear infinite}
+.kk-sound-btn{position:absolute;z-index:6;bottom:18px;right:16px;width:40px;height:40px;border-radius:50%;
+  display:grid;place-items:center;cursor:pointer;color:${CREAM};
+  background:rgba(10,10,10,0.55);border:1px solid ${GOLD};
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+  transition:background .2s ease, transform .2s ease}
+.kk-sound-btn:hover{background:rgba(10,10,10,0.8);transform:scale(1.06)}
 .kk-spark{position:absolute;bottom:22%;width:6px;height:6px;border-radius:50%;
   background:radial-gradient(circle, ${GOLD_HI}, ${GOLD_D});box-shadow:0 0 8px rgba(217,178,90,0.8);
   opacity:0;z-index:3}

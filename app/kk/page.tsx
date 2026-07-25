@@ -19,11 +19,11 @@ import KkClient from './KkClient';
 export const metadata = {
   title: 'Konquered Kocktails — Kraft Kocktail Experiences & Mobile Bar',
   description:
-    'Handcrafted themed kocktails, custom mixology experiences, spirit tastings, and full-service mobile bar for weddings, corporate events, and private parties across Greater St. Louis. Book your date with a $200 deposit.',
+    'Handcrafted themed Kocktails, custom mixology experiences, spirit tastings, and full-service mobile bar for weddings, corporate events, and private parties across Greater St. Louis. Book your date with a $200 deposit.',
   openGraph: {
     title: 'Konquered Kocktails — Kraft Kocktail Experiences & Mobile Bar',
     description:
-      'Handcrafted themed kocktails, custom mixology experiences, and full-service mobile bar. Book your event date online.',
+      'Handcrafted themed Kocktails, custom mixology experiences, and full-service mobile bar. Book your event date online.',
     url: 'https://goelev8.ai/kk',
     siteName: 'Konquered Kocktails',
     type: 'website',
@@ -32,7 +32,7 @@ export const metadata = {
     card: 'summary_large_image',
     title: 'Konquered Kocktails — Kraft Kocktail Experiences & Mobile Bar',
     description:
-      'Handcrafted themed kocktails, custom mixology, and full-service mobile bar. Book online.',
+      'Handcrafted themed Kocktails, custom mixology, and full-service mobile bar. Book online.',
   },
 };
 
