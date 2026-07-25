@@ -12,7 +12,7 @@ const MuxPlayer = dynamic(() => import('@mux/mux-player-react'), { ssr: false })
 /* Public Mux playback IDs. */
 const HERO_VIDEO_ID = 'FSsAfj00KwDZSPPaApJjMHqx5msnrneNULZFEdDov01g8';   // silent background loop
 const ABOUT_VIDEO_ID = 'MOxiZEb302JK1hwfkQzUQU3EDriQ401stR1CoSrTx02lq00'; // Gentleman Jack feature
-const MENU_VIDEO_ID = 'aJAE59oLfQgbyWqAY1cs9avjbrCg6FsIJunL8cNr5nw';      // "From the bar" feature
+const MENU_VIDEO_ID = 'aJAE59oLfQgbyWqAY1cs9avjbrCg6FsIJunL8cNr5nw';      // "From the studio" feature
 
 /* Header / mobile-menu links — shared by desktop nav and the mobile drawer. */
 const NAV_LINKS: [string, string][] = [
@@ -77,14 +77,14 @@ const PACKAGES = [
   {
     accent: GOLD,
     img: '/images/kk/live-mixology.jpg',
-    name: 'Full-Service Mobile Bar',
+    name: 'Full-Service Kreative Experience',
     tagline: 'Weddings, corporate & private parties',
     bullets: [
-      'We bring the bar, tools & talent to you',
-      'Signature drinks tailored to your event',
-      'Professional, licensed bar service',
+      'We bring the artistry, tools & talent to you',
+      'Signature Kocktails tailored to your event',
+      'Professional, curated Kreative service',
     ],
-    goal: 'Full-Service Mobile Bar',
+    goal: 'Full-Service Kreative Experience',
   },
 ];
 
@@ -107,9 +107,9 @@ const MENU = [
 const GOALS = [
   'The Kustom Mixology Experience',
   'Spirits & Kocktail Tasting',
-  'Full-Service Mobile Bar — Wedding',
-  'Full-Service Mobile Bar — Corporate',
-  'Full-Service Mobile Bar — Private Party',
+  'Full-Service Kreative Experience — Wedding',
+  'Full-Service Kreative Experience — Corporate',
+  'Full-Service Kreative Experience — Private Party',
   'Kocktail Masterclass',
 ];
 
@@ -342,7 +342,7 @@ export default function KkClient() {
           maxWidth: 760, margin: '0 auto', textAlign: 'center',
           display: 'flex', flexDirection: 'column', alignItems: 'center',
         }}>
-          <Eyebrow>Kraft Kocktails · Mobile Bar · {CONTACT.area}</Eyebrow>
+          <Eyebrow>Kraft Kocktails · Art + Kreativity · {CONTACT.area}</Eyebrow>
           <h1 style={{
             margin: '20px 0 0', fontFamily: FD, fontWeight: 600,
             fontSize: 'clamp(46px, 8vw, 92px)',
@@ -356,9 +356,10 @@ export default function KkClient() {
             margin: '24px auto 0', color: CREAM, opacity: 0.82,
             fontSize: 'clamp(15px, 2vw, 18px)', lineHeight: 1.75, maxWidth: 540, fontWeight: 300,
           }}>
-            Themed, handcrafted Kocktails and full-service mobile bar for weddings, corporate
-            events, and private parties. Custom menus, live mixology, and guided tastings — built
-            around your night. Reserve your date with a{' '}
+            An art gallery in a glass. Ninety percent of what Stephen creates is emotion in the
+            moment — curated Art + Kreativity for weddings, corporate events, and private parties.
+            Custom menus, live mixology, and guided tastings, built around your night.
+            Reserve your date with a{' '}
             <strong style={{ color: GOLD, fontWeight: 500 }}>$200 deposit</strong>.
           </p>
 
@@ -526,9 +527,9 @@ export default function KkClient() {
           </div>
           <div>
             <SectionHead
-              eyebrow="From the bar"
+              eyebrow="From the studio"
               title={<>Signature <em style={{ color: GOLD, fontStyle: 'italic' }}>Kocktails</em></>}
-              sub="A taste of the menu. Every event gets its own custom Kocktail list — these are house favorites."
+              sub="A taste of the gallery. Every event gets its own custom Kocktail list — each pour an emotion in the moment. These are house favorites."
             />
             <div style={{ marginTop: 32 }}>
               {MENU.map((m, i) => (
@@ -569,7 +570,7 @@ export default function KkClient() {
             <SectionHead
               eyebrow="Meet the makers"
               title={<>Kraft, <em style={{ color: GOLD, fontStyle: 'italic' }}>konquered</em></>}
-              sub="Konquered Kocktails is a St. Charles mobile bar built on handcrafted drinks, Uncle Nearest bourbon, and a whole lot of showmanship. We bring the bar, the tools, and the talent — you bring the guests."
+              sub="Konquered Kocktails is an art gallery in a glass. Ninety percent of what Stephen creates is emotion in the moment — curated Art + Kreativity, handcrafted into Kocktail experiences built on craft, showmanship, and intention. We bring the artistry, the tools, and the talent — you bring the guests."
             />
             <div style={{ display: 'grid', gap: 14, marginTop: 30 }}>
               <ContactRow icon="☎" label="Call or text" value={CONTACT.phone} href={`tel:${CONTACT.phone.replace(/\D/g, '')}`} />
@@ -609,7 +610,7 @@ export default function KkClient() {
             />
           </div>
           <p style={{ margin: '14px 0 0', fontSize: 14, color: MUTED, fontFamily: FD, fontStyle: 'italic' }}>
-            Stephen behind the bar for Jack Daniel’s Gentleman Jack — 2021 Culture Shakers feature.
+            Stephen featured in Jack Daniel’s Gentleman Jack — 2021 Culture Shakers.
           </p>
         </div>
       </section>
@@ -751,7 +752,7 @@ export default function KkClient() {
                     <span style={{ fontSize: 15, color: TEXT, fontWeight: 500 }}>event deposit</span>
                   </div>
                   <p style={{ margin: '12px 0 0', fontSize: 14.5, color: MUTED, lineHeight: 1.65 }}>
-                    Applied in full to your final event balance. It reserves your date and covers bar prep.
+                    Applied in full to your final event balance. It reserves your date and covers prep & materials.
                   </p>
                 </div>
                 <button type="button" onClick={payDeposit} disabled={depositBusy} className="kk-gold-btn"

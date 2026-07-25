@@ -10,29 +10,29 @@
 //
 // Served at goelev8.ai/kk. Self-contained, no auth. Carries the goElev8
 // cyber-noir system (#000 / gold #C9A84C / cyan #00CFFF) dressed up for a
-// premium mobile bar. All photography is Konquered Kocktails' own, pulled
+// premium Art + Kreativity brand. All photography is Konquered Kocktails' own, pulled
 // from konqueredbalance.com/konqueredkocktails and self-hosted under
 // /images/kk.
 
 import KkClient from './KkClient';
 
 export const metadata = {
-  title: 'Konquered Kocktails — Kraft Kocktail Experiences & Mobile Bar',
+  title: 'Konquered Kocktails — Kraft Kocktail Experiences · Art + Kreativity',
   description:
-    'Handcrafted themed Kocktails, custom mixology experiences, spirit tastings, and full-service mobile bar for weddings, corporate events, and private parties across Greater St. Louis. Book your date with a $200 deposit.',
+    'Handcrafted themed Kocktails, custom mixology experiences, spirit tastings, and curated Art + Kreativity for weddings, corporate events, and private parties across Greater St. Louis. Book your date with a $200 deposit.',
   openGraph: {
-    title: 'Konquered Kocktails — Kraft Kocktail Experiences & Mobile Bar',
+    title: 'Konquered Kocktails — Kraft Kocktail Experiences · Art + Kreativity',
     description:
-      'Handcrafted themed Kocktails, custom mixology experiences, and full-service mobile bar. Book your event date online.',
+      'Handcrafted themed Kocktails, custom mixology experiences, and curated Art + Kreativity. Book your event date online.',
     url: 'https://goelev8.ai/kk',
     siteName: 'Konquered Kocktails',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Konquered Kocktails — Kraft Kocktail Experiences & Mobile Bar',
+    title: 'Konquered Kocktails — Kraft Kocktail Experiences · Art + Kreativity',
     description:
-      'Handcrafted themed Kocktails, custom mixology, and full-service mobile bar. Book online.',
+      'Handcrafted themed Kocktails, custom mixology, and curated Art + Kreativity. Book online.',
   },
 };
 
