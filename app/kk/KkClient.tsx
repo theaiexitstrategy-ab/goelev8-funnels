@@ -2,7 +2,16 @@
 'use client';
 
 import Image from 'next/image';
+import dynamic from 'next/dynamic';
 import { useEffect, useState, type CSSProperties } from 'react';
+
+/* Videos are hosted on Mux — nothing lives in the repo. The <mux-player>
+   custom element can't render during SSR, so load it client-side only. */
+const MuxPlayer = dynamic(() => import('@mux/mux-player-react'), { ssr: false });
+
+/* Public Mux playback IDs. */
+const HERO_VIDEO_ID = 'FSsAfj00KwDZSPPaApJjMHqx5msnrneNULZFEdDov01g8';   // silent background loop
+const ABOUT_VIDEO_ID = 'MOxiZEb302JK1hwfkQzUQU3EDriQ401stR1CoSrTx02lq00'; // Gentleman Jack feature
 
 /* ── Konquered Kocktails brand palette (CLAUDE.md source of truth) ────
    Warm Black / Deep Emerald backgrounds · Cream Highlight body text ·
@@ -282,6 +291,28 @@ export default function KkClient() {
 
       {/* ── Hero ───────────────────────────────────────────────────── */}
       <section style={{ ...shell, position: 'relative', paddingTop: 'clamp(36px, 6vw, 72px)', paddingBottom: 'clamp(36px, 6vw, 72px)' }}>
+        {/* Mux background loop — muted, autoplay, looping, full-bleed behind
+            the hero. Warm Black scrim keeps the cream headline/CTAs legible. */}
+        <div aria-hidden="true" style={{
+          position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)',
+          width: '100vw', height: '100%', overflow: 'hidden', zIndex: 0, pointerEvents: 'none',
+        }}>
+          <MuxPlayer
+            playbackId={HERO_VIDEO_ID}
+            streamType="on-demand"
+            autoPlay="muted"
+            loop
+            muted
+            playsInline
+            style={{
+              width: '100%', height: '100%',
+              '--controls': 'none',
+              '--media-object-fit': 'cover',
+              '--media-object-position': 'center',
+            }}
+          />
+          <div style={{ position: 'absolute', inset: 0, background: INK, opacity: 0.55 }} />
+        </div>
         {/* warm ambient wash — royal gold core with emerald depth and a
             whisper of amethyst/garnet, per the brand palette */}
         <div aria-hidden="true" style={{
@@ -296,7 +327,7 @@ export default function KkClient() {
         {/* Single centered column: copy, then the animated drink medallion,
             then the CTAs directly beneath it. */}
         <div className="kk-fade-up" style={{
-          position: 'relative',
+          position: 'relative', zIndex: 2,
           maxWidth: 760, margin: '0 auto', textAlign: 'center',
           display: 'flex', flexDirection: 'column', alignItems: 'center',
         }}>
@@ -503,6 +534,30 @@ export default function KkClient() {
                 sizes="(max-width: 700px) 50vw, 260px" style={{ objectFit: 'cover', objectPosition: 'center' }} />
             </div>
           </div>
+        </div>
+
+        {/* Authority / social proof — 2021 Jack Daniel's Gentleman Jack feature.
+            Click-to-play with sound, lazy-loaded, framed in a Royal Gold ring. */}
+        <div style={{ marginTop: 'clamp(36px, 5vw, 60px)', maxWidth: 920, marginLeft: 'auto', marginRight: 'auto', textAlign: 'center' }}>
+          <Eyebrow>As seen · Gentleman Jack Culture Shakers</Eyebrow>
+          <div style={{
+            marginTop: 20, borderRadius: 16, overflow: 'hidden',
+            border: `1px solid ${GOLD}`, boxShadow: `0 0 0 1px ${GOLD}26, 0 20px 50px rgba(0,0,0,0.5)`,
+            background: PANEL2, lineHeight: 0,
+          }}>
+            <MuxPlayer
+              playbackId={ABOUT_VIDEO_ID}
+              streamType="on-demand"
+              accentColor={GOLD}
+              preload="none"
+              playsInline
+              metadata={{ video_title: "Konquered Kocktails — Gentleman Jack Culture Shakers (2021)" }}
+              style={{ width: '100%', aspectRatio: '16 / 9', display: 'block' }}
+            />
+          </div>
+          <p style={{ margin: '14px 0 0', fontSize: 14, color: MUTED, fontFamily: FD, fontStyle: 'italic' }}>
+            Stephen behind the bar for Jack Daniel’s Gentleman Jack — 2021 Culture Shakers feature.
+          </p>
         </div>
       </section>
 
