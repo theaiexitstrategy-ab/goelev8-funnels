@@ -4,21 +4,27 @@
 import Image from 'next/image';
 import { useEffect, useState, type CSSProperties } from 'react';
 
-/* ── Konquered Kocktails palette — warm, luxe, black-and-gold ─────────
-   Deliberately its OWN brand, not goElev8's cyber-noir: no cyan, no
-   monospace, no sharp tech edges. Elegant serif display + gold on ink. */
-const INK = '#0A0A0A';        // base black, faintly warm
-const PANEL = '#131110';      // raised surfaces
-const PANEL2 = '#1c1916';     // nested surfaces
-const GOLD = '#C6A15B';       // Konquered gold
-const GOLD_HI = '#E8CC86';    // bright gold for gradients / shimmer
-const GOLD_D = '#8a6f3a';     // deep gold
-const CREAM = '#EDE4D3';      // parchment accent
-const TEXT = '#F4EFE6';       // warm off-white body
-const MUTED = '#9c9284';      // warm muted
-const DIM = '#6b6357';        // faint
-const LINE = 'rgba(198,161,91,0.15)';   // gold hairline
-const LINE2 = 'rgba(198,161,91,0.28)';  // stronger gold hairline
+/* ── Konquered Kocktails brand palette (CLAUDE.md source of truth) ────
+   Warm Black / Deep Emerald backgrounds · Cream Highlight body text ·
+   Royal Gold / Konquered Bronze accents & CTAs · Garnet + Amethyst
+   sparingly for depth. Elegant serif display, no monospace. */
+const INK = '#151310';        // Warm Black — base background
+const PANEL = '#1b1813';      // raised surfaces (warm)
+const PANEL2 = '#232019';     // nested surfaces
+const EMERALD = '#123D35';    // Deep Emerald — feature background band
+const EMERALD_D = '#0d2b25';  // deeper emerald for gradients
+const GOLD = '#C39A45';       // Royal Gold — primary accent / CTA
+const GOLD_HI = '#D9B25A';    // lighter royal gold for gradient tops / shimmer
+const BRONZE = '#9A633A';     // Konquered Bronze — secondary accent
+const GOLD_D = '#6f4a26';     // deep bronze for gradient bottoms / shadow
+const GARNET = '#681F2B';     // Konquered Garnet — depth, used sparingly
+const AMETHYST = '#5C3B70';   // Amethyst Accent — depth, used sparingly
+const CREAM = '#E8D8B8';      // Cream Highlight
+const TEXT = '#EFE7D5';       // primary text (bright cream)
+const MUTED = '#A99C82';      // warm muted
+const DIM = '#776C58';        // faint
+const LINE = 'rgba(195,154,69,0.16)';   // royal-gold hairline
+const LINE2 = 'rgba(195,154,69,0.30)';  // stronger gold hairline
 
 const FD = '"Cormorant Garamond", Georgia, serif';       // display
 const FB = '"Outfit", system-ui, -apple-system, sans-serif'; // body + labels
@@ -276,10 +282,16 @@ export default function KkClient() {
 
       {/* ── Hero ───────────────────────────────────────────────────── */}
       <section style={{ ...shell, position: 'relative', paddingTop: 'clamp(36px, 6vw, 72px)', paddingBottom: 'clamp(36px, 6vw, 72px)' }}>
-        {/* warm ambient wash behind the whole hero */}
+        {/* warm ambient wash — royal gold core with emerald depth and a
+            whisper of amethyst/garnet, per the brand palette */}
         <div aria-hidden="true" style={{
           position: 'absolute', inset: 0, pointerEvents: 'none',
-          background: 'radial-gradient(60% 70% at 78% 40%, rgba(198,161,91,0.10) 0%, transparent 60%)',
+          background: [
+            `radial-gradient(46% 52% at 50% 6%, ${AMETHYST}2b 0%, transparent 55%)`,   // amethyst top
+            `radial-gradient(70% 68% at 82% 46%, ${EMERALD}4d 0%, transparent 62%)`,    // emerald right
+            `radial-gradient(60% 60% at 24% 78%, ${GARNET}29 0%, transparent 60%)`,     // garnet lower-left
+            `radial-gradient(52% 56% at 50% 44%, ${GOLD}1f 0%, transparent 62%)`,       // gold core
+          ].join(', '),
         }} />
         {/* Single centered column: copy, then the animated drink medallion,
             then the CTAs directly beneath it. */}
@@ -356,9 +368,9 @@ export default function KkClient() {
           }}>
             <span className="kk-live-dot" style={{ width: 7, height: 7, borderRadius: '50%', background: GOLD, flexShrink: 0 }} />
             <span style={{ color: GOLD }}>Now booking</span>
-            <span style={{ color: GOLD_D }}>·</span>
+            <span style={{ color: BRONZE }}>·</span>
             <span style={{ color: MUTED }}>Licensed &amp; insured</span>
-            <span style={{ color: GOLD_D }}>·</span>
+            <span style={{ color: BRONZE }}>·</span>
             <span style={{ color: MUTED }}>Deposit secured by Stripe</span>
           </div>
         </div>
@@ -494,10 +506,13 @@ export default function KkClient() {
         </div>
       </section>
 
-      <GoldDivider />
-
-      {/* ── Booking funnel ─────────────────────────────────────────── */}
-      <section id="book" style={{ ...shell, ...sectionPad }}>
+      {/* ── Booking funnel — on a full-bleed Deep Emerald band ───────── */}
+      <div style={{
+        background: `linear-gradient(180deg, ${EMERALD} 0%, ${EMERALD_D} 100%)`,
+        borderTop: `1px solid ${LINE2}`, borderBottom: `1px solid ${LINE2}`,
+        marginTop: 'clamp(24px, 4vw, 44px)',
+      }}>
+      <section id="book" style={{ ...shell, ...sectionPad, paddingBottom: 'clamp(40px, 6vw, 72px)' }}>
         <SectionHead
           center
           eyebrow="Reserve your date"
@@ -519,7 +534,7 @@ export default function KkClient() {
                   <span style={{
                     width: 26, height: 26, borderRadius: '50%', display: 'grid', placeItems: 'center',
                     fontFamily: FB, fontSize: 12, fontWeight: 600,
-                    background: done ? `linear-gradient(180deg, ${GOLD_HI}, ${GOLD})` : active ? 'rgba(198,161,91,0.12)' : PANEL2,
+                    background: done ? `linear-gradient(180deg, ${GOLD_HI}, ${GOLD})` : active ? 'rgba(195,154,69,0.12)' : PANEL2,
                     border: `1px solid ${done ? GOLD : active ? GOLD : LINE}`,
                     color: done ? INK : active ? GOLD : DIM,
                   }}>
@@ -581,7 +596,7 @@ export default function KkClient() {
                       const on = day?.key === d.key;
                       return (
                         <button key={d.key} type="button" aria-pressed={on} onClick={() => { setDay(d); setSlot(''); }}
-                          style={{ ...chipStyle, minWidth: 78, background: on ? 'rgba(198,161,91,0.14)' : PANEL2, borderColor: on ? GOLD : LINE, color: on ? TEXT : MUTED }}>
+                          style={{ ...chipStyle, minWidth: 78, background: on ? 'rgba(195,154,69,0.14)' : PANEL2, borderColor: on ? GOLD : LINE, color: on ? TEXT : MUTED }}>
                           <span style={{ display: 'block', fontFamily: FB, fontSize: 10.5, letterSpacing: '1px', textTransform: 'uppercase', opacity: 0.75 }}>{d.dow}</span>
                           <span style={{ display: 'block', fontFamily: FD, fontSize: 19, fontWeight: 600, marginTop: 2 }}>{d.md}</span>
                         </button>
@@ -596,7 +611,7 @@ export default function KkClient() {
                       const on = slot === s;
                       return (
                         <button key={s} type="button" aria-pressed={on} onClick={() => { setSlot(s); setSlotError(''); }}
-                          style={{ ...chipStyle, padding: '13px 10px', fontSize: 14.5, fontWeight: 500, background: on ? 'rgba(198,161,91,0.14)' : PANEL2, borderColor: on ? GOLD : LINE, color: on ? TEXT : MUTED }}>
+                          style={{ ...chipStyle, padding: '13px 10px', fontSize: 14.5, fontWeight: 500, background: on ? 'rgba(195,154,69,0.14)' : PANEL2, borderColor: on ? GOLD : LINE, color: on ? TEXT : MUTED }}>
                           {s}
                         </button>
                       );
@@ -622,7 +637,7 @@ export default function KkClient() {
                   <SummaryRow label="Experience" value={lead.goal} />
                   <SummaryRow label="Event date" value={when} last />
                 </div>
-                <div style={{ marginTop: 16, padding: 22, borderRadius: 12, background: 'rgba(198,161,91,0.06)', border: `1px solid ${LINE2}` }}>
+                <div style={{ marginTop: 16, padding: 22, borderRadius: 12, background: 'rgba(195,154,69,0.06)', border: `1px solid ${LINE2}` }}>
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap' }}>
                     <span style={{ fontFamily: FD, fontWeight: 600, fontSize: 42, color: GOLD, lineHeight: 1 }}>$200</span>
                     <span style={{ fontSize: 15, color: TEXT, fontWeight: 500 }}>event deposit</span>
@@ -677,9 +692,10 @@ export default function KkClient() {
           </div>
         </div>
       </section>
+      </div>
 
       {/* ── Footer ─────────────────────────────────────────────────── */}
-      <footer style={{ borderTop: `1px solid ${LINE}`, marginTop: 'clamp(44px, 6vw, 80px)' }}>
+      <footer style={{ borderTop: `1px solid ${LINE}`, marginTop: 0 }}>
         <div style={{
           maxWidth: 1180, margin: '0 auto', padding: '36px 20px 48px',
           display: 'flex', flexWrap: 'wrap', gap: 22, alignItems: 'center', justifyContent: 'space-between',
@@ -817,7 +833,7 @@ const goldButton: CSSProperties = {
   display: 'inline-block', background: `linear-gradient(180deg, ${GOLD_HI} 0%, ${GOLD} 55%, ${GOLD_D} 100%)`, color: INK,
   fontFamily: FB, fontWeight: 600, fontSize: 13, letterSpacing: '1.4px', textTransform: 'uppercase',
   border: 'none', borderRadius: 999, padding: '15px 28px', cursor: 'pointer', textDecoration: 'none', lineHeight: 1.2,
-  boxShadow: '0 8px 22px rgba(198,161,91,0.22)',
+  boxShadow: '0 8px 22px rgba(195,154,69,0.22)',
 };
 
 const ghostButton: CSSProperties = {
@@ -856,19 +872,19 @@ const errorTextStyle: CSSProperties = { margin: '10px 0 0', fontSize: 13, color:
 const KEYFRAMES = `
 .kk-stage{position:relative;display:flex;align-items:center;justify-content:center;min-height:clamp(360px,44vw,540px)}
 .kk-glow{position:absolute;width:82%;aspect-ratio:1;border-radius:50%;
-  background:radial-gradient(circle, rgba(198,161,91,0.32) 0%, rgba(198,161,91,0.10) 40%, transparent 66%);
+  background:radial-gradient(circle, ${GOLD}57 0%, ${GARNET}29 44%, transparent 68%);
   filter:blur(10px);animation:kkGlow 6s ease-in-out infinite}
 .kk-ring{position:absolute;width:70%;aspect-ratio:1;border-radius:50%;
-  background:conic-gradient(from 0deg, transparent 0deg, rgba(232,204,134,0.55) 60deg, transparent 130deg, transparent 230deg, rgba(198,161,91,0.45) 300deg, transparent 360deg);
+  background:conic-gradient(from 0deg, transparent 0deg, rgba(217,178,90,0.55) 60deg, transparent 130deg, transparent 230deg, rgba(195,154,69,0.45) 300deg, transparent 360deg);
   -webkit-mask:radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2px));
   mask:radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2px));
   animation:kkSpin 26s linear infinite}
 .kk-seal{position:absolute;width:56%;aspect-ratio:1;opacity:0.9;
-  filter:drop-shadow(0 0 24px rgba(198,161,91,0.28));animation:kkSpin 48s linear infinite}
+  filter:drop-shadow(0 0 24px rgba(195,154,69,0.28));animation:kkSpin 48s linear infinite}
 .kk-drink{position:relative;width:100%;max-width:360px;z-index:2;
   animation:kkFadeUp 1s .1s both, kkFloat 5.5s ease-in-out 1s infinite}
 .kk-spark{position:absolute;bottom:22%;width:6px;height:6px;border-radius:50%;
-  background:radial-gradient(circle, ${GOLD_HI}, ${GOLD_D});box-shadow:0 0 8px rgba(232,204,134,0.8);
+  background:radial-gradient(circle, ${GOLD_HI}, ${GOLD_D});box-shadow:0 0 8px rgba(217,178,90,0.8);
   opacity:0;z-index:3}
 .kk-spark-1{left:38%;animation:kkRise 4.2s ease-in 0.4s infinite}
 .kk-spark-2{left:54%;width:4px;height:4px;animation:kkRise 5s ease-in 1.6s infinite}
@@ -880,9 +896,9 @@ const KEYFRAMES = `
 .kk-contact{transition:opacity .2s ease}
 .kk-contact:hover{opacity:.82}
 .kk-gold-btn{transition:transform .18s ease, box-shadow .18s ease, filter .18s ease}
-.kk-gold-btn:hover{transform:translateY(-1px);filter:brightness(1.05);box-shadow:0 12px 28px rgba(198,161,91,0.34)}
+.kk-gold-btn:hover{transform:translateY(-1px);filter:brightness(1.05);box-shadow:0 12px 28px rgba(195,154,69,0.34)}
 .kk-ghost-btn{transition:border-color .2s ease, color .2s ease, background .2s ease}
-.kk-ghost-btn:hover{border-color:${GOLD};color:${GOLD};background:rgba(198,161,91,0.05)}
+.kk-ghost-btn:hover{border-color:${GOLD};color:${GOLD};background:rgba(195,154,69,0.06)}
 .kk-card{transition:transform .22s ease, border-color .22s ease}
 .kk-card:hover{transform:translateY(-3px);border-color:${LINE2}}
 .kk-input:focus{border-color:${GOLD}!important}
