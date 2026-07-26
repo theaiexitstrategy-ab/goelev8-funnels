@@ -289,22 +289,22 @@ export default function HomePage() {
         <div className={s['hero-scan']} aria-hidden="true" />
 
         <div className={s['hero-left']}>
-          <div className={s['hero-eyebrow']}>AI LEAD FOLLOW-UP · ALWAYS ON</div>
+          <div className={s['hero-eyebrow']}>CUSTOM AI AGENTS · DONE FOR YOU</div>
 
           <h1 className={s['hero-h']}>
-            Your Missed Calls<br/>
-            <span className={s.gold}>Book Themselves.</span>
+            AI Agents That Answer,<br/>
+            <span className={s.gold}>Book &amp; Follow Up.</span>
           </h1>
 
           <p className={s['hero-sub']}>
-            GoElev8.ai texts every missed caller back within <strong>60 seconds</strong> and books them on your calendar — automatically. <strong>No staff. No voicemail. No lost revenue.</strong>
+            GoElev8.ai designs, builds, and runs custom AI agents that answer every call and text, qualify the lead, and book it on your calendar — <strong>24/7</strong>. <strong>No staff. No missed leads. No lost revenue.</strong>
           </p>
 
           <div className={s['sys-status']}>
             <span className={s['sys-dot']} />
             <span className={s['sys-text']}>SYSTEM ONLINE</span>
             <span className={s['sys-sep']}>·</span>
-            <span className={s['sys-item']}>ZERO HUMANS REQUIRED</span>
+            <span className={s['sys-item']}>AGENTS ALWAYS ON</span>
             <span className={s['sys-sep']}>·</span>
             <span className={s['sys-item']}>GO LIVE IN 48 HOURS</span>
           </div>
@@ -352,7 +352,7 @@ export default function HomePage() {
                 <span className={s['demo-success-dot']} />
                 <span className={s['demo-success-text']}>✓ Demo sent to {heroPhone}</span>
               </div>
-              <p className={s['demo-success-sub']}>That&apos;s exactly what your missed callers receive — automatically.</p>
+              <p className={s['demo-success-sub']}>That&apos;s exactly what your leads get from your AI agent — automatically.</p>
               <div className={s['demo-success-links']}>
                 <a href="https://book.goelev8.ai/go" target="_blank" rel="noopener noreferrer" className={s['demo-success-link']}>Book a setup call →</a>
                 <button className={s['demo-success-link']} onClick={() => scrollTo('pricing')}>See pricing →</button>
@@ -465,8 +465,8 @@ export default function HomePage() {
           <div className={s.painLabel}>
             <span className={s.painLabelLine} />THE PROBLEM WE SOLVE
           </div>
-          <h2 className={s.painH}>YOUR LEADS AREN&apos;T DEAD.<br/><span style={{color:'var(--cyan)'}}>THEY STOPPED HEARING FROM YOU.</span></h2>
-          <p className={s.painSub}>The average service business takes 47 hours to follow up. Leads go cold in 5 minutes. Here is what that costs you every week.</p>
+          <h2 className={s.painH}>YOUR LEADS AREN&apos;T DEAD.<br/><span style={{color:'var(--cyan)'}}>YOU JUST CAN&apos;T ANSWER FAST ENOUGH.</span></h2>
+          <p className={s.painSub}>The average business takes 47 hours to follow up. Leads go cold in 5 minutes. A custom AI agent answers in seconds — here is what the gap costs you every week.</p>
           <div className={s.painGrid}>
             <div className={s.painCard} style={{background:'rgba(255,59,59,.03)'}}>
               <div className={s.painBar} style={{background:'var(--red)'}} />
@@ -482,9 +482,9 @@ export default function HomePage() {
               <div className={s.painCardLabel} style={{color:'#00E87A'}}>
                 <span className={s.painCardDot} style={{background:'#00E87A',animation:'pulse 2s infinite'}} />WITH GOELEV8.AI
               </div>
-              <div className={s.painCardH}>They Get a Text in 60 Seconds.</div>
-              <p className={s.painCardP}>Missed call comes in. The GoElev8.AI system texts them back within 60 seconds — before they&apos;ve opened another tab. The conversation starts automatically. <strong style={{color:'var(--wh)'}}>Your morning starts with confirmed bookings,</strong> not missed opportunities.</p>
-              <div className={s.painCardStat} style={{background:'rgba(0,207,255,.07)',borderLeft:'2px solid var(--cyan)',color:'var(--cyan)'}}>GoElev8.AI response time: &lt; 60 seconds. Every lead. Every time. Zero humans required.</div>
+              <div className={s.painCardH}>Your Agent Answers Instantly.</div>
+              <p className={s.painCardP}>A call or text comes in. Your GoElev8.AI agent responds within 60 seconds — before they&apos;ve opened another tab — qualifies the lead, and books the appointment automatically. <strong style={{color:'var(--wh)'}}>Your morning starts with confirmed bookings,</strong> not missed opportunities.</p>
+              <div className={s.painCardStat} style={{background:'rgba(0,207,255,.07)',borderLeft:'2px solid var(--cyan)',color:'var(--cyan)'}}>GoElev8.AI agent response time: &lt; 60 seconds. Every lead. Every time. Zero humans required.</div>
             </div>
           </div>
         </div>
@@ -493,13 +493,13 @@ export default function HomePage() {
       {/* HOW IT WORKS */}
       <section className={`${s.section} ${s.hiw}`} id="how" aria-labelledby="hiw-h">
         <div className={s.sl} aria-hidden="true">System</div>
-        <h2 className={s.sh} id="hiw-h">HOW THE<br/><span style={{color:'var(--cyan)'}}>SYSTEM WORKS</span></h2>
+        <h2 className={s.sh} id="hiw-h">HOW YOUR<br/><span style={{color:'var(--cyan)'}}>AGENT WORKS</span></h2>
         <div className={`${s.steps} ${s.rev}`} role="list">
           {[
-            {n:'01',ico:'📵',t:'Missed Call Detected',d:'A lead calls your business number. You\'re busy, in a meeting, or after hours. The system detects the missed call instantly.',tag:'Instant Detection'},
-            {n:'02',ico:'💬',t:'System Responds in 60 Sec',d:'The GoElev8.ai system texts the caller back within 60 seconds automatically. Growth and Pro clients also get an AI voice assistant that answers live.',tag:'SMS Default · Voice Optional'},
-            {n:'03',ico:'📅',t:'AI Books the Appointment',d:'The system qualifies the lead, handles back-and-forth, and books them on your calendar — all automated.',tag:'Automated Booking'},
-            {n:'04',ico:'📊',t:'You See Everything',d:'Every lead, every conversation, every booking — visible in your client portal dashboard in real time. Full pipeline visibility.',tag:'Live Intelligence'},
+            {n:'01',ico:'📞',t:'Your Agent Answers',d:'A lead calls or texts your business number. You\'re busy, in a meeting, or after hours. Your AI agent responds instantly — text-back by default, live AI voice on Growth and Pro.',tag:'Instant Response'},
+            {n:'02',ico:'💬',t:'It Talks Like You',d:'Trained on your business, your services, and your voice, the agent answers questions, handles the back-and-forth, and qualifies every lead automatically.',tag:'Voice + SMS'},
+            {n:'03',ico:'📅',t:'It Books the Appointment',d:'The agent checks your calendar, offers real times, and locks in the booking — no forms, no phone tag, no staff required.',tag:'Automated Booking'},
+            {n:'04',ico:'📊',t:'You See Everything',d:'Every call, conversation, and booking flows into your portal dashboard in real time. Full pipeline visibility, zero busywork.',tag:'Live Intelligence'},
           ].map((step, i) => (
             <div key={step.n} className={s.step} data-n={step.n} role="listitem">
               <div className={s['step-num']}>// {step.n}</div>
@@ -520,11 +520,11 @@ export default function HomePage() {
         <h2 className={`${s.sh} ${s.rev}`} id="who-h">BUILT FOR LOCAL<br/><span style={{color:'var(--cyan)'}}>SERVICE BUSINESSES</span></h2>
         <div className={`${s['who-grid']} ${s.rev}`}>
           {[
-            {ico:'🏋️',t:'Gyms & Fitness Studios',d:'Your front desk can\'t answer during class. We catch every missed lead and get them booked automatically.'},
-            {ico:'💆',t:'Med Spas & Aesthetics',d:'A missed consultation is $500 walking out the door. We text them back in 60 seconds before they book somewhere else.'},
-            {ico:'🔧',t:'HVAC & Home Services',d:'You\'re on a job and can\'t answer. We text the caller back and book them on your calendar — Jobber compatible.'},
-            {ico:'🏡',t:'Real Estate',d:'Buyers don\'t wait. We respond to every inquiry in under 60 seconds day or night.'},
-            {ico:'🛡️',t:'Insurance & Financial Planning',d:'Every missed call is a policy that went to a competitor. We follow up within 60 seconds automatically.'},
+            {ico:'🏋️',t:'Gyms & Fitness Studios',d:'Your front desk can\'t answer during class. Your AI agent does — catching every lead and booking them while you coach.'},
+            {ico:'💆',t:'Med Spas & Aesthetics',d:'A missed consultation is $500 walking out the door. Your agent replies in seconds and books it before they call someone else.'},
+            {ico:'🔧',t:'HVAC & Home Services',d:'You\'re on a job and can\'t answer. Your agent answers, qualifies the request, and books it on your calendar — Jobber compatible.'},
+            {ico:'🏡',t:'Real Estate',d:'Buyers don\'t wait. Your agent responds to every inquiry in under 60 seconds, day or night, and books the showing.'},
+            {ico:'🛡️',t:'Insurance & Financial Planning',d:'Every unanswered lead is a policy lost to a competitor. Your agent follows up instantly and never lets one slip.'},
           ].map(card => (
             <div key={card.t} className={s['who-card']}>
               <div className={s['who-ico']}>{card.ico}</div>
@@ -540,11 +540,11 @@ export default function HomePage() {
       <section className={`${s.section} ${s['trust-section']}`} id="trust" aria-labelledby="trust-h">
         <div className={s.sl} aria-hidden="true">Built to Perform</div>
         <h2 className={`${s.sh} ${s.rev}`} id="trust-h">ENTERPRISE-GRADE<br/><span style={{color:'var(--cyan)'}}>RELIABILITY.</span></h2>
-        <p className={`${s.ssub} ${s.rev}`}>The GoElev8.AI system is built on the same infrastructure tier used by Fortune 500 companies — with security, compliance, and uptime standards that protect your business and your leads.</p>
+        <p className={`${s.ssub} ${s.rev}`}>Your AI agents run on the same infrastructure tier used by Fortune 500 companies — with the security, compliance, and uptime standards that protect your business and every lead they handle.</p>
         <div className={`${s['trust-grid']} ${s.rev}`}>
           {[
             {ico:'🔒',n:'256-bit',t:'Encryption at Rest & in Transit',d:'Every lead record, call transcript, and SMS conversation is encrypted end-to-end. Your customer data never travels unprotected.'},
-            {ico:'⚡',n:'99.9%',t:'Uptime SLA',d:'Your AI system runs on globally distributed edge infrastructure. Zero downtime maintenance. Leads captured every second of every day.'},
+            {ico:'⚡',n:'99.9%',t:'Uptime SLA',d:'Your AI agents run on globally distributed edge infrastructure. Zero-downtime maintenance. Every lead answered, every second of every day.'},
             {ico:'📋',n:'A2P',t:'SMS Compliance Handled',d:'GoElev8.AI manages your A2P 10DLC registration automatically. You\'re compliant from Day 1 — no paperwork, no Twilio dashboards, no risk.'},
           ].map(c => (
             <div key={c.t} className={s['trust-card']}>
@@ -571,7 +571,7 @@ export default function HomePage() {
             {
               name:'STARTER',
               tier:'starter',
-              desc:'Missed call text-back, booking calendar, and a dedicated business number.',
+              desc:'Your always-on text agent — instant missed-call text-back, booking calendar, and a dedicated business number.',
               setup:300, mo:127, feat:false,
               features:['Missed call text-back (60 sec)','Automated booking calendar','Dedicated business phone number','Client portal dashboard','Monthly lead report','300 SMS/mo included','$0.05/msg overage'],
               off:['AI voice assistant (Vapi)'],
@@ -579,7 +579,7 @@ export default function HomePage() {
             {
               name:'GROWTH',
               tier:'growth',
-              desc:'The full GoElev8.AI system. AI voice, SMS campaigns, and portal analytics.',
+              desc:'The full agent — AI voice, lead qualification, SMS campaigns, and portal analytics.',
               setup:400, mo:197, feat:true,
               features:['Everything in Starter','AI voice assistant (Vapi)','Lead qualification flow','SMS campaign automation','Portal analytics + GA4','Priority support','600 SMS/mo + 60 min included','$0.05/msg · $0.15/min overage'],
               off:[],
@@ -587,7 +587,7 @@ export default function HomePage() {
             {
               name:'PRO',
               tier:'pro',
-              desc:'Multi-agent dashboard, routing logic, and dedicated account manager.',
+              desc:'A multi-agent command center — routing logic, pipeline view, and a dedicated account manager.',
               setup:600, mo:297, feat:false,
               features:['Everything in Growth','Multi-agent team dashboard','Agent routing logic','Broker pipeline view','Custom SMS campaigns','Dedicated account manager','1,200 SMS/mo + 120 min included','$0.05/msg · $0.15/min overage'],
               off:[],
@@ -626,7 +626,7 @@ export default function HomePage() {
       <section className={`${s.section} ${s['results-section']}`} id="results" aria-labelledby="results-h">
         <div className={s.sl} aria-hidden="true">Results</div>
         <h2 className={`${s.sh} ${s.rev}`} id="results-h">LIVE AND<br/><span style={{color:'var(--cyan)'}}>RUNNING.</span></h2>
-        <p className={`${s.ssub} ${s.rev}`}>Real businesses. Real leads. GoElev8.ai running right now.</p>
+        <p className={`${s.ssub} ${s.rev}`}>Real businesses. Real AI agents. Live and answering right now.</p>
         <div className={`${s['clients-grid']} ${s.rev}`}>
           {[
             {ico:'🏋️',name:'The Flex Facility',type:'Fitness Studio · Earth City, MO'},
@@ -666,7 +666,7 @@ export default function HomePage() {
           {[
             { ico:'🔗', t:'Your Custom Link',                 d:'Your booking page lives at book.goelev8.ai/yourbusiness — branded, shareable, and ready in 48 hours. Put it in your bio, your texts, your emails. Clients land on it, pick a time, done.' },
             { ico:'📅', t:'Two Service Types, Ready to Go',  d:'Strategy calls and setup sessions are pre-configured out of the box. Add your own service types from your portal — no code, no plugins, no monthly Calendly bill.' },
-            { ico:'⚡', t:'Synced to Your AI System',         d:'Every booking flows into your GoElev8.ai dashboard. Missed a call? The system texts them back and drops a link to your booking page automatically.' },
+            { ico:'⚡', t:'Synced to Your AI Agent',         d:'Every booking flows into your GoElev8.ai dashboard. When your agent answers a call or text, it drops your booking link right into the conversation — automatically.' },
           ].map(card => (
             <div key={card.t} style={{
               background:'#0a0a0a',
@@ -717,7 +717,7 @@ export default function HomePage() {
       <div className={`${s['cta-section']} ${s.rev}`} role="complementary">
         <div className={s['cta-grid-bg']} aria-hidden="true" />
         <h2 className={s['cta-h']}>STOP LOSING LEADS<br/><span className={s.c}>WHILE YOU SLEEP.</span></h2>
-        <p className={s['cta-p']}>Every missed call is a missed appointment. GoElev8.ai texts them back in 60 seconds — automatically. Setup takes 48 hours.</p>
+        <p className={s['cta-p']}>Every unanswered lead is a booking your competitor takes. Put a custom AI agent on your front line — answering, qualifying, and booking in seconds. Live in 48 hours.</p>
         <div className={s['cta-btns']}>
           <button className={s['btn-primary']} onClick={goToCheckout} disabled={checkoutLoading}>
             {checkoutLoading ? 'Starting…' : 'Get Started — $200 Setup →'}
