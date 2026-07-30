@@ -79,6 +79,7 @@ export default function BusinessCardClient() {
       'FN:Aaron Bryant',
       'ORG:GoElev8.ai',
       'TITLE:Founder & AI Automation Strategist',
+      'TEL;TYPE=CELL,VOICE:+13146569001',
       'URL:https://goelev8.ai',
       'URL;TYPE=Book a call:https://book.goelev8.ai/go',
       'X-SOCIALPROFILE;TYPE=instagram:https://instagram.com/goelev8.ai',
