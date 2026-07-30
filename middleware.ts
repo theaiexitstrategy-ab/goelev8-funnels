@@ -32,6 +32,7 @@ function isPublicRoute(pathname: string): boolean {
   if (pathname.startsWith('/anuday-proposal')) return true;
   if (pathname.startsWith('/kbsetup')) return true;
   if (pathname.startsWith('/kk')) return true;
+  if (pathname.startsWith('/businesscard')) return true;
   if (pathname.startsWith('/api/')) return true;
   if (pathname.startsWith('/_next/')) return true;
   if (pathname.startsWith('/images/')) return true;
