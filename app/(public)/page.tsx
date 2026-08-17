@@ -1,10 +1,11 @@
 'use client';
 // (c) 2026 GoElev8.ai | Aaron Bryant. All rights reserved.
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import s from './page.module.css';
+import QuizModule from './QuizModule';
 
 
 /* ── Phone format helper ── */
@@ -27,56 +28,6 @@ const INDUSTRIES = [
   { v: 'insurance', ico: '🛡️', label: 'Insurance / Financial' },
   { v: 'other', ico: '🏢', label: 'Other' },
 ];
-
-
-/* ── Animation examples ── */
-type AnimMsg = { kind: 'them' | 'me'; text: string; time: string; typewriter: boolean };
-type AnimExample = {
-  missedTime: string;
-  messages: AnimMsg[];
-  label: string;
-};
-
-const ANIM_EXAMPLES: AnimExample[] = [
-  {
-    missedTime: '9:47 PM',
-    messages: [
-      { kind: 'them', text: "Hey! Sorry we missed your call at STL Strength Studio. What fitness goal are you working toward? 💪", time: '9:48 PM', typewriter: true },
-      { kind: 'me', text: 'Trying to lose 30 lbs', time: '9:48 PM', typewriter: false },
-      { kind: 'them', text: "Perfect — Coach Marcus specializes in exactly that. I have Tuesday at 6pm open. Want me to lock that in?", time: '9:49 PM', typewriter: true },
-      { kind: 'me', text: 'Yes!', time: '9:49 PM', typewriter: false },
-      { kind: 'them', text: "Done! You're booked Tuesday at 6pm. See you then 🎉", time: '9:49 PM', typewriter: true },
-    ],
-    label: '⚡ Booked automatically while the owner slept',
-  },
-  {
-    missedTime: '8:23 PM',
-    messages: [
-      { kind: 'them', text: "Hi! Sorry we missed you at Glow Aesthetics. What treatment were you interested in? ✨", time: '8:24 PM', typewriter: true },
-      { kind: 'me', text: 'Botox consultation', time: '8:24 PM', typewriter: false },
-      { kind: 'them', text: "We'd love to help with that. Sarah has Thursday at 2pm available — want me to grab it?", time: '8:24 PM', typewriter: true },
-      { kind: 'me', text: 'That works!', time: '8:25 PM', typewriter: false },
-      { kind: 'them', text: "Confirmed for Thursday at 2pm. See you then ✨", time: '8:25 PM', typewriter: true },
-    ],
-    label: '⚡ $400 consultation captured at 8pm automatically',
-  },
-  {
-    missedTime: '7:15 PM',
-    messages: [
-      { kind: 'them', text: "Hey! Missed your call at Metro HVAC. Is this something urgent or can we schedule service? 🔧", time: '7:16 PM', typewriter: true },
-      { kind: 'me', text: 'AC stopped working', time: '7:16 PM', typewriter: false },
-      { kind: 'them', text: "Got it — that's urgent. I have tomorrow morning at 9am available. Want me to book that?", time: '7:16 PM', typewriter: true },
-      { kind: 'me', text: 'Please yes', time: '7:17 PM', typewriter: false },
-      { kind: 'them', text: "Booked for tomorrow 9am. Kevin will be there. Thank you 🔧", time: '7:17 PM', typewriter: true },
-    ],
-    label: '⚡ Emergency job booked at 7pm without Kevin lifting a finger',
-  },
-];
-
-const TYPE_SPEED = 28;
-const GAP_AFTER_SYSTEM = 1300;
-const GAP_AFTER_LEAD = 1100;
-const LOOP_PAUSE = 3000;
 
 
 /* ══════════ COMPONENT ══════════ */
@@ -130,13 +81,6 @@ export default function HomePage() {
     }
   }, []);
 
-  /* Animation state */
-  const [exIdx, setExIdx] = useState(0);
-  const [msgIdx, setMsgIdx] = useState(0);
-  const [typedText, setTypedText] = useState('');
-  const [showLabel, setShowLabel] = useState(false);
-  const animTimers = useRef<number[]>([]);
-
   /* Scroll reveal */
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
@@ -150,49 +94,6 @@ export default function HomePage() {
   const scrollTo = useCallback((id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
   }, []);
-
-  /* Animation loop */
-  useEffect(() => {
-    const clearTimers = () => { animTimers.current.forEach(t => clearTimeout(t)); animTimers.current = []; };
-    const push = (fn: () => void, ms: number) => { animTimers.current.push(window.setTimeout(fn, ms) as unknown as number); };
-
-    const currentEx = ANIM_EXAMPLES[exIdx];
-    const currentMsg = currentEx.messages[msgIdx];
-
-    if (!currentMsg) {
-      push(() => {
-        setShowLabel(true);
-        push(() => {
-          setShowLabel(false);
-          setExIdx(prev => (prev + 1) % ANIM_EXAMPLES.length);
-          setMsgIdx(0);
-          setTypedText('');
-        }, LOOP_PAUSE);
-      }, 400);
-      return clearTimers;
-    }
-
-    if (currentMsg.typewriter) {
-      let i = 0;
-      const typeNext = () => {
-        if (i <= currentMsg.text.length) {
-          setTypedText(currentMsg.text.slice(0, i));
-          i++;
-          push(typeNext, TYPE_SPEED);
-        } else {
-          push(() => {
-            setTypedText('');
-            setMsgIdx(prev => prev + 1);
-          }, GAP_AFTER_SYSTEM);
-        }
-      };
-      typeNext();
-    } else {
-      push(() => { setMsgIdx(prev => prev + 1); }, GAP_AFTER_LEAD);
-    }
-
-    return clearTimers;
-  }, [exIdx, msgIdx]);
 
   /* Submit hero SMS demo */
   const submitHero = useCallback(async () => {
@@ -250,11 +151,6 @@ export default function HomePage() {
       setVapiStatus('error');
     }
   }, [vapiPhone]);
-
-  const currentExample = ANIM_EXAMPLES[exIdx];
-  const visibleMsgs = currentExample.messages.slice(0, msgIdx);
-  const typingMsg = currentExample.messages[msgIdx];
-  const isTyping = !!(typingMsg && typingMsg.typewriter && typedText.length > 0);
 
 
   /* ══════════ JSX ══════════ */
@@ -361,43 +257,9 @@ export default function HomePage() {
           )}
         </div>
 
-        {/* RIGHT — Auto-playing SMS animation */}
+        {/* RIGHT — AI Readiness Score quiz (lead-capture) */}
         <div className={s['hero-right']}>
-          <div className={s['anim-phone']}>
-            <div className={s['anim-notch']} />
-            <div className={s['anim-screen']}>
-              <div className={s['anim-notif']}>
-                <div className={s['anim-notif-icon']}>📵</div>
-                <div>
-                  <div className={s['anim-notif-title']}>Missed call · {currentExample.missedTime}</div>
-                  <div className={s['anim-notif-sub']}>Unknown Number</div>
-                </div>
-              </div>
-
-              <div className={s['anim-thread']}>
-                {visibleMsgs.map((msg, i) => (
-                  <div key={`${exIdx}-${i}`} className={s['anim-row']} data-kind={msg.kind}>
-                    <div className={`${s['anim-bubble']} ${msg.kind === 'me' ? s['anim-me'] : s['anim-them']}`}>
-                      {msg.text}
-                    </div>
-                    <div className={s['anim-ts']}>{msg.time}</div>
-                  </div>
-                ))}
-
-                {isTyping && (
-                  <div className={s['anim-row']} data-kind={typingMsg.kind}>
-                    <div className={`${s['anim-bubble']} ${typingMsg.kind === 'me' ? s['anim-me'] : s['anim-them']}`}>
-                      {typedText}<span className={s['anim-cursor']}>▎</span>
-                    </div>
-                  </div>
-                )}
-
-                {showLabel && (
-                  <div className={s['anim-label']}>{currentExample.label}</div>
-                )}
-              </div>
-            </div>
-          </div>
+          <QuizModule />
         </div>
       </section>
 

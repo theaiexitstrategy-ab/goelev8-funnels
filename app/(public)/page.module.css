@@ -338,3 +338,226 @@
   .anim-bubble{font-size:11px}
   .vapi-strip-h{font-size:22px}
 }
+
+
+/* ════════════════════════════════════════
+   AI READINESS QUIZ — hero-right module
+   Restyled from the abandoned home-restructure branch to use the
+   current homepage's cyan/gold/DM Sans/Bebas Neue/JetBrains Mono
+   token system. Every class here is referenced by QuizModule.tsx.
+   ════════════════════════════════════════ */
+.quiz{
+  position:relative;
+  background:var(--card);
+  border:1px solid var(--b3);
+  border-radius:4px;
+  padding:24px 22px;
+  width:100%;
+  max-width:400px;
+  overflow:hidden;
+  animation:fadeUp .5s .18s ease both;
+}
+.quiz::before{
+  content:"";
+  position:absolute; top:-40%; right:-20%;
+  width:60%; height:180%;
+  background:radial-gradient(circle, var(--cyan-f), transparent 65%);
+  pointer-events:none;
+}
+
+/* Header + progress bar */
+.qhead{
+  display:flex; justify-content:space-between; align-items:baseline;
+  margin-bottom:8px; position:relative; z-index:1;
+  font-family:var(--fm);
+  font-size:10px; letter-spacing:1.5px; text-transform:uppercase;
+}
+.qcount{color:var(--cyan);}
+.progressTrack{
+  height:3px; background:var(--b2); border-radius:100px;
+  margin-bottom:22px; overflow:hidden;
+  position:relative; z-index:1;
+}
+.progressFill{
+  height:100%; background:var(--cyan);
+  transition:width .3s ease;
+  box-shadow:0 0 6px rgba(0,207,255,.4);
+}
+
+/* Question + option buttons */
+.qBlock{position:relative; z-index:1;}
+.qText{
+  font-family:var(--fb);
+  font-size:15.5px; font-weight:500; line-height:1.4;
+  color:var(--wh);
+  margin-bottom:16px;
+}
+.opt{
+  display:block; width:100%; text-align:left;
+  background:var(--blk2);
+  border:1px solid var(--b3);
+  color:var(--wh);
+  padding:13px 15px;
+  border-radius:2px;
+  margin-bottom:9px;
+  font-size:13.5px; line-height:1.4;
+  cursor:pointer;
+  font-family:var(--fb);
+  transition:border-color .15s ease, background .15s ease;
+}
+.opt:hover{border-color:var(--cyan); background:var(--cyan-f);}
+.opt.chosen{border-color:var(--cyan); background:var(--cyan-g);}
+
+/* Contact gate */
+.gateIcon{font-size:26px; text-align:center; margin-bottom:8px;}
+.gateH{
+  font-family:var(--fd);
+  font-size:28px; letter-spacing:1.5px; text-transform:uppercase;
+  text-align:center;
+  color:var(--wh);
+  margin-bottom:6px;
+  font-weight:400;
+}
+.gateP{
+  font-size:13px; color:var(--wh2);
+  text-align:center; line-height:1.55;
+  margin-bottom:18px;
+}
+.lockedScore{
+  display:flex; align-items:center; justify-content:center; gap:12px;
+  margin-bottom:20px; padding:12px 14px;
+  border:1px dashed var(--b3); border-radius:2px;
+  color:var(--wh2);
+  font-family:var(--fm); font-size:10px; letter-spacing:1.5px; text-transform:uppercase;
+}
+.lockedScore .blur{
+  filter:blur(6px);
+  font-family:var(--fd);
+  font-size:22px; font-weight:400; color:var(--wh);
+  letter-spacing:1px;
+}
+.qlabel{
+  display:block; font-size:10px; color:var(--wh2);
+  font-family:var(--fm); letter-spacing:1.5px; text-transform:uppercase;
+  margin-bottom:5px;
+}
+.qinput{
+  width:100%;
+  background:var(--blk2);
+  border:1px solid var(--b3);
+  color:var(--wh);
+  padding:12px 14px; border-radius:2px;
+  font-size:14px; font-family:var(--fb);
+  margin-bottom:12px; outline:none;
+  transition:border-color .2s;
+}
+.qinput::placeholder{color:var(--mu);}
+.qinput:focus{border-color:var(--cyan);}
+.inputError{border-color:var(--red);}
+.qsubmit{
+  width:100%;
+  background:var(--cyan); color:var(--blk);
+  border:1px solid var(--cyan);
+  padding:14px;
+  border-radius:2px;
+  font-family:var(--fm);
+  font-weight:600; font-size:12px; letter-spacing:1.2px; text-transform:uppercase;
+  cursor:pointer;
+  transition:background .2s, color .2s;
+}
+.qsubmit:hover:not(:disabled){background:var(--wh); border-color:var(--wh);}
+.qsubmit:disabled{opacity:.5; cursor:default;}
+.fineprint{
+  font-family:var(--fm); font-size:9.5px; letter-spacing:.5px;
+  color:var(--wh3);
+  margin-top:12px; text-align:center; line-height:1.6;
+}
+
+/* Score ring + reveal */
+.scoreRing{
+  width:140px; height:140px;
+  margin:4px auto 16px;
+  position:relative;
+}
+.scoreRing svg{width:100%; height:100%; transform:rotate(-90deg);}
+.scoreRing circle{fill:none; stroke-width:8;}
+.scoreTrack{stroke:var(--b2);}
+.scoreFill{
+  stroke:var(--cyan);
+  stroke-linecap:round;
+  transition:stroke-dashoffset 1s cubic-bezier(.4,0,.2,1);
+  filter:drop-shadow(0 0 6px rgba(0,207,255,.35));
+}
+.scoreNum{
+  position:absolute; inset:0;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+}
+.scoreN{
+  font-family:var(--fd);
+  font-size:44px; font-weight:400; color:var(--wh);
+  letter-spacing:1.5px; line-height:1;
+}
+.scoreL{
+  font-family:var(--fm);
+  font-size:10px; color:var(--wh2);
+  letter-spacing:1.5px;
+  margin-top:4px;
+}
+.tierTag{
+  display:block; text-align:center;
+  font-family:var(--fm);
+  font-size:11px; font-weight:600; letter-spacing:2px; text-transform:uppercase;
+  margin-bottom:8px;
+}
+.tierDesc{
+  text-align:center;
+  font-size:13.5px; color:var(--wh2); line-height:1.55;
+  max-width:340px; margin:0 auto 22px;
+  font-family:var(--fb);
+}
+
+/* Scarcity block */
+.scarcity{
+  border:1px solid rgba(255,59,59,.28);
+  background:var(--red-f);
+  border-radius:2px;
+  padding:14px 16px;
+  margin-bottom:18px;
+  text-align:center;
+}
+.scarcityTop{
+  font-family:var(--fm);
+  font-size:10px; letter-spacing:1.8px; text-transform:uppercase;
+  color:var(--red);
+  margin-bottom:6px;
+}
+.scarcityMain{
+  font-family:var(--fb);
+  font-size:14px; font-weight:600;
+  color:var(--wh);
+  margin-bottom:4px;
+  line-height:1.4;
+}
+.scarcitySpots{
+  font-family:var(--fm);
+  font-size:11px; letter-spacing:1px;
+  color:var(--wh2);
+}
+.scarcitySpots strong{color:var(--red);}
+
+/* Calendar embed */
+.calEmbed{
+  margin-top:14px;
+  border-radius:2px; overflow:hidden;
+  border:1px solid var(--b3);
+  height:480px;
+  background:var(--blk2);
+}
+.calEmbed iframe{width:100%; height:100%; border:0; display:block;}
+
+/* Wider max-width on desktop so the quiz doesn't feel cramped in the
+ * 380px hero-right column. Overrides the column width just for this
+ * module, matching the animation phone that was there before. */
+@media(min-width:900px){
+  .quiz{max-width:none;}
+}
