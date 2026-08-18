@@ -561,3 +561,89 @@
 @media(min-width:900px){
   .quiz{max-width:none;}
 }
+
+/* ══════════ QUIZ ACTIVATION TEASER ══════════
+ * Sits inside .quiz before the visitor clicks in. Frames the quiz as
+ * a value offer (score + action plan) rather than a stray form on the
+ * page. Same visual language as the rest of the quiz — cyan accent,
+ * card background, JetBrains Mono meta, Bebas Neue display headline.
+ */
+.qteaser{
+  position:relative;
+  z-index:1;
+  text-align:center;
+  padding:6px 4px 2px;
+}
+.qteaserEyebrow{
+  font-family:var(--fm);
+  font-size:10px;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  color:var(--cyan);
+  margin-bottom:14px;
+}
+.qteaserH{
+  font-family:var(--fd);
+  font-weight:400;
+  font-size:34px;
+  line-height:1.02;
+  letter-spacing:1.2px;
+  color:var(--wh);
+  margin-bottom:18px;
+  text-transform:uppercase;
+}
+.qteaserBullets{
+  list-style:none;
+  padding:0;
+  margin:0 0 22px;
+  text-align:left;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.qteaserBullets li{
+  font-family:var(--fb);
+  font-size:13.5px;
+  color:var(--wh2);
+  padding-left:22px;
+  position:relative;
+  line-height:1.4;
+}
+.qteaserBullets li::before{
+  content:"→";
+  position:absolute;
+  left:0;
+  top:0;
+  color:var(--cyan);
+  font-family:var(--fm);
+  font-weight:700;
+}
+.qteaserBtn{
+  width:100%;
+  background:var(--cyan);
+  color:var(--blk);
+  border:1px solid var(--cyan);
+  padding:16px;
+  border-radius:2px;
+  font-family:var(--fm);
+  font-weight:700;
+  font-size:12px;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+  cursor:pointer;
+  transition:background .18s, color .18s, transform .12s;
+  box-shadow:0 4px 18px rgba(0,207,255,.15);
+}
+.qteaserBtn:hover{
+  background:var(--wh);
+  border-color:var(--wh);
+  transform:translateY(-1px);
+}
+.qteaserFine{
+  font-family:var(--fm);
+  font-size:9.5px;
+  letter-spacing:.5px;
+  color:var(--wh3);
+  margin-top:12px;
+  line-height:1.55;
+}

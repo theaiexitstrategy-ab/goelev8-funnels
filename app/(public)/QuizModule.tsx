@@ -86,7 +86,11 @@ function tierFor(total: number) {
 }
 
 export default function QuizModule() {
-  const [phase, setPhase] = useState<'quiz' | 'gate' | 'result'>('quiz');
+  // 'teaser' is the activation gate — a value-forward card with a single
+  // CTA that transitions to 'quiz' on click. Keeps first-paint clean and
+  // frames the quiz as an intentional offer rather than a stray form
+  // sitting in the hero.
+  const [phase, setPhase] = useState<'teaser' | 'quiz' | 'gate' | 'result'>('teaser');
   const [current, setCurrent] = useState(0);
   const [answers, setAnswers] = useState<number[]>([]);
   const [lead, setLead] = useState({ name: '', email: '', phone: '' });
@@ -178,6 +182,31 @@ export default function QuizModule() {
 
   return (
     <div className={s.quiz}>
+      {phase === 'teaser' && (
+        <div className={s.qteaser}>
+          <div className={s.qteaserEyebrow}>Free · 60 seconds · Your score</div>
+          <h3 className={s.qteaserH}>
+            How AI-Ready Is<br />
+            Your Business?
+          </h3>
+          <ul className={s.qteaserBullets}>
+            <li>Instant score + tier assessment</li>
+            <li>Personalized action plan by SMS</li>
+            <li>Zero sales pitch — just insight</li>
+          </ul>
+          <button
+            type="button"
+            className={s.qteaserBtn}
+            onClick={() => setPhase('quiz')}
+          >
+            Get My AI Readiness Score →
+          </button>
+          <div className={s.qteaserFine}>
+            Free forever · Score delivered by SMS + email · Reply STOP anytime
+          </div>
+        </div>
+      )}
+
       {phase === 'quiz' && (
         <>
           <div className={s.qhead}>
