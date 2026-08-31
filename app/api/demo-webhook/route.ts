@@ -119,6 +119,54 @@ function twiml(body: string | null) {
   return new NextResponse(xml, { status: 200, headers: { 'Content-Type': 'text/xml; charset=utf-8' } });
 }
 
+// ─── Portal hand-off ─────────────────────────────────────────────
+//
+// +18883020649 is shared. This route owns it because the demo sequence
+// lives here, but portal tenants also run keywords on the same number —
+// Konquered Balance's KONQUER, while its own number waits on carrier
+// approval. Twilio only calls one URL per number, so text this route
+// doesn't claim is forwarded to the portal and its TwiML returned
+// verbatim, letting the portal answer as itself with its own
+// multi-tenant keyword routing and CRM attribution.
+
+const PORTAL_INBOUND_URL =
+  process.env.PORTAL_INBOUND_URL || 'https://portal.goelev8.ai/api/webhooks/twilio/inbound';
+
+// Returns the portal's TwiML, or null to fall back to silence. Never
+// throws: Twilio must get a valid response from us either way, and a
+// portal outage should degrade to the old no-reply behavior rather than
+// surface an error to the sender.
+async function forwardToPortal(rawBody: string): Promise<string | null> {
+  // Twilio abandons a webhook at ~15s. Stay well inside it — the portal
+  // may call its AI concierge before answering.
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 8000);
+  try {
+    const res = await fetch(PORTAL_INBOUND_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: rawBody,
+      signal: ctrl.signal,
+    });
+    if (!res.ok) {
+      console.error('[demo-webhook] portal forward HTTP', res.status);
+      return null;
+    }
+    const xml = (await res.text()).trim();
+    // Only pass through something that actually looks like TwiML.
+    if (!xml.startsWith('<')) {
+      console.error('[demo-webhook] portal forward returned non-XML');
+      return null;
+    }
+    return xml;
+  } catch (err) {
+    console.error('[demo-webhook] portal forward failed:', err);
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 // ─── DB helpers ──────────────────────────────────────────────────
 
 async function startNewSession(supabase: SupabaseClient, phone: string): Promise<void> {
@@ -191,13 +239,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
     }
   }
-  const form = await req.formData();
+  // Read the body as text rather than formData() so the exact bytes Twilio
+  // sent can be forwarded to the portal verbatim at the fallthrough — it
+  // reads MessageSid, To and the MMS fields this route never parses.
+  const raw = await req.text();
+  const form = new URLSearchParams(raw);
   const from = String(form.get('From') || '');
   const text = String(form.get('Body') || '');
-  return handleInbound(from, text, true);
+  return handleInbound(from, text, true, raw);
 }
 
-async function handleInbound(from: string, text: string, isTwilio: boolean) {
+async function handleInbound(from: string, text: string, isTwilio: boolean, rawBody?: string) {
   if (!from) return isTwilio ? twiml(null) : NextResponse.json({ error: 'Missing sender' }, { status: 400 });
 
   const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null;
@@ -297,6 +349,20 @@ async function handleInbound(from: string, text: string, isTwilio: boolean) {
     return isTwilio ? twiml(reply) : NextResponse.json({ reply });
   }
 
-  // ── Anything else → no auto-reply (per spec) ──
+  // ── Anything else → hand off to the portal ──
+  // Compliance and every demo keyword above already returned, so this
+  // only sees text none of them claimed. The portal answers with its own
+  // tenant keywords (KONQUER → Konquered Balance's booking link, logged
+  // to that tenant's CRM) or its AI concierge. If it can't be reached we
+  // fall back to the previous behavior: silence, never an error.
+  if (isTwilio && rawBody) {
+    const forwarded = await forwardToPortal(rawBody);
+    if (forwarded) {
+      return new NextResponse(forwarded, {
+        status: 200,
+        headers: { 'Content-Type': 'text/xml; charset=utf-8' },
+      });
+    }
+  }
   return isTwilio ? twiml(null) : NextResponse.json({ reply: '' });
 }
