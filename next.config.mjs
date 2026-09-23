@@ -67,6 +67,12 @@ const nextConfig = {
           source: '/anudaydemo',
           destination: '/anudaydemo.html',
         },
+        // goelev8.ai/kappa → Kappa Alpha Psi Lawton Chapter sales demo.
+        // /kappa/ is redirected to /kappa by Next's default trailing-slash handling.
+        {
+          source: '/kappa',
+          destination: '/kappa/index.html',
+        },
         // Mother's Day uplift landing pages — one per profile.
         { source: '/courtney', destination: '/courtney.html' },
         { source: '/ashlen',   destination: '/ashlen.html' },
