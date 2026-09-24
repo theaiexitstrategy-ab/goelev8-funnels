@@ -319,7 +319,7 @@ function renderAdmin(){
       <div style="display:flex;flex-direction:column;gap:10px">${S.officers.map((o,i)=>`<div class="row2"><input aria-label="Office ${i+1}" name="or${i}" value="${esc(o[0])}"><input aria-label="Name for office ${i+1}" name="on${i}" value="${esc(o[1])}"></div>`).join('')}</div></fieldset>
       <div><button class="btn btn-primary" type="submit">Save changes</button></div></form>`;
   }
-  $('#app').innerHTML=`<div class="wrap shell"><h1>Officer dashboard</h1><p class="sub" style="margin:0">Manage the site for ${esc(S.chapterName)}</p>
+  $('#app').innerHTML=`<div class="wrap shell"><h1>Officer dashboard</h1><p class="sub" style="margin:0">Manage the site for ${esc(S.chapterName)} · <a href="/kappa/agent">Open the Chapter Agent</a></p>
   <div class="tabs" role="tablist"><button role="tab" aria-selected="${tab==='aevents'}" data-tab="aevents">Events</button><button role="tab" aria-selected="${tab==='access'}" data-tab="access">Access</button><button role="tab" aria-selected="${tab==='content'}" data-tab="content">Page content</button></div>${body}</div>`;
   const af=$('#accessForm');
   if(af)af.addEventListener('submit',ev=>{ev.preventDefault(); const f=new FormData(af); const bp=f.get('brotherPw').trim(), op=f.get('officerPw').trim();
