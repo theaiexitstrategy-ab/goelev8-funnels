@@ -48,9 +48,12 @@ function normalizePhone(raw: string): string | null {
   return null;
 }
 
-/** The only numbers the demo may ever text for real. */
+/**
+ * The only numbers the demo may ever text for real: KAPPA_DEMO_TEST_NUMBERS
+ * plus the master admin's own cell (AARON_PERSONAL_CELL, already set in Vercel).
+ */
 export function liveTestNumbers(): string[] {
-  const raw = process.env.KAPPA_DEMO_TEST_NUMBERS || '';
+  const raw = [process.env.KAPPA_DEMO_TEST_NUMBERS, process.env.AARON_PERSONAL_CELL].filter(Boolean).join(',');
   const out = new Set<string>();
   for (const part of raw.split(',')) {
     const n = normalizePhone(part.trim());
