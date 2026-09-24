@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<!-- © 2026 GoElev8.ai | Aaron Bryant. All rights reserved. Unauthorized use prohibited. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="data:,">
+<title>Chapter Agent · Lawton Chapter Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --crimson:#8C1C2E; --crimson-deep:#6E1422; --accent:#8C1C2E;
+  --cream:#F2EADB; --bg:#FBF7F0; --surface:#FFFFFF; --ink:#231A1B; --muted:#6B5E5C; --line:#E3D8C8;
+  --on-crimson:#FBF1E6; --shadow:0 1px 2px rgba(35,26,27,.06);
+  --yes:#1F6B45; --yes-bg:#E3F1E8; --no:#8C1C2E; --no-bg:#F6E1E3; --wait:#6B5E5C; --wait-bg:#EFE8DC; --flash:#FCEFC9;
+  --serif:'DM Serif Display', Georgia, 'Times New Roman', serif;
+  --sans:'Figtree', system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#1A1314; --surface:#241B1C; --ink:#F2EADB; --muted:#BCAEA6; --line:#3B2F30; --accent:#E06A7D; --cream:#2C2122; --shadow:none;
+    --yes:#8FD6AE; --yes-bg:#1D3326; --no:#F29AA7; --no-bg:#3A1F24; --wait:#BCAEA6; --wait-bg:#2E2425; --flash:#4A3B1A;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#1A1314; --surface:#241B1C; --ink:#F2EADB; --muted:#BCAEA6; --line:#3B2F30; --accent:#E06A7D; --cream:#2C2122; --shadow:none;
+  --yes:#8FD6AE; --yes-bg:#1D3326; --no:#F29AA7; --no-bg:#3A1F24; --wait:#BCAEA6; --wait-bg:#2E2425; --flash:#4A3B1A;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0; background:var(--bg); color:var(--ink); font-family:var(--sans); font-size:16px; line-height:1.5; padding-bottom:env(safe-area-inset-bottom,0px)}
+a{color:var(--accent)}
+button,input,select,textarea{font:inherit; color:inherit}
+:focus-visible{outline:3px solid var(--accent); outline-offset:2px}
+.wrap{max-width:1320px; margin:0 auto; padding:0 16px}
+@media (min-width:720px){ .wrap{padding:0 24px} }
+[hidden]{display:none !important}
+
+/* demo bar */
+.demobar{background:var(--ink); color:var(--bg); font-size:14px}
+.demobar .wrap{display:flex; gap:10px 16px; align-items:center; justify-content:space-between; padding-top:8px; padding-bottom:8px; flex-wrap:wrap}
+.demobar .acts{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+.demobar button{background:transparent; border:1px solid currentColor; color:inherit; border-radius:6px; padding:4px 10px; cursor:pointer; font-size:13px}
+.live{display:inline-flex; gap:6px; align-items:center; cursor:pointer; font-size:13px}
+.live input{accent-color:#E06A7D; width:16px; height:16px}
+.live.armed{color:#FFD7A8; font-weight:600}
+
+/* nav */
+header.nav{background:var(--bg); border-bottom:1px solid var(--line)}
+header.nav .wrap{display:flex; align-items:center; justify-content:space-between; min-height:64px; gap:16px}
+.brand{font-family:var(--serif); font-size:23px; color:var(--ink); text-decoration:none; line-height:1.1}
+.brand small{display:block; font-family:var(--sans); font-size:12px; color:var(--muted)}
+.navlinks{display:flex; gap:16px; align-items:center}
+.navlinks a{color:var(--ink); text-decoration:none; font-weight:500}
+.navlinks a:hover{color:var(--accent)}
+
+.btn{display:inline-flex; align-items:center; justify-content:center; gap:6px; border-radius:8px; padding:9px 16px; font-weight:600; border:1px solid transparent; cursor:pointer; text-decoration:none; font-size:15px}
+.btn-primary{background:var(--crimson); color:var(--on-crimson)}
+.btn-primary:hover{background:var(--crimson-deep)}
+.btn-ghost{background:transparent; border-color:var(--line); color:var(--ink)}
+.btn-ghost:hover{border-color:var(--accent)}
+.btn-sm{padding:5px 11px; font-size:13px}
+.btn[disabled]{opacity:.55; cursor:not-allowed}
+
+/* chips */
+.chipbar{padding-top:14px; padding-bottom:4px}
+.chipbar h2{font-size:13px; font-weight:600; color:var(--muted); margin:0 0 8px}
+.chips{display:flex; gap:8px; overflow-x:auto; padding-bottom:8px; scrollbar-width:thin}
+@media (min-width:1000px){ .chips{flex-wrap:wrap; overflow:visible} }
+.chip{flex:0 0 auto; max-width:320px; text-align:left; background:var(--surface); border:1px solid var(--line); border-radius:999px; padding:7px 14px; font-size:14px; cursor:pointer; line-height:1.3; box-shadow:var(--shadow)}
+.chip:hover{border-color:var(--accent); color:var(--accent)}
+.chip[disabled]{opacity:.55; cursor:wait}
+
+/* layout */
+.layout{display:grid; grid-template-columns:1fr; gap:16px; padding-top:10px; padding-bottom:32px}
+@media (min-width:1000px){ .layout{grid-template-columns:minmax(0,1fr) minmax(0,1.05fr); align-items:start} }
+.card{background:var(--surface); border:1px solid var(--line); border-radius:14px; box-shadow:var(--shadow); min-width:0}
+
+/* chat */
+.chat{display:flex; flex-direction:column; height:min(72vh,760px); min-height:440px}
+@media (min-width:1000px){ .chat{position:sticky; top:12px; height:calc(100vh - 190px); min-height:520px} }
+.chat-head{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:14px 18px; border-bottom:1px solid var(--line)}
+.chat-head h1{font-family:var(--serif); font-weight:400; font-size:26px; margin:0; line-height:1.1}
+.status{font-size:13px; color:var(--muted); display:flex; align-items:center; gap:6px; text-align:right}
+.status .dot{width:8px; height:8px; border-radius:50%; background:var(--yes); flex:0 0 auto}
+.status.busy .dot{background:#C98A1B; animation:pulse 1s infinite}
+@keyframes pulse{50%{opacity:.3}}
+.log{flex:1; overflow-y:auto; padding:16px 18px; display:flex; flex-direction:column; gap:12px}
+.msg{max-width:88%; padding:10px 14px; border-radius:14px; overflow-wrap:anywhere}
+.msg p{margin:0 0 6px} .msg p:last-child{margin:0}
+.msg ul{margin:4px 0 6px; padding-left:20px} .msg li{margin:2px 0}
+.msg.user{align-self:flex-end; background:var(--crimson); color:var(--on-crimson); border-bottom-right-radius:4px}
+.msg.agent{align-self:flex-start; background:var(--cream); border-bottom-left-radius:4px}
+.msg.note{align-self:center; background:transparent; color:var(--muted); font-size:13px; padding:0; text-align:center; max-width:100%}
+.msg.error{align-self:flex-start; background:var(--no-bg); color:var(--no); font-size:14px}
+.who{font-size:12px; font-weight:600; color:var(--muted); margin:0 0 2px}
+.typing{align-self:flex-start; background:var(--cream); border-radius:14px; padding:12px 16px; display:flex; gap:4px}
+.typing span{width:7px; height:7px; border-radius:50%; background:var(--muted); animation:pulse 1s infinite}
+.typing span:nth-child(2){animation-delay:.2s} .typing span:nth-child(3){animation-delay:.4s}
+@media (prefers-reduced-motion:reduce){ .typing span,.status.busy .dot{animation:none} }
+
+.draft{align-self:stretch; border:1px solid var(--line); border-left:4px solid var(--crimson); border-radius:12px; padding:14px 16px; background:var(--bg)}
+.draft .dh{display:flex; justify-content:space-between; gap:8px; flex-wrap:wrap; font-size:13px; font-weight:600; color:var(--muted); margin-bottom:8px}
+.draft .sms{background:var(--surface); border:1px solid var(--line); border-radius:12px 12px 12px 4px; padding:10px 12px; white-space:pre-wrap; overflow-wrap:anywhere}
+.draft .meta{font-size:13px; color:var(--muted); margin:8px 0 0}
+.draft .acts{display:flex; gap:8px; margin-top:12px; flex-wrap:wrap}
+.draft textarea{width:100%; min-height:90px; border:1px solid var(--line); border-radius:10px; padding:10px 12px; background:var(--surface); resize:vertical}
+.draft .count{font-size:13px; color:var(--muted); margin-top:4px}
+.draft .count.bad{color:var(--no); font-weight:600}
+.draft.done{border-left-color:var(--yes)}
+.draft.dead{opacity:.6; border-left-color:var(--line)}
+.pill{display:inline-block; font-size:12px; font-weight:600; padding:2px 9px; border-radius:999px; background:var(--wait-bg); color:var(--wait); white-space:nowrap}
+.pill.yes{background:var(--yes-bg); color:var(--yes)} .pill.no{background:var(--no-bg); color:var(--no)}
+
+.composer{display:flex; gap:8px; padding:12px; border-top:1px solid var(--line); align-items:flex-end}
+.composer textarea{flex:1; min-height:46px; max-height:140px; resize:none; border:1px solid var(--line); border-radius:10px; padding:11px 12px; background:var(--bg); font-size:16px}
+.limit{font-size:12px; color:var(--muted); margin:0; padding:0 14px 10px}
+
+/* panel */
+.panel{min-height:440px}
+.tabs{display:flex; gap:2px; border-bottom:1px solid var(--line); overflow-x:auto; padding:0 8px}
+.tabs button{background:none; border:none; padding:14px 12px; cursor:pointer; font-weight:600; color:var(--muted); border-bottom:3px solid transparent; white-space:nowrap; display:flex; gap:6px; align-items:center}
+.tabs button[aria-selected="true"]{color:var(--ink); border-bottom-color:var(--crimson)}
+.badge{background:var(--crimson); color:var(--on-crimson); border-radius:999px; font-size:11px; padding:1px 7px; min-width:20px; text-align:center}
+.pbody{padding:16px 18px 22px}
+.sub{color:var(--muted); font-size:14px; margin:0 0 14px}
+h3.sec{font-family:var(--serif); font-weight:400; font-size:24px; margin:0 0 2px; line-height:1.2}
+
+.evpick{display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:10px}
+.evpick select{flex:1; min-width:200px; border:1px solid var(--line); border-radius:8px; padding:8px 10px; background:var(--bg)}
+.board{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px}
+@media (max-width:560px){ .board{grid-template-columns:1fr} }
+.col{border:1px solid var(--line); border-radius:12px; overflow:hidden; background:var(--bg); min-width:0}
+.col h4{margin:0; padding:10px 12px; font-size:14px; display:flex; justify-content:space-between; align-items:baseline}
+.col h4 b{font-family:var(--serif); font-weight:400; font-size:28px; line-height:1}
+.col.yes h4{background:var(--yes-bg); color:var(--yes)} .col.no h4{background:var(--no-bg); color:var(--no)} .col.wait h4{background:var(--wait-bg); color:var(--wait)}
+.col ul{list-style:none; margin:0; padding:6px 0; max-height:360px; overflow-y:auto}
+.col li{padding:4px 12px; font-size:14px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; transition:background 1.5s}
+.col li.fresh{background:var(--flash)}
+.col .none{color:var(--muted); font-size:13px; padding:6px 12px}
+.skipnote{font-size:13px; color:var(--muted); margin:12px 0 0}
+
+.tablewrap{overflow-x:auto; border:1px solid var(--line); border-radius:12px}
+table.data{width:100%; border-collapse:collapse; font-size:14px; min-width:460px}
+table.data th{text-align:left; font-size:12px; color:var(--muted); font-weight:600; padding:10px 12px; border-bottom:1px solid var(--line); background:var(--bg)}
+table.data td{padding:8px 12px; border-bottom:1px solid var(--line); vertical-align:middle}
+table.data tr:last-child td{border-bottom:none}
+.phone{font-variant-numeric:tabular-nums; color:var(--muted); white-space:nowrap}
+
+.feed{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px}
+.fi{border:1px solid var(--line); border-radius:12px; padding:10px 12px; background:var(--bg)}
+.fi.in{border-left:4px solid var(--yes)} .fi.out{border-left:4px solid var(--crimson)} .fi.auto{border-left:4px solid #C98A1B}
+.fi .fh{display:flex; justify-content:space-between; gap:8px; font-size:12px; color:var(--muted); margin-bottom:4px; flex-wrap:wrap}
+.fi .fh strong{color:var(--ink); font-size:13px}
+.fi .fb{font-size:14px; overflow-wrap:anywhere}
+.fi .tags{display:flex; gap:6px; margin-top:6px; flex-wrap:wrap}
+.fi.fresh{background:var(--flash)}
+
+.tiles{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin-bottom:16px}
+@media (max-width:560px){ .tiles{grid-template-columns:1fr 1fr} }
+.tile{border:1px solid var(--line); border-radius:12px; padding:12px; background:var(--bg)}
+.tile .k{font-size:12px; color:var(--muted); font-weight:600}
+.tile .v{font-family:var(--serif); font-size:30px; line-height:1.1}
+.tile .s{font-size:12px; color:var(--muted)}
+.links{list-style:none; margin:0 0 16px; padding:0; display:flex; flex-direction:column; gap:6px}
+.links li{display:flex; justify-content:space-between; gap:8px; align-items:center; flex-wrap:wrap; font-size:14px; border:1px solid var(--line); border-radius:10px; padding:8px 12px}
+.links code{font-size:12px; overflow-wrap:anywhere}
+h4.small{font-size:14px; margin:18px 0 8px}
+.banner{background:var(--no-bg); color:var(--no); border-radius:10px; padding:10px 14px; font-size:14px; margin:12px 0 0}
+
+footer.foot{padding:8px 0 40px; color:var(--muted); font-size:14px}
+footer.foot .wrap{display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap}
+.toast{position:fixed; left:50%; bottom:calc(20px + env(safe-area-inset-bottom,0px)); transform:translateX(-50%); background:var(--ink); color:var(--bg); padding:11px 18px; border-radius:10px; font-size:14px; z-index:60; opacity:0; pointer-events:none; transition:opacity .2s; max-width:calc(100% - 32px)}
+.toast.show{opacity:1}
+.sr{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0)}
+</style>
+</head>
+<body>
+<div class="demobar"><div class="wrap">
+  <span>Demo with sample data · Chapter Agent built by GoElev8.ai</span>
+  <div class="acts">
+    <label class="live" id="liveWrap" hidden title="Sends the next text once, for real, only to the demo test phone numbers. Sample brothers are never texted.">
+      <input type="checkbox" id="liveToggle"> <span id="liveLabel">Send a real test text</span>
+    </label>
+    <button id="resetBtn" type="button">Reset demo</button>
+  </div>
+</div></div>
+
+<header class="nav"><div class="wrap">
+  <a class="brand" href="/kappa">Lawton Chapter<small>Chapter Agent · officer view</small></a>
+  <nav class="navlinks"><a href="/kappa">Chapter site</a><button class="btn btn-ghost btn-sm" id="signOut" type="button">Sign out</button></nav>
+</div></header>
+
+<div class="wrap chipbar">
+  <h2 id="chipsLabel">Try asking</h2>
+  <div class="chips" id="chips" role="group" aria-labelledby="chipsLabel"></div>
+  <div class="banner" id="setupBanner" hidden></div>
+</div>
+
+<main class="wrap layout">
+  <section class="card chat" aria-label="Chat with the Chapter Agent">
+    <div class="chat-head">
+      <h1>Chapter Agent</h1>
+      <span class="status" id="status" role="status"><span class="dot"></span><span id="statusText">Ready</span></span>
+    </div>
+    <div class="log" id="log"></div>
+    <form class="composer" id="composer">
+      <label class="sr" for="input">Message the Chapter Agent</label>
+      <textarea id="input" rows="1" placeholder="Tell the agent what to do…" maxlength="1000"></textarea>
+      <button class="btn btn-primary" type="submit" id="sendBtn">Send</button>
+    </form>
+    <p class="limit" id="limitNote"></p>
+  </section>
+
+  <section class="card panel" aria-label="Chapter data">
+    <div class="tabs" role="tablist" id="tabs"></div>
+    <div class="pbody" id="pbody"></div>
+  </section>
+</main>
+
+<footer class="foot"><div class="wrap">
+  <span>© 2026 Lawton Chapter demo · all brothers, numbers, and payments are sample data</span>
+  <span>Site by <a href="https://goelev8.ai" target="_blank" rel="noopener">GoElev8.ai</a></span>
+</div></footer>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+const KEY = 'kappa-agent-demo-v1';
+const MAX_HISTORY = 38;
+const CHIPS = [
+  "Add a food drive Saturday Nov 7 at 9am at Central Plaza and ask everyone if they're coming",
+  "Who hasn't responded to the food drive?",
+  "Send a reminder to everyone who hasn't replied",
+  "Who's coming Saturday?",
+  "Send dues reminders to brothers who haven't paid",
+  "Text Brother Carter that the meeting moved to 7:30",
+];
+const TABS = [['rsvp', 'RSVP board'], ['roster', 'Brothers'], ['activity', 'Activity'], ['payments', 'Payments']];
+
+// ── helpers ───────────────────────────────────────────────────────────────
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const pad = (n) => String(n).padStart(2, '0');
+const isoLocal = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const newId = (p) => p + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+const rand = (a, b) => a + Math.random() * (b - a);
+const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+const shuffle = (arr) => { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const money = (n) => '$' + Number(n || 0).toLocaleString(undefined, { maximumFractionDigits: 2 });
+const parseDate = (iso) => { const [y, m, d] = iso.split('-').map(Number); return new Date(y, m - 1, d); };
+const fmtDate = (iso) => parseDate(iso).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+const fmtTime = (t) => { if (!t) return ''; const [h, m] = t.split(':').map(Number); const d = new Date(); d.setHours(h, m, 0, 0); return d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }); };
+const fmtClock = (ts) => new Date(ts).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+const fmtStamp = (ts) => { const d = new Date(ts); return (isoLocal(d) === isoLocal(new Date()) ? '' : d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) + ', ') + fmtClock(ts); };
+function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('show'), 2800); }
+
+// ── seed data (fictional) ────────────────────────────────────────────────
+const SURNAMES = [
+  ['J.', 'Carter'], ['M.', 'Washington'], ['D.', 'Harris'], ['A.', 'Robinson'], ['T.', 'Jenkins'], ['K.', 'Mitchell'],
+  ['R.', 'Coleman'], ['L.', 'Brooks'], ['C.', 'Hayes'], ['S.', 'Porter'], ['E.', 'Grant'], ['N.', 'Walker'],
+  ['B.', 'Reed'], ['G.', 'Foster'], ['V.', 'Bennett'], ['H.', 'Howard'], ['O.', 'Price'], ['W.', 'Sanders'],
+  ['F.', 'Hughes'], ['I.', 'Ellis'], ['P.', 'Wallace'], ['Q.', 'Barnes'], ['Z.', 'Fields'], ['Y.', 'Graham'],
+];
+const NOT_OPTED_IN = new Set(['b5', 'b11']);
+const UNPAID = new Set(['b3', 'b5', 'b8', 'b11', 'b14', 'b17', 'b19', 'b22', 'b24']);
+
+function nextWeekday(from, dow, minDays) {
+  const d = new Date(from); d.setDate(d.getDate() + minDays);
+  while (d.getDay() !== dow) d.setDate(d.getDate() + 1);
+  return isoLocal(d);
+}
+
+function seed() {
+  const now = new Date(); const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const brothers = SURNAMES.map(([i, s], n) => ({
+    id: 'b' + (n + 1), name: `Brother ${i} ${s}`, phone: `(580) 555-01${pad(n + 10)}`,
+    optIn: !NOT_OPTED_IN.has('b' + (n + 1)), dues: UNPAID.has('b' + (n + 1)) ? 'unpaid' : 'paid',
+  }));
+  const events = [
+    { id: 'e1', title: 'Chapter business meeting', date: nextWeekday(today, 2, 3), time: '19:00', location: 'Chapter meeting hall', desc: 'Monthly business meeting. Agenda in the brothers portal.', vis: 'members' },
+    { id: 'e2', title: 'Scholarship info night', date: nextWeekday(today, 4, 8), time: '18:30', location: 'Lawton Public Library', desc: 'Local seniors and parents learn how to apply for chapter scholarships.', vis: 'public' },
+  ];
+  const rsvps = {
+    e1: Object.fromEntries([...'1 2 4 6 7 9 10 12 13 15'.split(' ').map((n) => ['b' + n, 'yes']), ...'3 8 16'.split(' ').map((n) => ['b' + n, 'no'])]),
+    e2: Object.fromEntries([...'2 6 9 14 18 20'.split(' ').map((n) => ['b' + n, 'yes']), ...'7 21'.split(' ').map((n) => ['b' + n, 'no'])]),
+  };
+  const day = 86400000; const base = now.getTime();
+  const messages = []; const drafts = [];
+  const invites = [
+    { d: 'dseed1', ev: events[0], ago: 3 * day, body: `Kappa Lawton: Chapter business meeting ${fmtDate(events[0].date)} at 7:00 PM, chapter meeting hall. Reply YES or NO.` },
+    { d: 'dseed2', ev: events[1], ago: 2 * day, body: `Kappa Lawton: Scholarship info night ${fmtDate(events[1].date)} at 6:30 PM, Lawton Public Library. Can you help? Reply YES or NO.` },
+  ];
+  for (const inv of invites) {
+    const recips = brothers.filter((b) => b.optIn);
+    drafts.push({ id: inv.d, body: inv.body, recipientIds: recips.map((b) => b.id), skippedIds: ['b5', 'b11'], eventId: inv.ev.id, purpose: 'rsvp', audience: 'all', status: 'sent', createdAt: base - inv.ago });
+    for (const b of recips) messages.push({ id: newId('m'), dir: 'out', brotherId: b.id, body: inv.body, ts: base - inv.ago, eventId: inv.ev.id, draftId: inv.d, purpose: 'rsvp' });
+    Object.entries(rsvps[inv.ev.id]).forEach(([bid, ans], k) => {
+      messages.push({ id: newId('m'), dir: 'in', brotherId: bid, body: ans === 'yes' ? pick(['YES', 'Yes sir', 'yes']) : pick(['NO', 'No, working that night']), ts: base - inv.ago + (k + 1) * 11 * 60000, eventId: inv.ev.id, purpose: 'rsvp', rsvp: ans });
+    });
+  }
+  const payments = brothers.filter((b) => b.dues === 'paid').map((b, k) => ({ id: 'pseed' + k, brotherId: b.id, kind: 'dues', amount: 150, ts: base - (20 + k) * day, via: 'Card' }));
+  payments.push({ id: 'pseedd1', brotherId: 'b1', kind: 'donation', amount: 100, ts: base - 9 * day, via: 'Card' });
+  payments.push({ id: 'pseedd2', brotherId: 'b6', kind: 'donation', amount: 50, ts: base - 6 * day, via: 'Card' });
+  messages.sort((a, b) => a.ts - b.ts);
+  return {
+    state: { version: 1, today: isoLocal(today), duesAmount: 150, brothers, events, rsvps, messages, drafts, links: [], payments },
+    history: [],
+    log: [{ kind: 'agent', text: "I'm the Lawton Chapter's agent. Tell me what you need: add or change events, text brothers, chase RSVPs, or collect dues. Group texts always come to you as a draft first." }],
+    tab: 'rsvp', eventId: 'e1', seen: messages.length,
+  };
+}
+
+// ── store ─────────────────────────────────────────────────────────────────
+let S;
+try { S = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { S = null; }
+if (!S || !S.state || S.state.version !== 1) S = seed();
+S.state.today = isoLocal(new Date());
+if (typeof S.seen !== 'number') S.seen = S.state.messages.length;
+function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+
+let CONFIG = { agentReady: true, stripeMode: 'simulated', liveTextAvailable: false, liveTextNumbers: [] };
+let liveArmed = false;
+const fresh = new Map(); // key -> timestamp, for highlight
+const timers = new Set();
+const later = (ms, fn) => { const t = setTimeout(() => { timers.delete(t); fn(); }, ms); timers.add(t); };
+
+// Every state change goes through this queue so simulated replies never
+// collide with an in-flight agent request.
+let chain = Promise.resolve(); let busy = 0; let busyLabel = '';
+function enqueue(label, fn) {
+  const run = chain.then(async () => { busy++; busyLabel = label; renderStatus(); try { return await fn(); } finally { busy--; if (!busy) busyLabel = ''; renderStatus(); } });
+  chain = run.catch(() => {});
+  return run;
+}
+
+async function api(payload) {
+  const res = await fetch('/api/kappa-agent/chat', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ...payload, state: S.state }),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (res.status === 401) { toast('Session expired. Sign in again.'); setTimeout(() => location.reload(), 1200); }
+  if (!res.ok) throw new Error(data.error || 'Something went wrong. Try again.');
+  return data;
+}
+
+// ── lookups ───────────────────────────────────────────────────────────────
+const brother = (id) => S.state.brothers.find((b) => b.id === id);
+const eventById = (id) => S.state.events.find((e) => e.id === id);
+const upcomingEvents = () => S.state.events.filter((e) => e.date >= S.state.today).sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+function breakdown(evId) {
+  const ans = S.state.rsvps[evId] || {}; const r = { yes: [], no: [], wait: [], skip: [] };
+  for (const b of S.state.brothers) { const a = ans[b.id]; if (a === 'yes') r.yes.push(b); else if (a === 'no') r.no.push(b); else if (!b.optIn) r.skip.push(b); else r.wait.push(b); }
+  return r;
+}
+
+// ── chat ──────────────────────────────────────────────────────────────────
+function mdLite(text) {
+  const lines = esc(text).split(/\n/); let html = ''; let inList = false;
+  const inline = (s) => s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/(https?:\/\/[^\s<)]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
+  for (const raw of lines) {
+    const line = raw.trim();
+    if (/^[-•*]\s+/.test(line)) { if (!inList) { html += '<ul>'; inList = true; } html += '<li>' + inline(line.replace(/^[-•*]\s+/, '')) + '</li>'; continue; }
+    if (inList) { html += '</ul>'; inList = false; }
+    if (line) html += '<p>' + inline(line) + '</p>';
+  }
+  if (inList) html += '</ul>';
+  return html || '<p></p>';
+}
+
+function smsProblem(body) {
+  const b = body.trim();
+  if (!b.startsWith('Kappa Lawton:')) return 'Must start with “Kappa Lawton:”';
+  if (b.length >= 160) return `${b.length} characters. Must be under 160.`;
+  return '';
+}
+
+function draftCard(d, editing) {
+  const recips = d.recipientIds.length;
+  const skipped = d.skippedIds.map((i) => brother(i)?.name).filter(Boolean);
+  const ev = d.eventId ? eventById(d.eventId) : null;
+  let status = '';
+  if (d.status === 'sent') status = `<span class="pill yes">Sent to ${recips}</span>`;
+  else if (d.status === 'approved') status = `<span class="pill">Approved · sending…</span>`;
+  else if (d.status === 'cancelled') status = `<span class="pill">Replaced by a newer draft</span>`;
+  else status = `<span class="pill no">Needs your approval</span>`;
+  const cls = d.status === 'sent' ? 'done' : d.status === 'cancelled' ? 'dead' : '';
+  const body = editing
+    ? `<textarea data-edit="${d.id}" maxlength="400" aria-label="Edit the group text">${esc(d.body)}</textarea><div class="count" data-count="${d.id}"></div>`
+    : `<div class="sms">${esc(d.body)}</div>`;
+  const meta = `${recips} brother${recips === 1 ? '' : 's'}${ev ? ' · ' + esc(ev.title) : ''}${skipped.length ? ` · skipping ${skipped.map(esc).join(', ')} (not opted in)` : ''} · ${d.body.length} chars`;
+  let acts = '';
+  if (d.status === 'pending') {
+    acts = editing
+      ? `<div class="acts"><button class="btn btn-primary btn-sm" data-act="saveEdit" data-id="${d.id}">Save text</button><button class="btn btn-ghost btn-sm" data-act="cancelEdit" data-id="${d.id}">Cancel</button></div>`
+      : `<div class="acts"><button class="btn btn-primary btn-sm" data-act="approve" data-id="${d.id}" ${busy ? 'disabled' : ''}>Approve &amp; send</button><button class="btn btn-ghost btn-sm" data-act="edit" data-id="${d.id}">Edit</button></div>`;
+  }
+  return `<div class="draft ${cls}"><div class="dh"><span>Group text draft</span>${status}</div>${body}<p class="meta">${meta}</p>${acts}</div>`;
+}
+
+let editingDraft = null; let typing = false;
+function renderLog() {
+  const log = $('#log');
+  const atBottom = log.scrollHeight - log.scrollTop - log.clientHeight < 80;
+  log.innerHTML = S.log.map((m) => {
+    if (m.kind === 'user') return `<div class="msg user">${esc(m.text)}</div>`;
+    if (m.kind === 'agent') return `<div class="msg agent"><p class="who">Chapter Agent</p>${mdLite(m.text)}</div>`;
+    if (m.kind === 'draft') { const d = S.state.drafts.find((x) => x.id === m.draftId); return d ? draftCard(d, editingDraft === d.id) : ''; }
+    if (m.kind === 'error') return `<div class="msg error">${esc(m.text)}</div>`;
+    return `<div class="msg note">${esc(m.text)}</div>`;
+  }).join('') + (typing ? '<div class="typing" aria-label="Agent is working"><span></span><span></span><span></span></div>' : '');
+  if (atBottom || typing) log.scrollTop = log.scrollHeight;
+  if (editingDraft) updateCount(editingDraft);
+  const left = MAX_HISTORY - S.history.length;
+  $('#limitNote').textContent = left <= 10 ? (left > 0 ? `${Math.floor(left / 2)} messages left in this demo conversation.` : 'Conversation limit reached. Press Reset demo to start over.') : '';
+}
+
+function updateCount(id) {
+  const ta = document.querySelector(`[data-edit="${id}"]`); const c = document.querySelector(`[data-count="${id}"]`);
+  if (!ta || !c) return; const p = smsProblem(ta.value);
+  c.textContent = p || `${ta.value.trim().length} / 159 characters`; c.classList.toggle('bad', !!p);
+}
+
+function renderStatus() {
+  $('#status').classList.toggle('busy', !!busy);
+  $('#statusText').textContent = busy ? (busyLabel || 'Working…') : 'Ready';
+  document.querySelectorAll('.chip').forEach((c) => (c.disabled = !!busy && typing));
+  document.querySelectorAll('[data-act="approve"]').forEach((b) => (b.disabled = !!busy));
+  $('#sendBtn').disabled = typing;
+}
+
+function renderChips() {
+  $('#chips').innerHTML = CHIPS.map((c, i) => `<button class="chip" type="button" data-chip="${i}">${esc(c)}</button>`).join('');
+}
+
+async function sendChat(text, opts = {}) {
+  text = text.trim(); if (!text || typing) return;
+  if (S.history.length >= MAX_HISTORY) { toast('Conversation limit reached. Press Reset demo.'); return; }
+  S.log.push({ kind: 'user', text });
+  S.history.push({ role: 'user', content: text });
+  typing = true; renderLog(); renderStatus(); save();
+  try {
+    await enqueue('Agent is working…', async () => {
+      const data = await api({ mode: 'chat', history: S.history, approveDraftId: opts.approveDraftId, focusEventId: S.eventId, liveText: liveArmed || undefined });
+      S.state = data.state;
+      const reply = (data.reply || 'Done.').slice(0, 2000);
+      S.history.push({ role: 'assistant', content: reply });
+      S.log.push({ kind: 'agent', text: reply });
+      for (const id of data.newDraftIds || []) S.log.push({ kind: 'draft', draftId: id });
+      if (data.focusEventId && eventById(data.focusEventId)) S.eventId = data.focusEventId;
+      if (data.live) {
+        if (data.live.sent) S.log.push({ kind: 'note', text: `Real test text sent to ${data.live.sent} test phone${data.live.sent === 1 ? '' : 's'}.` });
+        else S.log.push({ kind: 'note', text: 'The real test text didn’t go out (limit reached or Twilio error). Simulated texts still sent.' });
+        setLive(false);
+      }
+      const sent = data.sent || [];
+      if (sent.length) {
+        const kinds = new Set(sent.map((s) => s.purpose));
+        if ((kinds.has('rsvp') || kinds.has('reminder')) && S.eventId) S.tab = 'rsvp';
+        else if (kinds.has('dues')) S.tab = 'payments';
+        scheduleReplies(sent);
+      }
+    });
+  } catch (err) {
+    S.history.pop();
+    S.log.push({ kind: 'error', text: err.message });
+  } finally {
+    typing = false; save(); renderAll();
+  }
+}
+
+// ── simulated brothers ────────────────────────────────────────────────────
+const YES = ['YES', 'Yes', 'yes sir', "YES. I'll be there", 'Yes, count me in', 'Yes!'];
+const NO = ['NO', "No, can't make it", 'No, out of town that weekend', 'NO. Working that day'];
+const QUESTIONS = ['What time does it start?', 'Where is it again?', 'what time?'];
+const DUES_Q = ['How much are dues again?'];
+
+function classify(body) {
+  const b = body.trim();
+  if (/\?\s*$/.test(b)) return 'question';
+  if (/^(yes|y|yep|yeah|count me in)\b/i.test(b)) return 'yes';
+  if (/^(no|nope|can'?t)\b/i.test(b)) return 'no';
+  if (/\bpaid\b/i.test(b)) return 'paid';
+  return 'other';
+}
+
+function scheduleReplies(sent) {
+  const rsvp = shuffle(sent.filter((s) => (s.purpose === 'rsvp' || s.purpose === 'reminder') && s.eventId));
+  const askers = new Set(rsvp.slice(0, rsvp.length >= 10 ? 2 : rsvp.length >= 4 ? 1 : 0).map((s) => s.messageId));
+  for (const s of rsvp) {
+    if (askers.has(s.messageId)) { later(rand(3000, 8000), () => receive(s.brotherId, pick(QUESTIONS), s.eventId, s.purpose, true)); continue; }
+    const r = Math.random();
+    if (r < 0.62) later(rand(2000, 20000), () => receive(s.brotherId, pick(YES), s.eventId, s.purpose));
+    else if (r < 0.82) later(rand(2500, 20000), () => receive(s.brotherId, pick(NO), s.eventId, s.purpose));
+  }
+  const dues = shuffle(sent.filter((s) => s.purpose === 'dues'));
+  dues.forEach((s, k) => {
+    if (k === 0 && dues.length >= 4) later(rand(3000, 7000), () => receive(s.brotherId, pick(DUES_Q), undefined, 'dues', false));
+    else if (Math.random() < 0.45) later(rand(5000, 20000), () => receive(s.brotherId, 'Just paid. Thanks', undefined, 'dues'));
+  });
+  const info = sent.filter((s) => s.purpose === 'info');
+  if (info.length === 1 && !info[0].draftId) later(rand(4000, 7000), () => receive(info[0].brotherId, 'Got it, thanks.', info[0].eventId, 'info'));
+}
+
+function receive(brotherId, body, eventId, purpose, thenYes) {
+  enqueue(`New text from ${brother(brotherId)?.name || 'a brother'}`, async () => {
+    const b = brother(brotherId); if (!b) return;
+    const kind = classify(body);
+    const msg = { id: newId('m'), dir: 'in', brotherId, body, ts: Date.now(), purpose };
+    if (eventId && eventById(eventId)) msg.eventId = eventId;
+    if ((kind === 'yes' || kind === 'no') && msg.eventId) {
+      (S.state.rsvps[msg.eventId] ||= {})[brotherId] = kind; msg.rsvp = kind;
+      fresh.set(msg.eventId + ':' + brotherId, Date.now());
+    }
+    if (kind === 'paid' && b.dues === 'unpaid') {
+      b.dues = 'paid';
+      S.state.payments.push({ id: newId('p'), brotherId, kind: 'dues', amount: S.state.duesAmount, ts: Date.now(), via: 'Payment link' });
+    }
+    S.state.messages.push(msg); fresh.set(msg.id, Date.now());
+    save(); renderPanel(); renderTabs();
+    if (kind === 'question') {
+      busyLabel = `Auto-replying to ${b.name}…`; renderStatus();
+      try {
+        const data = await api({ mode: 'inbound', inbound: { brotherId, body, eventId: msg.eventId } });
+        S.state = data.state;
+        for (const s of data.sent || []) fresh.set(s.messageId, Date.now());
+        if (data.focusEventId && eventById(data.focusEventId) && S.tab !== 'rsvp') S.eventId = data.focusEventId;
+      } catch (err) { console.warn('auto-reply failed', err); }
+      save(); renderAll();
+      if (thenYes && Math.random() < 0.8) later(rand(4000, 7000), () => receive(brotherId, pick(YES), eventId, purpose));
+    }
+  });
+}
+
+// ── panel ─────────────────────────────────────────────────────────────────
+function renderTabs() {
+  const unseen = Math.max(0, S.state.messages.length - S.seen);
+  $('#tabs').innerHTML = TABS.map(([k, label]) => `<button role="tab" type="button" aria-selected="${S.tab === k}" data-tab="${k}">${label}${k === 'activity' && unseen && S.tab !== 'activity' ? `<span class="badge">${unseen}</span>` : ''}</button>`).join('');
+}
+
+function isFresh(key) { const t = fresh.get(key); return t && Date.now() - t < 4000; }
+
+function renderRsvp() {
+  const ups = upcomingEvents();
+  if (!ups.length) return '<p class="sub">No upcoming events. Ask the agent to add one.</p>';
+  if (!ups.find((e) => e.id === S.eventId)) S.eventId = ups[0].id;
+  const ev = eventById(S.eventId); const r = breakdown(ev.id);
+  const col = (cls, label, list) => `<div class="col ${cls}"><h4><span>${label}</span><b>${list.length}</b></h4><ul>${list.length ? list.map((b) => `<li class="${isFresh(ev.id + ':' + b.id) ? 'fresh' : ''}">${esc(b.name.replace('Brother ', ''))}</li>`).join('') : '<li class="none">No one yet</li>'}</ul></div>`;
+  return `<div class="evpick"><label class="sr" for="evSel">Event</label><select id="evSel">${ups.map((e) => `<option value="${e.id}" ${e.id === ev.id ? 'selected' : ''}>${esc(e.title)} · ${esc(fmtDate(e.date))}</option>`).join('')}</select></div>
+    <h3 class="sec">${esc(ev.title)}</h3>
+    <p class="sub">${esc(fmtDate(ev.date))}${ev.time ? ' at ' + esc(fmtTime(ev.time)) : ''} · ${esc(ev.location)} · ${ev.vis === 'public' ? 'Open to everyone' : 'Brothers only'}</p>
+    <div class="board">${col('yes', 'Yes', r.yes)}${col('no', 'No', r.no)}${col('wait', 'No reply', r.wait)}</div>
+    ${r.skip.length ? `<p class="skipnote">Can’t be texted (not opted in): ${r.skip.map((b) => esc(b.name)).join(', ')}</p>` : ''}`;
+}
+
+function renderRoster() {
+  const bs = S.state.brothers; const paid = bs.filter((b) => b.dues === 'paid').length; const opted = bs.filter((b) => b.optIn).length;
+  return `<h3 class="sec">Brothers roster</h3><p class="sub">${bs.length} brothers · ${opted} opted in to texts · ${paid} dues paid</p>
+  <div class="tablewrap"><table class="data"><thead><tr><th>Brother</th><th>Phone</th><th>Texts</th><th>Dues</th></tr></thead><tbody>
+  ${bs.map((b) => `<tr><td>${esc(b.name)}</td><td class="phone">${esc(b.phone)}</td><td>${b.optIn ? '<span class="pill yes">Opted in</span>' : '<span class="pill no">Not opted in</span>'}</td><td>${b.dues === 'paid' ? '<span class="pill yes">Paid</span>' : '<span class="pill">Unpaid</span>'}</td></tr>`).join('')}
+  </tbody></table></div>`;
+}
+
+function renderActivity() {
+  const items = []; const seenDraft = new Set();
+  for (let i = S.state.messages.length - 1; i >= 0 && items.length < 150; i--) {
+    const m = S.state.messages[i];
+    if (m.dir === 'out' && m.draftId) {
+      if (seenDraft.has(m.draftId)) continue; seenDraft.add(m.draftId);
+      const n = S.state.messages.filter((x) => x.draftId === m.draftId && x.dir === 'out').length;
+      const live = S.state.messages.some((x) => x.draftId === m.draftId && x.live);
+      items.push(`<li class="fi out ${isFresh(m.id) ? 'fresh' : ''}"><div class="fh"><strong>Group text → ${n} brothers</strong><span>${esc(fmtStamp(m.ts))}</span></div><div class="fb">${esc(m.body)}</div>${live ? '<div class="tags"><span class="pill yes">Also sent as a real test text</span></div>' : ''}</li>`);
+      continue;
+    }
+    const b = brother(m.brotherId); const name = esc(b ? b.name : 'Unknown');
+    if (m.dir === 'in') {
+      const tag = m.rsvp ? `<span class="pill ${m.rsvp}">RSVP recorded: ${m.rsvp === 'yes' ? 'Yes' : 'No'}</span>` : classify(m.body) === 'question' ? '<span class="pill">Question · agent answering</span>' : classify(m.body) === 'paid' ? '<span class="pill yes">Payment received</span>' : '';
+      items.push(`<li class="fi in ${isFresh(m.id) ? 'fresh' : ''}"><div class="fh"><strong>${name} → chapter</strong><span>${esc(fmtStamp(m.ts))}</span></div><div class="fb">${esc(m.body)}</div>${tag ? `<div class="tags">${tag}</div>` : ''}</li>`);
+    } else {
+      items.push(`<li class="fi ${m.auto ? 'auto' : 'out'} ${isFresh(m.id) ? 'fresh' : ''}"><div class="fh"><strong>${m.auto ? 'Agent auto-reply' : 'Text'} → ${name}</strong><span>${esc(fmtStamp(m.ts))}</span></div><div class="fb">${esc(m.body)}</div>${m.live ? '<div class="tags"><span class="pill yes">Also sent as a real test text</span></div>' : ''}</li>`);
+    }
+  }
+  return `<h3 class="sec">Activity</h3><p class="sub">Every text sent and received, newest first.</p><ul class="feed">${items.join('') || '<li class="sub">No texts yet.</li>'}</ul>`;
+}
+
+function renderPayments() {
+  const st = S.state; const paid = st.brothers.filter((b) => b.dues === 'paid'); const unpaid = st.brothers.filter((b) => b.dues === 'unpaid');
+  const sum = (k) => st.payments.filter((p) => p.kind === k).reduce((a, p) => a + p.amount, 0);
+  const modeNote = CONFIG.stripeMode === 'stripe_test' ? 'New links are real Stripe test-mode Payment Links (use card 4242 4242 4242 4242). Mark paid below after a test payment.' : 'Payment links are simulated in this demo. Use Mark paid to record a payment.';
+  return `<h3 class="sec">Payments</h3><p class="sub">${modeNote}</p>
+  <div class="tiles">
+    <div class="tile"><div class="k">Dues collected</div><div class="v">${money(sum('dues'))}</div><div class="s">${paid.length} of ${st.brothers.length} paid · ${money(st.duesAmount)} each</div></div>
+    <div class="tile"><div class="k">Dues outstanding</div><div class="v">${money(unpaid.length * st.duesAmount)}</div><div class="s">${unpaid.length} brothers</div></div>
+    <div class="tile"><div class="k">Donations</div><div class="v">${money(sum('donation'))}</div><div class="s">${st.payments.filter((p) => p.kind === 'donation').length} gifts</div></div>
+  </div>
+  ${st.links.length ? `<h4 class="small">Payment links</h4><ul class="links">${st.links.map((l) => `<li><span>${l.kind === 'dues' ? 'Dues' : 'Donation'} · ${l.amount != null ? money(l.amount) : 'any amount'} · <span class="pill ${l.mode === 'stripe_test' ? 'yes' : ''}">${l.mode === 'stripe_test' ? 'Stripe test' : 'Simulated'}</span></span>${l.mode === 'stripe_test' ? `<a href="${esc(l.url)}" target="_blank" rel="noopener"><code>${esc(l.url)}</code></a>` : `<code>${esc(l.url)}</code>`}</li>`).join('')}</ul>` : ''}
+  <h4 class="small">Unpaid dues (${unpaid.length})</h4>
+  <div class="tablewrap"><table class="data"><tbody>${unpaid.length ? unpaid.map((b) => `<tr><td>${esc(b.name)}${b.optIn ? '' : ' <span class="pill no">Not opted in</span>'}</td><td style="text-align:right"><button class="btn btn-ghost btn-sm" data-act="markPaid" data-id="${b.id}">Mark paid</button></td></tr>`).join('') : '<tr><td class="sub">Everyone is paid up.</td></tr>'}</tbody></table></div>
+  <h4 class="small">Recent payments</h4>
+  <div class="tablewrap"><table class="data"><thead><tr><th>From</th><th>Type</th><th>Amount</th><th>When</th></tr></thead><tbody>${st.payments.slice().sort((a, b) => b.ts - a.ts).slice(0, 12).map((p) => `<tr><td>${esc(brother(p.brotherId)?.name || 'Guest')}</td><td>${p.kind === 'dues' ? 'Dues' : 'Donation'}</td><td>${money(p.amount)}</td><td class="phone">${esc(fmtStamp(p.ts))}</td></tr>`).join('')}</tbody></table></div>`;
+}
+
+function renderPanel() {
+  const body = $('#pbody');
+  if (S.tab === 'activity') S.seen = S.state.messages.length;
+  body.innerHTML = S.tab === 'roster' ? renderRoster() : S.tab === 'activity' ? renderActivity() : S.tab === 'payments' ? renderPayments() : renderRsvp();
+}
+
+function renderAll() { renderLog(); renderTabs(); renderPanel(); renderStatus(); }
+// Keep highlights and relative stamps current while replies stream in.
+setInterval(() => { if ([...fresh.values()].some((t) => Date.now() - t < 5000)) { renderPanel(); } }, 1500);
+
+// ── live test text toggle ─────────────────────────────────────────────────
+function setLive(on) {
+  liveArmed = !!on; $('#liveToggle').checked = liveArmed; $('#liveWrap').classList.toggle('armed', liveArmed);
+  $('#liveLabel').textContent = liveArmed ? `Next text also goes to ${CONFIG.liveTextNumbers.join(', ')}` : 'Send a real test text';
+}
+
+// ── events ────────────────────────────────────────────────────────────────
+document.addEventListener('click', (ev) => {
+  const chip = ev.target.closest('[data-chip]'); if (chip) { sendChat(CHIPS[Number(chip.dataset.chip)]); return; }
+  const tab = ev.target.closest('[data-tab]'); if (tab) { S.tab = tab.dataset.tab; save(); renderTabs(); renderPanel(); return; }
+  const a = ev.target.closest('[data-act]'); if (!a) return;
+  const id = a.dataset.id;
+  if (a.dataset.act === 'approve') { editingDraft = null; sendChat('Approved. Send it.', { approveDraftId: id }); }
+  else if (a.dataset.act === 'edit') { editingDraft = id; renderLog(); document.querySelector(`[data-edit="${id}"]`)?.focus(); }
+  else if (a.dataset.act === 'cancelEdit') { editingDraft = null; renderLog(); }
+  else if (a.dataset.act === 'saveEdit') {
+    const ta = document.querySelector(`[data-edit="${id}"]`); const p = smsProblem(ta.value);
+    if (p) { toast(p); return; }
+    const d = S.state.drafts.find((x) => x.id === id);
+    if (d && d.status === 'pending') { d.body = ta.value.trim(); editingDraft = null; save(); renderLog(); toast('Draft updated. Approve to send.'); }
+  } else if (a.dataset.act === 'markPaid') {
+    enqueue('Recording payment…', async () => {
+      const b = brother(id); if (!b || b.dues === 'paid') return;
+      b.dues = 'paid'; S.state.payments.push({ id: newId('p'), brotherId: id, kind: 'dues', amount: S.state.duesAmount, ts: Date.now(), via: 'Marked paid' });
+      save(); renderPanel(); toast(`${b.name} marked paid.`);
+    });
+  }
+});
+document.addEventListener('input', (ev) => { if (ev.target.matches('[data-edit]')) updateCount(ev.target.dataset.edit); if (ev.target.id === 'input') autoGrow(ev.target); });
+document.addEventListener('change', (ev) => { if (ev.target.id === 'evSel') { S.eventId = ev.target.value; save(); renderPanel(); } if (ev.target.id === 'liveToggle') setLive(ev.target.checked); });
+function autoGrow(t) { t.style.height = 'auto'; t.style.height = Math.min(t.scrollHeight, 140) + 'px'; }
+$('#composer').addEventListener('submit', (ev) => { ev.preventDefault(); const t = $('#input'); const v = t.value; t.value = ''; autoGrow(t); sendChat(v); });
+$('#input').addEventListener('keydown', (ev) => { if (ev.key === 'Enter' && !ev.shiftKey) { ev.preventDefault(); $('#composer').requestSubmit(); } });
+$('#resetBtn').addEventListener('click', () => {
+  timers.forEach(clearTimeout); timers.clear(); fresh.clear(); editingDraft = null;
+  chain.then(() => { S = seed(); S.seen = S.state.messages.length; save(); setLive(false); renderAll(); toast('Demo reset to sample data.'); });
+});
+$('#signOut').addEventListener('click', async () => { try { await fetch('/api/kappa-agent/login', { method: 'DELETE' }); } catch (e) {} location.href = '/kappa'; });
+
+// ── boot ──────────────────────────────────────────────────────────────────
+renderChips(); renderAll();
+fetch('/api/kappa-agent/config').then((r) => (r.ok ? r.json() : null)).then((cfg) => {
+  if (!cfg) return; CONFIG = cfg;
+  $('#liveWrap').hidden = !cfg.liveTextAvailable; setLive(false);
+  if (!cfg.agentReady) { const b = $('#setupBanner'); b.hidden = false; b.textContent = 'The agent isn’t connected yet: ANTHROPIC_API_KEY is missing on the server.'; }
+  renderPanel();
+}).catch(() => {});
+})();
+</script>
+</body>
+</html>

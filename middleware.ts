@@ -1,6 +1,7 @@
 // (c) 2026 GoElev8.ai | Aaron Bryant. All rights reserved.
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
+import { SESSION_COOKIE, verifySessionValue } from './lib/kappa-agent/session';
 
 const PUBLIC_ROUTES = new Set([
   '/',
@@ -42,6 +43,15 @@ function isPublicRoute(pathname: string): boolean {
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // /kappa/agent is gated by the officer demo password (see /api/kappa-agent/login).
+  // Without a valid session cookie, serve the sign-in page in its place.
+  if (pathname === '/kappa/agent' || pathname.startsWith('/kappa/agent/')) {
+    if (await verifySessionValue(request.cookies.get(SESSION_COOKIE)?.value)) return NextResponse.next();
+    const res = NextResponse.rewrite(new URL('/kappa/login.html', request.url));
+    res.headers.set('Cache-Control', 'no-store');
+    return res;
+  }
 
   // Skip auth check entirely for public routes
   if (isPublicRoute(pathname)) {

@@ -73,6 +73,11 @@ const nextConfig = {
           source: '/kappa',
           destination: '/kappa/index.html',
         },
+        // goelev8.ai/kappa/agent → Kappa Chapter Agent demo (gated in middleware.ts).
+        {
+          source: '/kappa/agent',
+          destination: '/kappa/agent/index.html',
+        },
         // Mother's Day uplift landing pages — one per profile.
         { source: '/courtney', destination: '/courtney.html' },
         { source: '/ashlen',   destination: '/ashlen.html' },
