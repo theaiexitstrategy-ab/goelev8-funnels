@@ -174,6 +174,8 @@ export async function POST(req: NextRequest) {
   ];
 
   let reply = '';
+  // Tool names and outcomes only (no model text), so the demo can be debugged from the browser.
+  const trace: string[] = [];
   try {
     for (let round = 0; round < MAX_TOOL_ROUNDS; round++) {
       const response = await client.messages.create({
@@ -206,6 +208,7 @@ export async function POST(req: NextRequest) {
       const results: Anthropic.ToolResultBlockParam[] = [];
       for (const use of toolUses) {
         const out = await runTool(ctx, use.name, use.input);
+        trace.push(`${use.name}(${JSON.stringify(use.input).slice(0, 120)}) -> ${out.isError ? 'ERROR ' : ''}${out.content.slice(0, 160)}`);
         results.push({ type: 'tool_result', tool_use_id: use.id, content: out.content, is_error: out.isError || undefined });
       }
       messages.push({ role: 'user', content: results });
@@ -247,5 +250,6 @@ export async function POST(req: NextRequest) {
     sent: ctx.sent,
     focusEventId: ctx.focusEventId,
     live,
+    trace,
   });
 }
