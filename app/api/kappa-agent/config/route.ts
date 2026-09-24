@@ -5,7 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { SESSION_COOKIE, verifySessionValue } from '@/lib/kappa-agent/session';
-import { liveTestNumbers, liveTextAvailable, maskPhone, stripeTestKey } from '@/lib/kappa-agent/integrations';
+import { liveTestNumbers, liveTextAvailable, maskPhone, realBrotherPhones, stripeTestKey } from '@/lib/kappa-agent/integrations';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -20,5 +20,7 @@ export async function GET(req: NextRequest) {
     stripeMode: stripeTestKey() ? 'stripe_test' : 'simulated',
     liveTextAvailable: live,
     liveTextNumbers: live ? liveTestNumbers().map(maskPhone) : [],
+    // Brother id -> masked real phone, for roster entries that text real people.
+    realBrothers: realBrotherPhones(),
   });
 }

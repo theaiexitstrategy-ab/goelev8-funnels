@@ -27,4 +27,5 @@ export const LIMITS = {
   inbound: { max: 30, windowMs: 10 * 60 * 1000 },
   login: { max: 10, windowMs: 10 * 60 * 1000 },
   liveText: { max: 5, windowMs: 60 * 60 * 1000 },
+  realText: { max: 10, windowMs: 60 * 60 * 1000 },
 };

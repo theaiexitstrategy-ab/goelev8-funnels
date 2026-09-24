@@ -12,7 +12,7 @@ import { SESSION_COOKIE, verifySessionValue } from '@/lib/kappa-agent/session';
 import { LIMITS, takeToken } from '@/lib/kappa-agent/rate-limit';
 import { StateSchema, describeDate, describeTime, type DemoState } from '@/lib/kappa-agent/state';
 import { INBOUND_TOOL_NAMES, TOOLS, runTool, type ToolContext } from '@/lib/kappa-agent/tools';
-import { liveTextAvailable, sendLiveTestText, stripeTestKey } from '@/lib/kappa-agent/integrations';
+import { liveTextAvailable, maskPhone, realPhoneFor, sendLiveTestText, sendRealText, stripeTestKey } from '@/lib/kappa-agent/integrations';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -73,6 +73,9 @@ function dynamicContext(state: DemoState, focusEventId: string | undefined): str
   if (!upcoming.length) lines.push('  - none');
   const focus = focusEventId && state.events.find((e) => e.id === focusEventId);
   if (focus) lines.push(`- Event most recently discussed: ${focus.id} (${focus.title}).`);
+  if (state.brothers.some((b) => b.id === 'b25')) {
+    lines.push('- Brother Aaron Bryant (b25) is the admin you are talking to. When the admin says "me" or "myself", text b25.');
+  }
   const open = state.drafts.filter((d) => d.status === 'pending');
   for (const d of open) lines.push(`- Group-text draft ${d.id} is waiting for the admin's approval (${d.recipientIds.length} brothers).`);
   return lines.join('\n');
@@ -143,14 +146,33 @@ export async function POST(req: NextRequest) {
   // Tool names and outcomes only (no model text), so the demo can be debugged from the browser.
   const trace: string[] = [];
 
-  // Shared ending: optional live test text, bounded state, response.
+  // Shared ending: real texts, optional live test text, bounded state, response.
   const finish = async (reply: string) => {
+    // Individual texts to the brothers who stand for real people go to their
+    // real phones. Group texts stay simulated for them unless the toggle is on.
+    const realTexts: { brotherId: string; name: string; phone: string; ok: boolean }[] = [];
+    const textedNumbers = new Set<string>();
+    if (mode === 'chat') {
+      for (const s of ctx.sent) {
+        const to = s.draftId ? null : realPhoneFor(s.brotherId);
+        const msg = state.messages.find((m) => m.id === s.messageId);
+        if (!to || !msg) continue;
+        const name = state.brothers.find((b) => b.id === s.brotherId)?.name ?? 'Brother';
+        if (!takeToken(`real:${sid}`, LIMITS.realText.max, LIMITS.realText.windowMs).ok) {
+          realTexts.push({ brotherId: s.brotherId, name, phone: maskPhone(to), ok: false });
+          continue;
+        }
+        const ok = await sendRealText(to, msg.body);
+        if (ok) { msg.live = true; textedNumbers.add(to); }
+        realTexts.push({ brotherId: s.brotherId, name, phone: maskPhone(to), ok });
+      }
+    }
     let live: { sent: number; failed: number } | null = null;
     if (mode === 'chat' && parsed.liveText && ctx.sent.length && liveTextAvailable()) {
       if (takeToken(`live:${sid}`, LIMITS.liveText.max, LIMITS.liveText.windowMs).ok) {
         const first = state.messages.find((m) => m.id === ctx.sent[0].messageId);
         if (first) {
-          live = await sendLiveTestText(first.body);
+          live = await sendLiveTestText(first.body, textedNumbers);
           if (live.sent) first.live = true;
         }
       } else {
@@ -165,6 +187,7 @@ export async function POST(req: NextRequest) {
       sent: ctx.sent,
       focusEventId: ctx.focusEventId,
       live,
+      realTexts,
       trace,
     });
   };

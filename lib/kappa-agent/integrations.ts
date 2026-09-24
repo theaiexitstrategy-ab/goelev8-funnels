@@ -79,33 +79,68 @@ export function maskPhone(e164: string): string {
   return '•••-' + e164.slice(-4);
 }
 
-/** Sends one message to each allow-listed test number. Returns how many went out. */
-export async function sendLiveTestText(body: string): Promise<{ sent: number; failed: number }> {
-  if (!liveTextAvailable()) return { sent: 0, failed: 0 };
+// ── Demo brothers with real phones ────────────────────────────────────────
+// Two roster entries stand for real people so the admin can text them live.
+// Their numbers come only from env vars — never the repo or the browser —
+// and must already be on the live-test allowlist.
+const REAL_BROTHERS: Record<string, () => string | null | undefined> = {
+  // Brother Aaron Bryant: the master admin's own cell.
+  b25: () => normalizePhone(process.env.AARON_PERSONAL_CELL || ''),
+  // Brother Anthony: the KAPPA_DEMO_TEST_NUMBERS entry ending in 4892.
+  b26: () => liveTestNumbers().find((n) => n.endsWith('4892')),
+};
+
+/** The real phone for a demo brother, or null if that brother is simulated or Twilio isn't set up. */
+export function realPhoneFor(brotherId: string): string | null {
+  const n = REAL_BROTHERS[brotherId]?.() || null;
+  const twilioReady = !!process.env.TWILIO_ACCOUNT_SID && !!process.env.TWILIO_AUTH_TOKEN && !!twilioFrom();
+  return n && twilioReady && liveTestNumbers().includes(n) ? n : null;
+}
+
+/** Masked real phones by brother id, for the page to label them. */
+export function realBrotherPhones(): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const id of Object.keys(REAL_BROTHERS)) {
+    const n = realPhoneFor(id);
+    if (n) out[id] = maskPhone(n);
+  }
+  return out;
+}
+
+async function sendSms(to: string, body: string): Promise<boolean> {
   const sid = process.env.TWILIO_ACCOUNT_SID!;
   const token = process.env.TWILIO_AUTH_TOKEN!;
-  const from = twilioFrom();
+  try {
+    const res = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`, {
+      method: 'POST',
+      headers: {
+        Authorization: 'Basic ' + Buffer.from(`${sid}:${token}`).toString('base64'),
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: new URLSearchParams({ To: to, From: twilioFrom(), Body: body }),
+    });
+    if (res.ok) return true;
+    console.error('[kappa-agent] Twilio error', res.status, await res.text());
+  } catch (err) {
+    console.error('[kappa-agent] Twilio fetch error', err);
+  }
+  return false;
+}
+
+/** Sends one text to a real phone that is on the allowlist. */
+export async function sendRealText(to: string, body: string): Promise<boolean> {
+  return liveTestNumbers().includes(to) ? sendSms(to, body) : false;
+}
+
+/** Sends one message to each allow-listed test number, except any in `skip`. */
+export async function sendLiveTestText(body: string, skip: Set<string> = new Set()): Promise<{ sent: number; failed: number }> {
+  if (!liveTextAvailable()) return { sent: 0, failed: 0 };
   let sent = 0;
   let failed = 0;
   for (const to of liveTestNumbers()) {
-    try {
-      const res = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`, {
-        method: 'POST',
-        headers: {
-          Authorization: 'Basic ' + Buffer.from(`${sid}:${token}`).toString('base64'),
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({ To: to, From: from, Body: body }),
-      });
-      if (res.ok) sent++;
-      else {
-        failed++;
-        console.error('[kappa-agent] Twilio error', res.status, await res.text());
-      }
-    } catch (err) {
-      failed++;
-      console.error('[kappa-agent] Twilio fetch error', err);
-    }
+    if (skip.has(to)) continue;
+    if (await sendSms(to, body)) sent++;
+    else failed++;
   }
   return { sent, failed };
 }

@@ -267,6 +267,13 @@ const SURNAMES = [
 ];
 const NOT_OPTED_IN = new Set(['b5', 'b11']);
 const UNPAID = new Set(['b3', 'b5', 'b8', 'b11', 'b14', 'b17', 'b19', 'b22', 'b24']);
+// Roster entries for real people. Their phones live on the server; texting
+// one of them individually sends a real SMS, and they never auto-reply.
+const REAL_BROTHERS = [
+  { id: 'b25', name: 'Brother Aaron Bryant', phone: 'Real phone', optIn: true, dues: 'paid' },
+  { id: 'b26', name: 'Brother Anthony', phone: 'Real phone', optIn: true, dues: 'paid' },
+];
+const REAL_IDS = new Set(REAL_BROTHERS.map((b) => b.id));
 
 function nextWeekday(from, dow, minDays) {
   const d = new Date(from); d.setDate(d.getDate() + minDays);
@@ -279,7 +286,7 @@ function seed() {
   const brothers = SURNAMES.map(([i, s], n) => ({
     id: 'b' + (n + 1), name: `Brother ${i} ${s}`, phone: `(580) 555-01${pad(n + 10)}`,
     optIn: !NOT_OPTED_IN.has('b' + (n + 1)), dues: UNPAID.has('b' + (n + 1)) ? 'unpaid' : 'paid',
-  }));
+  })).concat(REAL_BROTHERS.map((b) => ({ ...b })));
   const events = [
     { id: 'e1', title: 'Chapter business meeting', date: nextWeekday(today, 2, 3), time: '19:00', location: 'Chapter meeting hall', desc: 'Monthly business meeting. Agenda in the brothers portal.', vis: 'members' },
     { id: 'e2', title: 'Scholarship info night', date: nextWeekday(today, 4, 8), time: '18:30', location: 'Lawton Public Library', desc: 'Local seniors and parents learn how to apply for chapter scholarships.', vis: 'public' },
@@ -319,6 +326,7 @@ let S;
 try { S = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { S = null; }
 if (!S || !S.state || S.state.version !== 1) S = seed();
 S.state.today = isoLocal(new Date());
+for (const b of REAL_BROTHERS) if (!S.state.brothers.some((x) => x.id === b.id)) S.state.brothers.push({ ...b });
 if (typeof S.seen !== 'number') S.seen = S.state.messages.length;
 function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
 
@@ -457,6 +465,9 @@ async function sendChat(text, opts = {}) {
         else S.log.push({ kind: 'note', text: 'The real test text didn’t go out (limit reached or Twilio error). Simulated texts still sent.' });
         setLive(false);
       }
+      for (const r of data.realTexts || []) {
+        S.log.push({ kind: 'note', text: r.ok ? `Real text sent to ${r.name} (${r.phone}).` : `The real text to ${r.name} didn’t go out (limit reached or Twilio error).` });
+      }
       const sent = data.sent || [];
       if (sent.length) {
         const kinds = new Set(sent.map((s) => s.purpose));
@@ -489,6 +500,7 @@ function classify(body) {
 }
 
 function scheduleReplies(sent) {
+  sent = sent.filter((s) => !REAL_IDS.has(s.brotherId));
   const rsvp = shuffle(sent.filter((s) => (s.purpose === 'rsvp' || s.purpose === 'reminder') && s.eventId));
   const askers = new Set(rsvp.slice(0, rsvp.length >= 10 ? 2 : rsvp.length >= 4 ? 1 : 0).map((s) => s.messageId));
   for (const s of rsvp) {
@@ -561,7 +573,7 @@ function renderRoster() {
   const bs = S.state.brothers; const paid = bs.filter((b) => b.dues === 'paid').length; const opted = bs.filter((b) => b.optIn).length;
   return `<h3 class="sec">Brothers roster</h3><p class="sub">${bs.length} brothers · ${opted} opted in to texts · ${paid} dues paid</p>
   <div class="tablewrap"><table class="data"><thead><tr><th>Brother</th><th>Phone</th><th>Texts</th><th>Dues</th></tr></thead><tbody>
-  ${bs.map((b) => `<tr><td>${esc(b.name)}</td><td class="phone">${esc(b.phone)}</td><td>${b.optIn ? '<span class="pill yes">Opted in</span>' : '<span class="pill no">Not opted in</span>'}</td><td>${b.dues === 'paid' ? '<span class="pill yes">Paid</span>' : '<span class="pill">Unpaid</span>'}</td></tr>`).join('')}
+  ${bs.map((b) => `<tr><td>${esc(b.name)}${CONFIG.realBrothers?.[b.id] ? ' <span class="pill yes">Real phone</span>' : ''}</td><td class="phone">${esc(CONFIG.realBrothers?.[b.id] || b.phone)}</td><td>${b.optIn ? '<span class="pill yes">Opted in</span>' : '<span class="pill no">Not opted in</span>'}</td><td>${b.dues === 'paid' ? '<span class="pill yes">Paid</span>' : '<span class="pill">Unpaid</span>'}</td></tr>`).join('')}
   </tbody></table></div>`;
 }
 
@@ -573,7 +585,7 @@ function renderActivity() {
       if (seenDraft.has(m.draftId)) continue; seenDraft.add(m.draftId);
       const n = S.state.messages.filter((x) => x.draftId === m.draftId && x.dir === 'out').length;
       const live = S.state.messages.some((x) => x.draftId === m.draftId && x.live);
-      items.push(`<li class="fi out ${isFresh(m.id) ? 'fresh' : ''}"><div class="fh"><strong>Group text → ${n} brothers</strong><span>${esc(fmtStamp(m.ts))}</span></div><div class="fb">${esc(m.body)}</div>${live ? '<div class="tags"><span class="pill yes">Also sent as a real test text</span></div>' : ''}</li>`);
+      items.push(`<li class="fi out ${isFresh(m.id) ? 'fresh' : ''}"><div class="fh"><strong>Group text → ${n} brothers</strong><span>${esc(fmtStamp(m.ts))}</span></div><div class="fb">${esc(m.body)}</div>${live ? '<div class="tags"><span class="pill yes">Real text sent</span></div>' : ''}</li>`);
       continue;
     }
     const b = brother(m.brotherId); const name = esc(b ? b.name : 'Unknown');
@@ -581,7 +593,7 @@ function renderActivity() {
       const tag = m.rsvp ? `<span class="pill ${m.rsvp}">RSVP recorded: ${m.rsvp === 'yes' ? 'Yes' : 'No'}</span>` : classify(m.body) === 'question' ? '<span class="pill">Question · agent answering</span>' : classify(m.body) === 'paid' ? '<span class="pill yes">Payment received</span>' : '';
       items.push(`<li class="fi in ${isFresh(m.id) ? 'fresh' : ''}"><div class="fh"><strong>${name} → chapter</strong><span>${esc(fmtStamp(m.ts))}</span></div><div class="fb">${esc(m.body)}</div>${tag ? `<div class="tags">${tag}</div>` : ''}</li>`);
     } else {
-      items.push(`<li class="fi ${m.auto ? 'auto' : 'out'} ${isFresh(m.id) ? 'fresh' : ''}"><div class="fh"><strong>${m.auto ? 'Agent auto-reply' : 'Text'} → ${name}</strong><span>${esc(fmtStamp(m.ts))}</span></div><div class="fb">${esc(m.body)}</div>${m.live ? '<div class="tags"><span class="pill yes">Also sent as a real test text</span></div>' : ''}</li>`);
+      items.push(`<li class="fi ${m.auto ? 'auto' : 'out'} ${isFresh(m.id) ? 'fresh' : ''}"><div class="fh"><strong>${m.auto ? 'Agent auto-reply' : 'Text'} → ${name}</strong><span>${esc(fmtStamp(m.ts))}</span></div><div class="fb">${esc(m.body)}</div>${m.live ? '<div class="tags"><span class="pill yes">Real text sent</span></div>' : ''}</li>`);
     }
   }
   return `<h3 class="sec">Activity</h3><p class="sub">Every text sent and received, newest first.</p><ul class="feed">${items.join('') || '<li class="sub">No texts yet.</li>'}</ul>`;
