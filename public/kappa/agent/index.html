@@ -445,7 +445,7 @@ async function sendChat(text, opts = {}) {
   typing = true; renderLog(); renderStatus(); save();
   try {
     await enqueue('Agent is working…', async () => {
-      const data = await api({ mode: 'chat', history: S.history, approveDraftId: opts.approveDraftId, liveText: liveArmed || undefined });
+      const data = await api({ mode: 'chat', history: S.history, approveDraftId: opts.approveDraftId, focusEventId: S.eventId, liveText: liveArmed || undefined });
       S.state = data.state;
       const reply = (data.reply || 'Done.').slice(0, 2000);
       S.history.push({ role: 'assistant', content: reply });

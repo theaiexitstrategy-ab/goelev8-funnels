@@ -362,7 +362,13 @@ const EXECUTORS: Record<string, Exec> = {
     }
     const problem = checkSms(draft.body);
     if (problem) throw new ToolError(problem);
-    const recipients = draft.recipientIds.map((i) => ctx.state.brothers.find((b) => b.id === i)).filter((b): b is Brother => !!b && b.optIn);
+    const answered = draft.eventId ? ctx.state.rsvps[draft.eventId] ?? {} : {};
+    const recipients = draft.recipientIds
+      .map((i) => ctx.state.brothers.find((b) => b.id === i))
+      .filter((b): b is Brother => !!b && b.optIn)
+      // A no-reply follow-up skips anyone who answered after it was drafted.
+      .filter((b) => draft.audience !== 'no_reply' || !answered[b.id]);
+    if (!recipients.length) throw new ToolError('Everyone on this draft has already replied, so there is no one left to text.');
     for (const b of recipients) pushOutbound(ctx, b, draft.body, { eventId: draft.eventId, purpose: draft.purpose, draftId: draft.id });
     draft.status = 'sent';
     if (draft.eventId) ctx.focusEventId = draft.eventId;

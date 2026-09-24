@@ -30,6 +30,7 @@ const BodySchema = z.object({
     .default([]),
   state: StateSchema,
   approveDraftId: z.string().max(40).optional(),
+  focusEventId: z.string().max(40).optional(),
   liveText: z.boolean().optional(),
   inbound: z
     .object({ brotherId: z.string().max(40), body: z.string().min(1).max(300), eventId: z.string().max(40).optional() })
@@ -38,17 +39,18 @@ const BodySchema = z.object({
 
 const SYSTEM_RULES = `You are the Chapter Agent for the Lawton Chapter of Kappa Alpha Psi Fraternity, Inc. You work for the chapter's master admin, who chats with you here. You keep chapter events up to date, text brothers individually or as a group, track RSVPs, follow up with brothers who haven't replied, collect dues and donations, and report exactly who can and can't attend.
 
-Everything you know about the chapter comes from your tools. Never invent brothers, events, RSVPs, payments, or links; if a tool didn't return it, it doesn't exist. Look things up instead of guessing.
+Everything you know about the chapter comes from your tools and the chapter context below. Never invent brothers, events, RSVPs, payments, links, or ids; use only ids that appear in tool results or the context. Look things up instead of guessing.
 
 How to answer the admin:
 - Short and specific. Lead with the answer, then names and counts (for example "12 yes, 3 no, 7 no reply"). Use a short bullet list when you name more than three people. No preamble, no sign-off.
 - Plain text with simple "- " bullets. You may bold a key number with **double asterisks**. No headings or tables.
 
 Texting rules:
-- Group texts (more than one brother): always call draft_group_text first, then stop and ask the admin to approve. The admin sees the draft as a card with Approve and Edit buttons, so give a one- or two-line summary (who it goes to, who was skipped and why) instead of repeating the text. Never call send_group_text in the same turn you drafted; only send a draft the admin has approved.
+- Group texts (more than one brother): always call draft_group_text first, then stop and ask the admin to approve. The admin sees the draft as a card with Approve and Edit buttons, so give a one- or two-line summary (who it goes to, who was skipped and why) instead of repeating the text. Never call send_group_text in the same turn you drafted; approved drafts are sent for you when the admin presses Approve.
 - A text to one brother the admin names can go out right away with send_individual_text.
 - Every SMS starts with "Kappa Lawton:" and is under 160 characters in total, including any link. Write like a chapter officer: plain, warm, direct. No emoji or hashtags.
 - RSVP requests ask brothers to reply YES or NO and include the date, time, and place.
+- When a text mentions an event, use that event's real day and date from the data. Never say "tonight" or "tomorrow" unless it's true.
 - Brothers who haven't opted in to texts can't be texted. The tools skip them automatically; always tell the admin who was skipped.
 
 Other rules:
@@ -56,25 +58,38 @@ Other rules:
 - Resolve relative dates ("Saturday", "next week") against today's date below. If the admin names a weekday without a date, use the soonest upcoming event on that day; if none, the event you were just discussing.
 - You can't issue refunds, change passwords, or change the dues amount. For those, or anything you can't answer from the data, say you'll pass it to the admin.`;
 
-function dynamicContext(state: DemoState, approvedNow: string | null): string {
+// The browser only keeps text history, so each request restates the ids the
+// model needs (events, the event last discussed, open drafts).
+function dynamicContext(state: DemoState, focusEventId: string | undefined): string {
   const lines = [
-    `Today is ${describeDate(state.today)} (${state.today}).`,
-    `Chapter dues: $${state.duesAmount} per brother.`,
-    `Payment links: ${stripeTestKey() ? 'real Stripe test-mode links' : 'simulated demo links'}.`,
+    'Chapter context:',
+    `- Today is ${describeDate(state.today)} (${state.today}).`,
+    `- Chapter dues: $${state.duesAmount} per brother.`,
+    `- Payment links: ${stripeTestKey() ? 'real Stripe test-mode links' : 'simulated demo links'}.`,
+    '- Upcoming events:',
   ];
-  const open = state.drafts.filter((d) => d.status === 'pending' || d.status === 'approved');
-  if (open.length) {
-    for (const d of open) {
-      lines.push(`Group-text draft ${d.id} (${d.status}) to ${d.recipientIds.length} brothers: "${d.body}"`);
-    }
-  } else {
-    lines.push('No group-text drafts are waiting.');
-  }
-  if (approvedNow) lines.push(`The admin just approved draft ${approvedNow}. Send it now with send_group_text, then confirm in one line.`);
+  const upcoming = state.events.filter((e) => e.date >= state.today).sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+  for (const e of upcoming) lines.push(`  - ${e.id}: ${e.title}, ${describeDate(e.date)}${e.time ? ' at ' + describeTime(e.time) : ''}, ${e.location}`);
+  if (!upcoming.length) lines.push('  - none');
+  const focus = focusEventId && state.events.find((e) => e.id === focusEventId);
+  if (focus) lines.push(`- Event most recently discussed: ${focus.id} (${focus.title}).`);
+  const open = state.drafts.filter((d) => d.status === 'pending');
+  for (const d of open) lines.push(`- Group-text draft ${d.id} is waiting for the admin's approval (${d.recipientIds.length} brothers).`);
   return lines.join('\n');
 }
 
-const AFFIRMATIVE = /^\s*(yes|yep|yeah|approve[d]?|send( it)?|go ahead|looks good|lgtm|ok(ay)?|do it)\b/i;
+// A short, unambiguous "yes, send it" typed instead of pressing Approve.
+const AFFIRMATIVE = /^\s*(yes|yep|yeah|approve[d]?|send( it)?|go ahead|looks good|lgtm|do it)\b[^?]{0,25}$/i;
+
+function sentConfirmation(result: { sent_to?: number; skipped_not_opted_in?: string[] }, purpose: string): string {
+  const n = result.sent_to ?? 0;
+  const skipped = result.skipped_not_opted_in ?? [];
+  let text = `Sent to **${n}** brother${n === 1 ? '' : 's'}.`;
+  if (skipped.length) text += ` Skipped ${skipped.join(' and ')} (not opted in to texts).`;
+  if (purpose === 'rsvp' || purpose === 'reminder') text += ' Replies will fill in the RSVP board as they arrive.';
+  else if (purpose === 'dues') text += ' Payments will show on the Payments tab as they come in.';
+  return text;
+}
 
 function inboundPrompt(state: DemoState, inbound: NonNullable<z.infer<typeof BodySchema>['inbound']>): string | null {
   const b = state.brothers.find((x) => x.id === inbound.brotherId);
@@ -125,8 +140,38 @@ export async function POST(req: NextRequest) {
   const state = parsed.state;
   const ctx: ToolContext = { state, mode, sent: [], newDraftIds: [] };
 
-  // ── approval: only the admin's own action can move a draft to "approved" ──
-  let approvedNow: string | null = null;
+  // Tool names and outcomes only (no model text), so the demo can be debugged from the browser.
+  const trace: string[] = [];
+
+  // Shared ending: optional live test text, bounded state, response.
+  const finish = async (reply: string) => {
+    let live: { sent: number; failed: number } | null = null;
+    if (mode === 'chat' && parsed.liveText && ctx.sent.length && liveTextAvailable()) {
+      if (takeToken(`live:${sid}`, LIMITS.liveText.max, LIMITS.liveText.windowMs).ok) {
+        const first = state.messages.find((m) => m.id === ctx.sent[0].messageId);
+        if (first) {
+          live = await sendLiveTestText(first.body);
+          if (live.sent) first.live = true;
+        }
+      } else {
+        live = { sent: 0, failed: 0 };
+      }
+    }
+    if (state.messages.length > 1200) state.messages.splice(0, state.messages.length - 1200);
+    return NextResponse.json({
+      reply: reply || 'Done.',
+      state,
+      newDraftIds: ctx.newDraftIds,
+      sent: ctx.sent,
+      focusEventId: ctx.focusEventId,
+      live,
+      trace,
+    });
+  };
+
+  // ── approval: only the admin's own action (button or a short typed "yes")
+  // approves a draft, and an approved draft is sent here in code — the model
+  // never decides on its own that a group text goes out.
   if (mode === 'chat') {
     const pending = state.drafts.filter((d) => d.status === 'pending');
     const lastUser = [...parsed.history].reverse().find((m) => m.role === 'user')?.content ?? '';
@@ -135,9 +180,18 @@ export async function POST(req: NextRequest) {
       : pending.length === 1 && AFFIRMATIVE.test(lastUser)
         ? pending[0]
         : undefined;
+    if (parsed.approveDraftId && !target) {
+      return finish('That draft is no longer waiting for approval. Ask me to draft it again if you still want to send it.');
+    }
     if (target) {
       target.status = 'approved';
-      approvedNow = target.id;
+      const out = await runTool(ctx, 'send_group_text', { draft_id: target.id });
+      trace.push(`send_group_text({"draft_id":"${target.id}"}) -> ${out.isError ? 'ERROR ' : ''}${out.content.slice(0, 160)}`);
+      if (out.isError) {
+        target.status = 'pending';
+        return finish(`I couldn't send that draft: ${out.content}`);
+      }
+      return finish(sentConfirmation(JSON.parse(out.content), target.purpose));
     }
   }
 
@@ -161,7 +215,7 @@ export async function POST(req: NextRequest) {
   if (!apiKey) {
     if (mode === 'inbound' && parsed.inbound) {
       await fallbackInboundReply(ctx, parsed.inbound);
-      return NextResponse.json({ reply: '', state, newDraftIds: [], sent: ctx.sent, focusEventId: ctx.focusEventId });
+      return finish('');
     }
     return NextResponse.json({ error: 'The agent isn’t configured yet (ANTHROPIC_API_KEY is missing).' }, { status: 503 });
   }
@@ -170,12 +224,10 @@ export async function POST(req: NextRequest) {
   const tools = mode === 'inbound' ? TOOLS.filter((t) => INBOUND_TOOL_NAMES.has(t.name)) : TOOLS;
   const system: Anthropic.TextBlockParam[] = [
     { type: 'text', text: SYSTEM_RULES, cache_control: { type: 'ephemeral' } },
-    { type: 'text', text: dynamicContext(state, approvedNow) },
+    { type: 'text', text: dynamicContext(state, parsed.focusEventId ?? parsed.inbound?.eventId) },
   ];
 
   let reply = '';
-  // Tool names and outcomes only (no model text), so the demo can be debugged from the browser.
-  const trace: string[] = [];
   try {
     for (let round = 0; round < MAX_TOOL_ROUNDS; round++) {
       const response = await client.messages.create({
@@ -225,31 +277,5 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'The agent is unavailable for a moment. Try again.' }, { status });
   }
 
-  // ── optional live test text: one message, allow-listed numbers only ──
-  let live: { sent: number; failed: number } | null = null;
-  if (mode === 'chat' && parsed.liveText && ctx.sent.length && liveTextAvailable()) {
-    if (takeToken(`live:${sid}`, LIMITS.liveText.max, LIMITS.liveText.windowMs).ok) {
-      const first = state.messages.find((m) => m.id === ctx.sent[0].messageId);
-      if (first) {
-        live = await sendLiveTestText(first.body);
-        if (live.sent) first.live = true;
-      }
-    } else {
-      live = { sent: 0, failed: 0 };
-    }
-  }
-
-  // Keep the state the browser stores bounded.
-  if (state.messages.length > 1200) state.messages.splice(0, state.messages.length - 1200);
-
-  return NextResponse.json({
-    reply: reply || 'Done.',
-    state,
-    newDraftIds: ctx.newDraftIds,
-    approvedDraftId: approvedNow,
-    sent: ctx.sent,
-    focusEventId: ctx.focusEventId,
-    live,
-    trace,
-  });
+  return finish(reply);
 }
